@@ -27,6 +27,10 @@ async function createRoom() {
     subscribeToRoom(data.id);
     showRoomUI();
     updatePhaseButton(data.phase);
+
+    // 初始化技能队列（如果队列模块已加载）
+    if (typeof initNightQueue === 'function') initNightQueue(data.phase);
+    if (typeof subscribeSkillActions === 'function') subscribeSkillActions(data.id);
 }
 
 // 生成 6 位房间码（大写字母 + 数字，排除易混淆字符）
@@ -83,6 +87,10 @@ async function restoreRoom() {
     restoreBoard();
     renderRoundTable();
     updateEvilToolbarButton(); // 恢复后检查是否有邪恶玩家
+
+    // 初始化技能队列（如果队列模块已加载）
+    if (typeof initNightQueue === 'function') initNightQueue(data.phase);
+    if (typeof subscribeSkillActions === 'function') subscribeSkillActions(data.id);
 }
 
 // 显示房间 UI（创建/恢复房间后）
@@ -370,6 +378,14 @@ async function executePhaseSwitch() {
     updatePhaseButton(newPhase);
     updateRoundTablePhase(newPhase);
     hidePhaseConfirm();
+
+    // 首夜结束时初始化技能状态
+    if (newPhase === '第一天' && typeof initSkillStates === 'function') {
+        initSkillStates();
+    }
+
+    // 阶段切换后刷新技能队列
+    if (typeof initNightQueue === 'function') initNightQueue(newPhase);
 }
 
 async function togglePhase() {

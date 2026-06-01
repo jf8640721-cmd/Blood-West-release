@@ -1755,3 +1755,237 @@ body::after {
     flex: 1;
     overflow: hidden;
 }
+
+/* ============================================================
+   夜间行动队列面板
+   ============================================================ */
+.night-queue-panel {
+    margin: 0 16px;
+    background: linear-gradient(135deg, #0d0d1a, #111128);
+    border: 1px solid #2a2a50;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.queue-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, #1a1030, #0d0d1a);
+    border-bottom: 1px solid #2a2a50;
+}
+
+.queue-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #c8b0e0;
+    white-space: nowrap;
+}
+
+.queue-progress {
+    flex: 1;
+    font-size: 12px;
+    color: #8a7a9a;
+    white-space: nowrap;
+}
+
+.queue-list {
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.queue-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.queue-list::-webkit-scrollbar-thumb {
+    background: #2a2a50;
+    border-radius: 2px;
+}
+
+.queue-empty {
+    text-align: center;
+    color: #5a506a;
+    padding: 20px;
+    font-size: 13px;
+}
+
+/* 队列行 */
+.queue-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #12122a;
+    transition: background 0.2s;
+}
+
+.queue-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.queue-row.queue-done {
+    opacity: 0.5;
+}
+
+.queue-order {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a3a;
+    border-radius: 50%;
+    font-size: 11px;
+    color: #8a7aaa;
+    flex-shrink: 0;
+}
+
+.queue-type-icon {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.queue-player-name {
+    min-width: 50px;
+    font-weight: 600;
+    color: #d0d0e0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.queue-role-name {
+    min-width: 70px;
+    color: #c8b060;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.queue-action-desc {
+    flex: 1;
+    color: #8a8aaa;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* 状态指示器 */
+.queue-status {
+    min-width: 80px;
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-pending { color: #6a6a8a; }
+.status-submitted { color: #4ac; }
+.status-processing { color: #f9a825; }
+.status-completed { color: #4caf50; }
+.status-skipped { color: #5a506a; }
+.status-awaiting { color: #ff9800; animation: pulse-await 1.5s ease-in-out infinite; }
+.status-auto { color: #4a5a6a; font-style: italic; }
+
+@keyframes pulse-await {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 队列操作按钮 */
+.queue-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.queue-buttons .btn-xs {
+    padding: 2px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    border: 1px solid;
+    cursor: pointer;
+    background: transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.btn-queue-process {
+    color: #4caf50;
+    border-color: #2e5a2e;
+}
+.btn-queue-process:hover {
+    background: #1a3a1a;
+    color: #6dff6d;
+}
+
+.btn-queue-skip {
+    color: #6a6a8a;
+    border-color: #2a2a3a;
+}
+.btn-queue-skip:hover {
+    background: #1a1a2a;
+    color: #9a9aba;
+}
+
+.btn-queue-manual {
+    color: #f9a825;
+    border-color: #5a4a1a;
+}
+.btn-queue-manual:hover {
+    background: #3a2a0a;
+    color: #ffc107;
+}
+
+.btn-queue-prompt {
+    color: #ff9800;
+    border-color: #5a3a1a;
+}
+.btn-queue-prompt:hover {
+    background: #3a1a0a;
+    color: #ffb74d;
+}
+
+.btn-queue-confirm {
+    color: #8a7aaa;
+    border-color: #2a2a4a;
+}
+.btn-queue-confirm:hover {
+    background: #1a1a3a;
+    color: #b0a0d0;
+}
+
+.btn-queue-undo {
+    color: #e57373;
+    border-color: #4a1a1a;
+}
+.btn-queue-undo:hover {
+    background: #3a1a1a;
+    color: #ef9a9a;
+}
+
+/* 触发行高亮 */
+.queue-row.queue-triggered {
+    border-left: 3px solid #ff9800;
+    background: rgba(255, 152, 0, 0.05);
+}
+
+/* 主动行 */
+.queue-row.queue-active {
+    border-left: 3px solid #4ac;
+}
+
+/* 被动行 */
+.queue-row.queue-passive {
+    border-left: 3px solid #3a3a5a;
+    opacity: 0.8;
+}

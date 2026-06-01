@@ -1,5 +1,41 @@
 # 版本日志
 
+## v1.8.0 (2026-06-01)
+
+### 技能发动收集系统 — Phase 2 基础架构
+
+#### 数据库（需在 Supabase SQL Editor 执行）
+- **`skill_actions` 表**：技能行动记录，统一处理玩家主动发动(`player_initiated`) + 主持人反向询问(`host_prompted`)
+  - 状态流转：`submitted`→`processing`→`completed` / `awaiting_response`→`responded` / `skipped`
+- **`skill_states` 表**：技能状态追踪（全局一次/连续目标/晕眩/待回应标记），按 `(room_id, player_id)` 唯一约束
+- **`game_state` 表**：灵活游戏状态 JSONB 存储
+- **`players.is_dizzy`**：玩家晕眩状态标记
+
+#### 小程序数据层
+- **`utils/roles.js` 扩展**：84角色全部新增字段 — `abilityType`(56主动/5触发/12被动/11全局一次)、`nightOrder`(58个)、`firstNightOrder`(32个)、`needsChoice`、`isDizzyable`
+- **`utils/api.js` 新增8个函数**：`submitSkillAction`、`respondSkillPrompt`、`getPlayerSkillState`、`getPendingSkillPrompts`、`getRoomSkillActions`、`updatePlayerDizzy`、`updateSkillState`、`createSkillState`
+
+#### Web 端夜间行动队列面板
+- **`admin/js/queue.js`**（新文件，759行）：队列核心模块
+  - `generateNightQueue()` — 按 nightOrder/firstNightOrder 有序生成队列，首夜信息位优先
+  - 三种行类型：🎯主动(player_initiated)、⚡触发(host_prompted)、—被动(passive_auto)
+  - `detectAndInsertTriggers()` — 触发检测引擎（恶魔杀人→检测目标角色是否triggered→自动插入触发行）
+  - `sendHostPrompt()` — 主持人反向询问（创建skill_actions+发送系统消息+标记pending_prompt）
+  - `subscribeSkillActions()` — Realtime 监听玩家提交/回应，实时刷新队列状态
+  - 操作按钮：处理/跳过/手动处理/发消息询问/确认/撤销
+- **`admin/index.html`**：工具栏下方新增队列面板（夜晚阶段显示），含折叠/进度指示
+- **`admin/style.css`**：队列面板完整样式（三种行类型左边框颜色区分、状态动画、操作按钮）
+- **`admin/js/room.js`**：createRoom/restoreRoom/executePhaseSwitch 接入队列初始化 + 首夜结束时初始化技能状态
+
+### 变更文件
+- `supabase/schema.sql` — 新增3表 + 1列 + RLS + Realtime
+- `miniprogram/utils/roles.js` — 84角色扩展新字段
+- `miniprogram/utils/api.js` — 新增8个技能API函数
+- `admin/js/queue.js` — 新建，夜间行动队列核心模块
+- `admin/js/room.js` — 接入队列钩子（3处）
+- `admin/index.html` — 队列面板HTML + 脚本引用
+- `admin/style.css` — 队列面板样式（~200行）
+
 ## v1.7.1 (2026-06-01)
 
 ### 项目
