@@ -1890,6 +1890,15 @@ body::after {
 }
 
 /* 已处理备注（位于状态标识左侧） */
+/* 目标高亮（位于技能名右侧） */
+.queue-target {
+    color: #4dc9f6;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 .queue-resolution {
     background: rgba(201, 168, 76, 0.12);
     color: #e8d070;

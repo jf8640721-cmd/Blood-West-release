@@ -232,24 +232,31 @@ function renderQueueRow(item, index) {
         statusClass = 'status-awaiting';
     }
 
-    // 行动描述
+    // 行动描述 + 目标 + 备注（三者紧贴）
     var actionDesc = getSkillShortName(r);
-    if (item.targetPlayerId) {
+    var targetHtml = '';
+    var noteHtml = '';
+
+    // 目标：优先显示手动输入的原始文本 → 高亮
+    var targetText = item.targetRaw || '';
+    if (!targetText && item.targetPlayerId) {
         var targetPlayer = state.players.find(function(pl) { return pl.id === item.targetPlayerId; });
         if (targetPlayer) {
-            actionDesc += ' → ' + targetPlayer.player_number + '号';
+            targetText = targetPlayer.player_number + '号';
         }
     }
+    if (targetText) {
+        targetHtml = ' <span class="queue-target">→ ' + escapeHtml(targetText) + '</span>';
+    }
 
-    // 已处理项的备注（手动处理时填写的备注）
-    var resolutionHtml = '';
+    // 备注：紧贴目标右侧
     if (item.status === 'completed' || item.status === 'skipped') {
         var resolution = item.resolution || '';
         if (!resolution && item.actionId && state.queueActions[item.actionId]) {
             resolution = state.queueActions[item.actionId].resolution || '';
         }
         if (resolution) {
-            resolutionHtml = '<span class="queue-resolution" title="' + escapeHtml(resolution) + '">' + escapeHtml(resolution.substring(0, 15)) + '</span>';
+            noteHtml = ' <span class="queue-resolution" title="' + escapeHtml(resolution) + '">' + escapeHtml(resolution) + '</span>';
         }
     }
 
@@ -264,8 +271,7 @@ function renderQueueRow(item, index) {
         '<span class="queue-type-icon">' + typeIcon + '</span>' +
         '<span class="queue-player-name">' + escapeHtml(p.nickname || '玩家') + '</span>' +
         '<span class="queue-role-name">' + r.name + '</span>' +
-        '<span class="queue-action-desc" title="' + escapeHtml(r.ability || '') + '">' + escapeHtml(actionDesc) + '</span>' +
-        resolutionHtml +
+        '<span class="queue-action-desc" title="' + escapeHtml(r.ability || '') + '">' + escapeHtml(actionDesc) + targetHtml + noteHtml + '</span>' +
         '<span class="queue-status ' + statusClass + '">' + statusText + '</span>' +
         '<span class="queue-buttons">' + actionButtons + '</span>' +
         '</div>';
@@ -451,11 +457,16 @@ async function skipQueueItem(item) {
 // 手动处理（玩家口头告知）
 // ============================================================
 async function manualProcessItem(item) {
-    var targetNum = prompt('请输入目标玩家号码（留空表示无目标）：');
-    if (targetNum) {
-        var targetPlayer = state.players.find(function(p) { return p.player_number === parseInt(targetNum); });
-        if (targetPlayer) {
-            item.targetPlayerId = targetPlayer.id;
+    var targetInput = prompt('请输入目标（如：3、3和4、5号，留空表示无目标）：');
+    if (targetInput) {
+        item.targetRaw = targetInput.trim();
+        // 尝试解析纯数字作为玩家号码匹配
+        var num = parseInt(targetInput);
+        if (!isNaN(num) && String(num) === targetInput.trim()) {
+            var targetPlayer = state.players.find(function(p) { return p.player_number === num; });
+            if (targetPlayer) {
+                item.targetPlayerId = targetPlayer.id;
+            }
         }
     }
     var note = prompt('处理备注（可选）：');
