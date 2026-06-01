@@ -498,12 +498,12 @@ var ROLES = [
   },
   {
     id: "kongque_gongzhu", name: "孔雀公主", category: "outsider",
-    ability: "授道：每晚向一名玩家发出风火雷电任一元素，若他选择相同元素则加入你的教派，恶魔除外。四个教徒入教后你们单独获胜",
-    abilityType: "active", nightOrder: null, firstNightOrder: null,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    ability: "恶魔代言人：异乡人+6/玩家数，本场无邪恶角色，说书人是恶魔，你是他队友。第五个白天结束未处决说书人，善良阵营落败",
+    abilityType: "passive", nightOrder: null, firstNightOrder: null,
+    needsChoice: false, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
-    description: "孔雀公主以风火雷电四种元素招收教徒入教，集齐四人则独立获胜。恶魔不可被教化。",
-    tips: "主持需告知被选中玩家元素类型并询问其选择；记录教徒数量；4人即独立获胜"
+    description: "孔雀公主改变游戏规则——本局无邪恶角色，说书人成为隐藏恶魔，若第五天仍未处决说书人则善良失败。",
+    tips: "全场无邪恶角色（除孔雀公主）；说书人是隐藏恶魔；第五天是deadline"
   },
   {
     id: "qing_she", name: "青蛇", category: "outsider",
@@ -584,12 +584,12 @@ var ROLES = [
   },
   {
     id: "qingshi_jing", name: "青狮精", category: "minion",
-    ability: "恶魔代言人：异乡人+6/玩家数，本场无邪恶角色，说书人是恶魔，你是他队友。第五个白天结束未处决说书人，善良阵营落败",
+    ability: "睚眦：提名过你的善良玩家将在隔夜死亡；负隅：若在处决前公开身份，将获得一次死亡豁免",
     abilityType: "passive", nightOrder: 5, firstNightOrder: 4,
     needsChoice: false, isDizzyable: true, deathImmune: false,
-    inheritsDemon: false, teamSynergy: null,
-    description: "青狮精改变游戏规则——本局无邪恶角色，说书人成为隐藏恶魔，若第五天仍未处决说书人则善良失败。",
-    tips: "全场无邪恶角色（除青狮精）；说书人是隐藏恶魔；第五天是deadline"
+    inheritsDemon: true, teamSynergy: null,
+    description: "青狮精的报复——提名过他的善良玩家隔夜必死。公开身份可获得一次死亡豁免。",
+    tips: "记录所有提名过青狮精的善良玩家；隔夜自动死亡；公开身份=一次免死"
   },
   {
     id: "jinjiao_dawang", name: "金角大王", category: "minion",
@@ -639,12 +639,12 @@ var ROLES = [
   },
   {
     id: "liyu_jing", name: "鲤鱼精", category: "minion",
-    ability: "睚眦：提名过你的善良玩家将在隔夜死亡；负隅：若在处决前公开身份，将获得一次死亡豁免",
-    abilityType: "passive", nightOrder: 5, firstNightOrder: 4,
-    needsChoice: false, isDizzyable: true, deathImmune: false,
+    ability: "莲台泡影：当你获得说书人给予的衣服时，确认选择一件，可幻化做该角色并获得对应技能",
+    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
-    description: "鲤鱼精的报复——提名过他的善良玩家隔夜必死。公开身份可获得一次死亡豁免。",
-    tips: "记录所有提名过鲤鱼精的善良玩家；隔夜自动死亡；公开身份=一次免死"
+    description: "鲤鱼精可变身为其他角色并获得其技能，是最灵活的爪牙。",
+    tips: "从说书人提供的角色中选择一件'衣服'（幻化目标），获得该角色技能"
   },
   {
     id: "daji", name: "妲己", category: "minion",
@@ -719,12 +719,12 @@ var ROLES = [
   },
   {
     id: "jinchi_dapeng", name: "金翅大鹏", category: "demon",
-    ability: "莲台泡影：当你获得说书人给予的衣服时，确认选择一件，可幻化做该角色并获得对应技能",
+    ability: "业报：每晚选择一名玩家猎食；涅槃：首次死亡进入假死状态，第3夜最近的善良玩家感到灼热；上清仙光：每晚选择一名玩家杀死，并可指定其收到的死亡信息；混元真气：每晚发动，被查验时，邪恶阵营被视作善良角色。不可连续发动",
     abilityType: "active", nightOrder: 11, firstNightOrder: 5,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, isDizzyable: true, deathImmune: true,
     inheritsDemon: false, teamSynergy: null,
-    description: "金翅大鹏可变身为其他角色并获得其技能，是最灵活的恶魔。",
-    tips: "从说书人提供的角色中选择一件'衣服'（幻化目标），获得该角色技能"
+    description: "金翅大鹏每晚杀两人（业报+上清仙光），首次死亡假死，可混淆查验结果。",
+    tips: "业报+上清仙光每晚各杀一人；假死状态持续；混元真气不可连续发动"
   },
   {
     id: "diyong_furen", name: "地涌夫人", category: "demon",
@@ -766,12 +766,12 @@ var ROLES = [
   },
   {
     id: "tongtian_jiaozhu", name: "通天教主", category: "demon",
-    ability: "业报：每晚选择一名玩家猎食；涅槃：首次死亡进入假死状态，第3夜最近的善良玩家感到灼热；上清仙光：每晚选择一名玩家杀死，并可指定其收到的死亡信息；混元真气：每晚发动，被查验时，邪恶阵营被视作善良角色。不可连续发动",
+    ability: "上清仙光：每晚选择一名玩家杀死，并可指定其收到的死亡信息；混元真气：每晚发动，被查验时，邪恶阵营被视作善良角色。不可连续发动",
     abilityType: "active", nightOrder: 11, firstNightOrder: 5,
-    needsChoice: true, isDizzyable: true, deathImmune: true,
+    needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: "三清现世",
-    description: "通天教主每晚杀两人（业报+上清仙光），首次死亡假死，可混淆查验结果。三清同时在场时获得一次死亡免疫。",
-    tips: "业报+上清仙光每晚各杀一人；假死状态持续；混元真气不可连续发动；三清羁绊=一次免死"
+    description: "通天教主每晚以上清仙光杀人并指定死亡信息，混元真气可混淆查验结果。三清同时在场时获得一次死亡免疫。",
+    tips: "上清仙光每晚杀一人+自定义死亡信息；混元真气不可连续发动；三清羁绊=一次免死"
   },
   {
     id: "zhou_wang", name: "纣王", category: "demon",

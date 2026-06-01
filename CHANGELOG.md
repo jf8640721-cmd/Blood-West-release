@@ -1,5 +1,21 @@
 # 版本日志
 
+## v1.8.1 (2026-06-01)
+
+### 角色技能数据修正 — 5角色技能轮转
+
+根据最新版角色说明书同步：
+- **孔雀公主** (外来者)：授道(招募教徒) → 恶魔代言人(原青狮精技能)，abilityType: active→passive
+- **青狮精** (爪牙)：恶魔代言人 → 睚眦+负隅(原鲤鱼精技能)，inheritsDemon: false→true
+- **鲤鱼精** (爪牙)：睚眦+负隅 → 莲台泡影(原金翅大鹏技能)，abilityType: passive→active
+- **金翅大鹏** (恶魔)：莲台泡影 → 业报+涅槃+上清仙光+混元真气(原通天教主技能)，deathImmune: false→true
+- **通天教主** (恶魔)：移除业报+涅槃，仅保留上清仙光+混元真气，deathImmune: true→false
+
+### 变更文件
+- `docs/西游纪角色说明书.txt` — 用户手动编辑（备份：docs/西游纪角色说明书_备份_20260601.txt）
+- `admin/data/roles.js` — 5角色ability/abilityType/needsChoice/deathImmune/inheritsDemon/description/tips
+- `miniprogram/utils/roles.js` — 孔雀公主+鲤鱼精 abilityType/needsChoice 同步
+
 ## v1.8.0 (2026-06-01)
 
 ### 技能发动收集系统 — Phase 2 基础架构
