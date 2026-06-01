@@ -20,7 +20,7 @@ function computeSeatPosition(angle) {
     const rectHalfH = surfH / 2 - endR; // 矩形段半高
 
     // 座位路径 = 表面外扩 gap px
-    const gap = 32;
+    const gap = 24;
     const seatR = endR + gap;           // 两端半圆外扩
     const seatHalfH = rectHalfH + gap;  // 矩形段外扩
 

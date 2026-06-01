@@ -844,10 +844,10 @@ body::after {
 /* 长桌容器（竖形，模拟血染钟楼长桌） */
 #round-table {
     position: relative;
-    width: min(34vw, 42vh);
-    height: min(68vw, 80vh);
-    min-width: 200px;
-    min-height: 400px;
+    width: min(30vw, 36vh);
+    height: min(58vw, 68vh);
+    min-width: 180px;
+    min-height: 340px;
 }
 
 /* 桌面 - 长桌木纹 */
@@ -1760,7 +1760,7 @@ body::after {
    夜间行动队列面板
    ============================================================ */
 .night-queue-panel {
-    margin: 0 16px;
+    margin: 0 16px 10px;
     background: linear-gradient(135deg, #0d0d1a, #111128);
     border: 1px solid #2a2a50;
     border-radius: 8px;
