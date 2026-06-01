@@ -1830,7 +1830,17 @@ body::after {
 }
 
 .queue-row.queue-done {
-    opacity: 0.5;
+    opacity: 0.78;
+    background: rgba(76, 175, 80, 0.06);
+    border-left: 3px solid #4caf50;
+}
+.queue-row.queue-done.queue-triggered {
+    border-left: 3px solid #ff9800;
+    background: rgba(255, 152, 0, 0.06);
+}
+.queue-row.queue-done.queue-passive {
+    border-left: 3px solid #607d8b;
+    background: rgba(96, 125, 139, 0.05);
 }
 
 .queue-order {
@@ -1881,15 +1891,19 @@ body::after {
 
 /* 已处理备注（位于状态标识左侧） */
 .queue-resolution {
-    color: #b0b0d0;
+    background: rgba(201, 168, 76, 0.12);
+    color: #e8d070;
     font-size: 11px;
-    font-style: italic;
+    font-style: normal;
     max-width: 120px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     flex-shrink: 0;
     margin-right: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(201, 168, 76, 0.2);
 }
 
 /* 状态指示器 */

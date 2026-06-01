@@ -233,7 +233,7 @@ function renderQueueRow(item, index) {
     }
 
     // 行动描述
-    var actionDesc = r.name + ' · ' + (r.ability || '').substring(0, 20);
+    var actionDesc = getSkillShortName(r);
     if (item.targetPlayerId) {
         var targetPlayer = state.players.find(function(pl) { return pl.id === item.targetPlayerId; });
         if (targetPlayer) {
