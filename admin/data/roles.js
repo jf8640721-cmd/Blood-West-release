@@ -21,7 +21,7 @@ var ROLES = [
   {
     id: "sun_wukong", name: "孙悟空", category: "townsfolk",
     ability: "金箍棒：每晚挥动金箍棒攻击一名玩家，其今夜晕眩，不可连续攻击同一玩家（若打到唐僧孙悟空死亡）",
-    abilityType: "active", nightOrder: 3, firstNightOrder: null,
+    abilityType: "active", nightOrder: 3, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: "师徒四人",
     description: "齐天大圣的金箍棒能令目标晕眩，但需注意不可连续攻击同一目标，且千万不能误伤唐僧。",
@@ -67,7 +67,7 @@ var ROLES = [
   {
     id: "change", name: "嫦娥", category: "townsfolk",
     ability: "奔月：每晚飞向月宫，免疫当日的死亡技能。不可连续奔月；月神：全局一次，嫦娥奔月时可携带一名玩家",
-    abilityType: "active", nightOrder: 4, firstNightOrder: null,
+    abilityType: "active", nightOrder: 4, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "嫦娥每晚可奔月免疫死亡技能，但不能连续使用。每局有一次机会携带一名同伴一起登月。",
@@ -104,7 +104,7 @@ var ROLES = [
     id: "taishang_laojun", name: "太上老君", category: "townsfolk",
     ability: "炼丹炉：每晚开炉炼丹，次晚随机炼成仙丹或毒丹可对他人使用，仙丹复活，毒丹晕眩（外来者+1）",
     outsiderModifier: 1,
-    abilityType: "active", nightOrder: 6, firstNightOrder: null,
+    abilityType: "active", nightOrder: 6, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: "三清现世",
     description: "太上老君每晚炼药，次晚可使用——仙丹可复活死者，毒丹使目标晕眩。三清同时在场时获得一次死亡免疫。",
@@ -113,7 +113,7 @@ var ROLES = [
   {
     id: "erlang_shen", name: "二郎神", category: "townsfolk",
     ability: "天眼：每晚睁开第三只眼，可选择两名玩家，得知其中是否有恶魔，一名善良玩家是你的宿敌，会被误判为恶魔",
-    abilityType: "active", nightOrder: 23, firstNightOrder: null,
+    abilityType: "active", nightOrder: 23, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "二郎神的天眼可查验两名玩家中是否包含恶魔，但有一名善良宿敌会干扰结果被误判为恶魔。",
@@ -133,7 +133,7 @@ var ROLES = [
     id: "puti_zushi", name: "菩提祖师", category: "townsfolk",
     ability: "归元：全局一次，重置一名玩家的技能到初始状态；化墟：全局一次，可使一名死亡玩家使用一次技能（外来者+1）",
     outsiderModifier: 1,
-    abilityType: "active", nightOrder: 14, firstNightOrder: null,
+    abilityType: "active", nightOrder: 14, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "菩提祖师拥有两项强大的全局一次能力：归元可重置技能，化墟可让死者再次行动。",
@@ -142,7 +142,7 @@ var ROLES = [
   {
     id: "tuota_tianwang", name: "托塔天王", category: "townsfolk",
     ability: "雷峰塔：每晚可将一名玩家收入雷峰塔，其不会受到当夜发起的死亡技能，雷峰塔不能连续收入同一名玩家",
-    abilityType: "active", nightOrder: 10, firstNightOrder: null,
+    abilityType: "active", nightOrder: 10, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "托塔天王每夜可庇护一名玩家免于死亡技能，但不能连续保护同一人。",
@@ -160,7 +160,7 @@ var ROLES = [
   {
     id: "wangmu_niangniang", name: "王母娘娘", category: "townsfolk",
     ability: "天后：每晚传唤两名善良角色，得知传唤成功的人数",
-    abilityType: "active", nightOrder: 21, firstNightOrder: null,
+    abilityType: "active", nightOrder: 21, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "王母娘娘每夜选择两名玩家传唤，得知其中有多少善良角色响应了传唤。",
@@ -188,7 +188,7 @@ var ROLES = [
     id: "guangmu_tianwang", name: "广目天王", category: "townsfolk",
     ability: "看破：每晚可查看一名死者的真实角色（外来者-1）",
     outsiderModifier: -1,
-    abilityType: "active", nightOrder: 16, firstNightOrder: null,
+    abilityType: "active", nightOrder: 16, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "广目天王每夜可查验一名死者的真实身份，外来者因此减少一人。",
@@ -234,7 +234,7 @@ var ROLES = [
   {
     id: "pilanpo", name: "毗蓝婆", category: "townsfolk",
     ability: "洞察：首夜得知全场异常人数，每晚选择两名玩家进行查验",
-    abilityType: "active", nightOrder: 25, firstNightOrder: 7,
+    abilityType: "active", nightOrder: 25, firstNightOrder: 7, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "毗蓝婆首夜获知全场异常（邪恶+外来者+独立）人数，之后每晚可查验两名玩家。",
@@ -252,7 +252,7 @@ var ROLES = [
   {
     id: "donghua_dijun", name: "东华帝君", category: "townsfolk",
     ability: "天帝律令：每双数夜晚选择一个号码，若其为村民则死亡，今夜不会再有其他死者",
-    abilityType: "active", nightOrder: 8, firstNightOrder: null,
+    abilityType: "active", nightOrder: 8, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "东华帝君在双数夜晚执行天帝律令——选择号码，若是村民则死亡，且该夜无其他死者。",
@@ -270,7 +270,7 @@ var ROLES = [
   {
     id: "randeng_gufo", name: "燃灯古佛", category: "townsfolk",
     ability: "过去未来：全局一次，在死去玩家的尸体上点燃琉璃灯，你死去时，其于次日早晨复活，若你复活，灯火熄灭，其再次死亡",
-    abilityType: "once_per_game", nightOrder: 18, firstNightOrder: null,
+    abilityType: "once_per_game", nightOrder: 18, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "燃灯古佛以自身生命为代价点燃琉璃灯，死后可复活被点灯的玩家。若燃灯复活则灯灭人亡。",
@@ -297,7 +297,7 @@ var ROLES = [
   {
     id: "guanyin_pusa", name: "观音菩萨", category: "townsfolk",
     ability: "玉净瓶：每晚选择一名玩家播撒杨枝甘露，当夜免疫异常，如撒到爪牙其当夜晕眩，不可连续播撒同一人",
-    abilityType: "active", nightOrder: 1, firstNightOrder: null,
+    abilityType: "active", nightOrder: 1, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "观音菩萨的杨枝甘露可庇护善良玩家免疫异常，但若选中爪牙则使其晕眩。不可连续庇护同一人。",
@@ -333,7 +333,7 @@ var ROLES = [
   {
     id: "dizang_pusa", name: "地藏菩萨", category: "townsfolk",
     ability: "彼岸花：全局一次，白天在死去玩家上种植彼岸花，当夜获得其技能。若该玩家复活，彼岸花凋谢，技能失效",
-    abilityType: "once_per_game", nightOrder: 15, firstNightOrder: null,
+    abilityType: "once_per_game", nightOrder: 15, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "地藏菩萨种下彼岸花后获得死者技能，但若该玩家复活则失去。",
@@ -351,7 +351,7 @@ var ROLES = [
   {
     id: "wenshu_pusa", name: "文殊菩萨", category: "townsfolk",
     ability: "穿魂：每晚向一名玩家吟诵梵音，若其为恶魔，你与他交换身份及阵营，并将其晕眩二个夜晚后才得知此信息",
-    abilityType: "active", nightOrder: 7, firstNightOrder: null,
+    abilityType: "active", nightOrder: 7, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "文殊菩萨每晚对一名玩家吟诵梵音，若选中恶魔则交换身份阵营，对方被晕眩两晚后才知情。",
@@ -360,7 +360,7 @@ var ROLES = [
   {
     id: "maori_xingguan", name: "昴日星官", category: "townsfolk",
     ability: "极昼：每晚引导日轮照亮亡者之路，得知昨日被处决玩家的两侧是否有邪恶角色",
-    abilityType: "active", nightOrder: 38, firstNightOrder: null,
+    abilityType: "active", nightOrder: 38, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: false, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "昴日星官每夜查验昨日处决玩家两侧座位是否有邪恶角色。",
@@ -387,7 +387,7 @@ var ROLES = [
   {
     id: "jiang_ziya", name: "姜子牙", category: "townsfolk",
     ability: "封神：全局一次，在夜晚对一名玩家发动技能，若其为白板角色随机转变为同阵营的不在场角色；打神鞭：全局一次，在夜晚对一名玩家发动技能，若其为爪牙则永久失去技能",
-    abilityType: "once_per_game", nightOrder: 26, firstNightOrder: null,
+    abilityType: "once_per_game", nightOrder: 26, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "姜子牙手握封神榜和打神鞭——封神可将白板转变为同阵营不在场角色，打神鞭可永久废掉爪牙技能。两项能力各独立使用。",
@@ -414,7 +414,7 @@ var ROLES = [
   {
     id: "fa_hai", name: "法海", category: "townsfolk",
     ability: "大威天龙：全局一次，召唤天龙攻击一名玩家，若其为恶魔则直接死亡；大罗法咒：全局一次，向一名玩家吟诵法咒，若其为爪牙则直接死亡。两个技能仅择一使用，发动时需公开宣布，若选择目标为明牌状态则技能发动无效",
-    abilityType: "once_per_game", nightOrder: 27, firstNightOrder: null,
+    abilityType: "once_per_game", nightOrder: 27, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "法海拥有大威天龙（杀恶魔）和大罗法咒（杀爪牙），二选一使用。必须公开宣布发动，对明牌角色无效。",
@@ -423,7 +423,7 @@ var ROLES = [
   {
     id: "ning_caichen", name: "宁采臣", category: "townsfolk",
     ability: "笔墨：全局一次，在白天选择两名玩家，当夜他们的号码将被交换；丹青：全局一次，在夜晚选择两名玩家，白天他们的号码将被交换",
-    abilityType: "once_per_game", nightOrder: 28, firstNightOrder: null,
+    abilityType: "once_per_game", nightOrder: 28, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "宁采臣以笔墨丹青之术交换玩家号码——笔墨白天选人当夜交换，丹青夜晚选人白天交换。两项独立使用。",
@@ -508,7 +508,7 @@ var ROLES = [
   {
     id: "qing_she", name: "青蛇", category: "outsider",
     ability: "练气：每晚选择一名玩家施放技能，由于道行不够，单数夜晚随机善良阵营技能生效，双数夜晚随机邪恶阵营生效",
-    abilityType: "active", nightOrder: 30, firstNightOrder: null,
+    abilityType: "active", nightOrder: 30, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "青蛇道行尚浅，每晚对一名玩家施放随机技能——单数夜随机善良技能，双数夜随机邪恶技能，效果不可控。",
@@ -567,7 +567,7 @@ var ROLES = [
   {
     id: "huli_jing", name: "狐狸精", category: "minion",
     ability: "魅惑：首夜魅惑一名玩家，会被认作邪恶阵营；诱惑：每晚诱惑说书人透露一名角色的身份",
-    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "active", nightOrder: 5, firstNightOrder: 4, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "狐狸精首夜栽赃一名善良玩家使其被查验时显示邪恶，之后每晚可诱惑说书人泄露角色信息。",
@@ -595,7 +595,7 @@ var ROLES = [
     id: "jinjiao_dawang", name: "金角大王", category: "minion",
     ability: "金葫芦：首夜选择一名玩家，若发起提名，则会立即死亡；捆仙绳：每晚选择一名玩家，白天不会被处决，不可连续选择同一玩家（外来者-1）",
     outsiderModifier: -1,
-    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "active", nightOrder: 5, firstNightOrder: 4, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "金角大王有金葫芦（首夜标记即死提名陷阱）和捆仙绳（每夜庇护邪恶玩家免于处决）。",

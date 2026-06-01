@@ -42,6 +42,7 @@ function generateNightQueue(phase) {
             .sort(function(a, b) { return a.roleObj.firstNightOrder - b.roleObj.firstNightOrder; });
         var normal = inPlay
             .filter(function(e) { return e.roleObj.nightOrder != null; })
+            .filter(function(e) { return !e.roleObj.firstNightBlocked; })
             .sort(function(a, b) { return a.roleObj.nightOrder - b.roleObj.nightOrder; });
         queue = pre.concat(normal);
         // 去重（同一玩家可能同时在两个列表）
