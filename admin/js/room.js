@@ -202,6 +202,8 @@ function subscribeToRoom(roomId) {
             state.players.push(payload.new);
             state.players.sort((a, b) => a.player_number - b.player_number);
             renderRoundTable();
+            // 新玩家加入时刷新夜间队列（若是夜晚阶段）
+            if (typeof initNightQueue === 'function') initNightQueue();
         })
 
         // 监听玩家信息更新（昵称变更、座位交换等）
@@ -231,6 +233,8 @@ function subscribeToRoom(roomId) {
                     if (state.msgTab === 'evil') {
                         renderEvilMembers();
                     }
+                    // 角色变更时刷新夜间队列（若是夜晚阶段）
+                    if (typeof initNightQueue === 'function') initNightQueue();
                 }
             }
         })

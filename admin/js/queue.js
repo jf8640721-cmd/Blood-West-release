@@ -240,6 +240,18 @@ function renderQueueRow(item, index) {
         }
     }
 
+    // 已处理项的备注（手动处理时填写的备注）
+    var resolutionHtml = '';
+    if (item.status === 'completed' || item.status === 'skipped') {
+        var resolution = item.resolution || '';
+        if (!resolution && item.actionId && state.queueActions[item.actionId]) {
+            resolution = state.queueActions[item.actionId].resolution || '';
+        }
+        if (resolution) {
+            resolutionHtml = '<span class="queue-resolution" title="' + escapeHtml(resolution) + '">' + escapeHtml(resolution.substring(0, 15)) + '</span>';
+        }
+    }
+
     // 操作按钮
     actionButtons = renderQueueButtons(item);
 
@@ -249,9 +261,10 @@ function renderQueueRow(item, index) {
     return '<div class="' + rowClass + '" data-index="' + index + '" data-player-id="' + p.id + '">' +
         '<span class="queue-order">' + item.order + '</span>' +
         '<span class="queue-type-icon">' + typeIcon + '</span>' +
-        '<span class="queue-player-name">' + p.player_number + '号 ' + escapeHtml(p.nickname || '玩家') + '</span>' +
+        '<span class="queue-player-name">' + escapeHtml(p.nickname || '玩家') + '</span>' +
         '<span class="queue-role-name">' + r.name + '</span>' +
         '<span class="queue-action-desc" title="' + escapeHtml(r.ability || '') + '">' + escapeHtml(actionDesc) + '</span>' +
+        resolutionHtml +
         '<span class="queue-status ' + statusClass + '">' + statusText + '</span>' +
         '<span class="queue-buttons">' + actionButtons + '</span>' +
         '</div>';

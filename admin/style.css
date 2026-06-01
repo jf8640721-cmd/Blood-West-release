@@ -1879,6 +1879,19 @@ body::after {
     min-width: 0;
 }
 
+/* 已处理备注（位于状态标识左侧） */
+.queue-resolution {
+    color: #b0b0d0;
+    font-size: 11px;
+    font-style: italic;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+    margin-right: 6px;
+}
+
 /* 状态指示器 */
 .queue-status {
     min-width: 80px;
