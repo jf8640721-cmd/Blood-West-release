@@ -1,0 +1,1757 @@
+/* ============================================================
+   西游纪 Blood-West · 主持后台 — 暗黑西游主题样式
+   ============================================================ */
+
+/* ----- CSS 设计系统变量 ----- */
+:root {
+    /* 五级灰阶背景 */
+    --bg-deepest:   #07060e;
+    --bg-deep:      #0a0a12;
+    --bg-surface:   #0f0f1c;
+    --bg-elevated:  #151528;
+    --bg-card:      #1a1a30;
+
+    /* 强调色 */
+    --gold-primary: #c9a84c;
+    --gold-dim:     #b8963e;
+    --gold-dark:    #8b6914;
+    --gold-glow:    rgba(201, 168, 76, 0.4);
+
+    --blood-red:    #8b2500;
+    --blood-bright: #a83220;
+    --blood-glow:   rgba(139, 37, 0, 0.4);
+
+    --purple-deep:  #2a1040;
+    --purple-mid:   #3a2060;
+    --purple-glow:  rgba(60, 30, 90, 0.4);
+
+    --copper:       #b87333;
+
+    /* 文字色 */
+    --text-primary:   #e0d6c2;
+    --text-secondary: #a09080;
+    --text-muted:     #605050;
+    --text-gold:      #d4b860;
+
+    /* 边框色 */
+    --border-subtle: #1e1e36;
+    --border-mid:    #2a2040;
+    --border-gold:   #5a3e1a;
+
+    /* 阴影 */
+    --shadow-gold:    0 0 12px var(--gold-glow);
+    --shadow-gold-lg: 0 0 24px var(--gold-glow), 0 0 48px rgba(139, 105, 20, 0.2);
+    --shadow-red:     0 0 10px var(--blood-glow);
+    --shadow-purple:  0 0 14px var(--purple-glow);
+    --shadow-card:    0 4px 24px rgba(0, 0, 0, 0.5), 0 0 1px rgba(201, 168, 76, 0.15);
+    --shadow-inset:   inset 0 2px 8px rgba(0, 0, 0, 0.5);
+
+    /* 字体 */
+    --font-gothic: 'Georgia', 'STSong', 'SimSun', serif;
+    --font-body:   "Microsoft YaHei", "PingFang SC", sans-serif;
+    --font-mono:   "Courier New", "Consolas", monospace;
+
+    /* 圆角 */
+    --radius-sm:  4px;
+    --radius-md:  8px;
+    --radius-lg:  12px;
+    --radius-xl:  20px;
+    --radius-full: 50%;
+
+    /* 过渡 */
+    --transition-fast:   0.15s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow:   0.5s ease;
+
+    /* 角色类别颜色 */
+    --role-town:      #e0d6c2;
+    --role-town-bg:   rgba(224, 214, 194, 0.12);
+    --role-outsider:  #4a9e5a;
+    --role-outsider-bg: rgba(74, 158, 90, 0.15);
+    --role-minion:    #c9a030;
+    --role-minion-bg: rgba(201, 160, 48, 0.15);
+    --role-demon:     #a83220;
+    --role-demon-bg:  rgba(168, 50, 32, 0.15);
+}
+
+/* ----- 基础重置 ----- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-deepest);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 细微噪点纹理叠加 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+}
+
+/* ----- 按钮通用 ----- */
+.btn {
+    cursor: pointer;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-size: 14px;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+.btn:hover { opacity: 0.85; }
+.btn:active { transform: scale(0.97); }
+
+.btn-gold {
+    background: linear-gradient(180deg, #6a4a1e 0%, #4a2e0e 50%, #3a2008 100%);
+    color: #f0d68a;
+    border-color: var(--gold-dark);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.btn-gold:hover {
+    box-shadow: var(--shadow-gold-lg), 0 2px 4px rgba(0,0,0,0.5);
+    color: #ffe8a0;
+    opacity: 1;
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: transparent;
+    color: var(--gold-primary);
+    border-color: var(--gold-primary);
+}
+.btn-small:hover {
+    box-shadow: var(--shadow-gold);
+    background: rgba(201, 168, 76, 0.08);
+}
+
+.btn-exit {
+    padding: 6px 14px;
+    font-size: 12px;
+    background: transparent;
+    color: #c94c4c;
+    border-color: #5a2020;
+}
+.btn-exit:hover {
+    background: #3a1010;
+    box-shadow: var(--shadow-red);
+}
+
+/* 邪恶群聊工具栏按钮 */
+.btn-evil-toolbar {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 36px;
+    text-align: center;
+    border-radius: var(--radius-full);
+    background: linear-gradient(180deg, #2a1040 0%, #1a0828 50%, #0f0418 100%);
+    border: 1.5px solid #5a2080;
+    color: #e04060;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(192, 60, 80, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transition: all var(--transition-medium);
+    position: relative;
+    animation: demon-pulse 2.5s ease-in-out infinite;
+}
+
+.btn-evil-toolbar:hover {
+    border-color: #c04060;
+    box-shadow: 0 0 16px rgba(192, 60, 80, 0.5), 0 0 32px rgba(128, 30, 60, 0.25);
+    color: #ff5060;
+    transform: scale(1.08);
+}
+
+.btn-evil-toolbar:active {
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+}
+
+@keyframes demon-pulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(192, 60, 80, 0.25); }
+    50% { box-shadow: 0 0 14px rgba(192, 60, 80, 0.5), 0 0 28px rgba(128, 30, 60, 0.2); }
+}
+
+@keyframes demon-pulse-unread {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 60, 80, 0.4), 0 0 18px rgba(192, 40, 60, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(255, 60, 80, 0.8), 0 0 40px rgba(192, 40, 60, 0.5); }
+}
+
+/* 阶段切换按钮 */
+.btn-phase {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: var(--radius-md);
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.4;
+}
+.btn-phase .next-hint {
+    font-size: 10px;
+    font-weight: normal;
+    opacity: 0.6;
+}
+.btn-phase.night {
+    background: linear-gradient(135deg, #1a0a2e, #2d1545);
+    color: #b8a0d0;
+    border-color: #4a2a7a;
+    animation: phasePulseNight 3s infinite;
+}
+.btn-phase.day {
+    background: linear-gradient(135deg, #3e2a0a, #5a3e1a);
+    color: #f0d68a;
+    border-color: var(--gold-dark);
+    animation: phasePulseDay 3s infinite;
+}
+
+/* 阶段切换按钮组 */
+.phase-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 阶段前进/后退箭头按钮 */
+.btn-phase-arrow {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 28px;
+    text-align: center;
+    background: rgba(30, 30, 54, 0.6);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+.btn-phase-arrow:hover {
+    color: var(--gold-primary);
+    border-color: var(--gold-dark);
+    box-shadow: var(--shadow-gold);
+    background: rgba(201, 168, 76, 0.1);
+}
+
+/* 确认弹窗 */
+.modal-confirm {
+    max-width: 380px;
+    padding: 28px 32px 24px;
+}
+
+.confirm-text {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.confirm-text .phase-target {
+    color: var(--gold-primary);
+    font-weight: bold;
+    text-shadow: 0 0 8px var(--gold-glow);
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-actions .btn {
+    padding: 10px 24px;
+    font-size: 15px;
+}
+
+/* 铜色按钮 */
+.btn-copper {
+    background: linear-gradient(180deg, #5a3530 0%, #3a2018 50%, #2a1510 100%);
+    color: #d4a090;
+    border-color: #6a3a2a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.btn-copper:hover {
+    box-shadow: 0 0 12px rgba(139, 55, 35, 0.4);
+    color: #e8b8a8;
+    opacity: 1;
+}
+
+/* ----- 顶部工具栏 ----- */
+#toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: linear-gradient(180deg, #0d0c1a 0%, var(--bg-deep) 100%);
+    border-bottom: 1px solid var(--border-mid);
+    flex-shrink: 0;
+    position: relative;
+}
+/* 工具栏底部分隔装饰线 */
+#toolbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    line-height: 1.2;
+}
+
+.logo-main {
+    font-size: 24px;
+    font-family: 'STKaiti', 'KaiTi', 'STSong', 'SimSun', var(--font-gothic);
+    color: var(--gold-primary);
+    letter-spacing: 6px;
+    text-shadow:
+        0 0 12px var(--gold-glow),
+        0 0 24px rgba(201, 168, 76, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.logo-sub {
+    font-size: 11px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: #8b7355;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 4px rgba(139, 115, 85, 0.3);
+}
+
+.logo-version {
+    font-size: 9px;
+    color: #4a3a2a;
+    letter-spacing: 1px;
+    font-family: var(--font-mono);
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.room-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-inset);
+}
+
+.room-label {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.room-code-value {
+    color: var(--gold-primary);
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    font-family: var(--font-mono);
+    text-shadow: 0 0 8px var(--gold-glow);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+}
+/* 面板标题装饰分隔线 */
+.panel-header::after {
+    content: '✦   ❧   ✦';
+    display: block;
+    position: absolute;
+    bottom: -1px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: var(--gold-dark);
+    letter-spacing: 6px;
+    white-space: nowrap;
+    opacity: 0.4;
+}
+
+.panel-header h2 {
+    font-size: 15px;
+    color: var(--gold-primary);
+    font-weight: normal;
+    font-family: var(--font-gothic);
+    letter-spacing: 2px;
+}
+
+.count-badge {
+    background: var(--border-mid);
+    color: var(--text-secondary);
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* 玩家列表 */
+.player-list {
+    list-style: none;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.player-empty {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.player-item {
+    padding: 14px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-surface);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.player-item:hover {
+    background: var(--bg-elevated);
+}
+
+.player-item.active {
+    background: var(--bg-elevated);
+    border-left: 3px solid var(--gold-primary);
+    padding-left: 13px;
+    box-shadow: var(--shadow-gold), inset 2px 0 8px rgba(201, 168, 76, 0.08);
+}
+
+.drag-handle {
+    color: var(--text-muted);
+    font-size: 14px;
+    cursor: grab;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.player-item.dragging {
+    opacity: 0.4;
+}
+
+.player-item.drag-over {
+    border-top: 2px solid var(--gold-primary);
+}
+
+.player-name {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* 新消息提示小红点 */
+.player-item .new-msg-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--blood-bright);
+    margin-left: auto;
+    display: none;
+    animation: newMsgPulse 2s infinite;
+}
+.player-item.has-new .new-msg-dot {
+    display: block;
+}
+
+/* 生死状态标记（玩家列表） */
+.player-item .status-badge {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    margin-left: 6px;
+    flex-shrink: 0;
+}
+.status-badge-executed {
+    background: var(--blood-bright);
+    box-shadow: 0 0 4px var(--blood-glow);
+}
+.status-badge-killed_at_night {
+    background: #4a3080;
+    box-shadow: 0 0 4px var(--purple-glow);
+}
+
+/* 踢出按钮 */
+.player-item .kick-btn {
+    display: none;
+    margin-left: auto;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.2s;
+    flex-shrink: 0;
+    padding: 2px;
+    line-height: 1;
+}
+
+.player-item:hover .kick-btn {
+    display: inline-block;
+}
+
+.player-item .kick-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* 座位上的踢出按钮 */
+.seat-kick-btn {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    background: var(--bg-surface);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+.player-seat:hover .seat-kick-btn {
+    opacity: 0.7;
+}
+
+.player-seat .seat-kick-btn:hover {
+    opacity: 1;
+    transform: scale(1.3);
+}
+
+/* 消息列表 */
+.message-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.msg-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+/* 单条消息 */
+.msg-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+}
+
+.msg-row.player-msg .msg-meta {
+    text-align: right;
+    color: #8b5a6a;
+}
+
+.msg-row.host-msg .msg-meta {
+    text-align: left;
+    color: #7a6a3a;
+}
+
+.msg-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: break-all;
+}
+
+.msg-row.player-msg {
+    align-items: flex-end;
+}
+.msg-row.player-msg .msg-bubble {
+    background: linear-gradient(135deg, #1a0815 0%, #250d1e 100%);
+    border: 1px solid #3a1530;
+    color: #e0c0d0;
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 0 20px rgba(60, 15, 40, 0.15);
+}
+
+.msg-row.host-msg {
+    align-items: flex-start;
+}
+.msg-row.host-msg .msg-bubble {
+    background: linear-gradient(135deg, #141005 0%, #1e1808 100%);
+    border: 1px solid #3a2a10;
+    color: #d0c8a0;
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 8px rgba(139, 105, 20, 0.08);
+}
+
+.msg-time {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* 回复输入区 */
+.reply-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+}
+
+.reply-row {
+    display: flex;
+    gap: 10px;
+}
+
+.reply-input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--bg-deepest);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-inset);
+}
+
+.reply-input:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow), var(--shadow-inset);
+}
+
+.reply-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* 快捷回复模板 */
+.quick-reply-templates {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.quick-reply-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-right: 2px;
+}
+
+.btn-quick-reply {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-mid);
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.btn-quick-reply:hover {
+    border-color: var(--gold-dim);
+    color: var(--text-gold);
+    background: var(--bg-card);
+    box-shadow: 0 0 6px rgba(201, 168, 76, 0.2);
+}
+
+.btn-quick-reply:active {
+    transform: scale(0.96);
+    border-color: var(--gold-primary);
+    color: var(--gold-primary);
+}
+
+/* ----- 二维码弹窗 ----- */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    animation: fadeIn var(--transition-medium);
+}
+
+.modal-content {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-gold);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    text-align: center;
+    position: relative;
+    max-width: 90vw;
+    box-shadow: var(--shadow-gold-lg), 0 0 0 4px rgba(10,10,18,0.8), 0 0 0 6px rgba(90,62,26,0.25);
+    animation: fadeInUp var(--transition-medium);
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+    color: var(--gold-dim);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+.modal-close:hover { color: var(--gold-primary); }
+
+.modal-content h3 {
+    color: var(--gold-primary);
+    margin-bottom: 20px;
+    font-weight: normal;
+    font-family: var(--font-gothic);
+    letter-spacing: 2px;
+}
+
+#qrcode-container {
+    display: inline-block;
+    padding: 16px;
+    background: #fff;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    box-shadow: 0 0 16px rgba(0,0,0,0.4);
+}
+
+.qr-code-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.qr-code-text strong {
+    color: var(--gold-primary);
+    font-size: 20px;
+    letter-spacing: 3px;
+    font-family: var(--font-mono);
+    text-shadow: 0 0 8px var(--gold-glow);
+}
+
+.qr-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ----- 滚动条美化 ----- */
+::-webkit-scrollbar {
+    width: 5px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-mid);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-dark);
+}
+
+/* ============================================================
+   圆桌视图
+   ============================================================ */
+
+#round-table-view {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 左侧紧凑面板 */
+#rt-player-panel {
+    width: 180px;
+    flex-shrink: 0;
+    background: var(--bg-deep);
+    border-right: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 中央圆桌区域 */
+#rt-table-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    position: relative;
+    overflow: visible;
+}
+
+/* 长桌容器（竖形，模拟血染钟楼长桌） */
+#round-table {
+    position: relative;
+    width: min(34vw, 42vh);
+    height: min(68vw, 80vh);
+    min-width: 200px;
+    min-height: 400px;
+}
+
+/* 桌面 - 长桌木纹 */
+.table-surface {
+    position: absolute;
+    top: 8%;
+    left: 8%;
+    width: 84%;
+    height: 84%;
+    border-radius: 999px;
+    background:
+        radial-gradient(ellipse at 35% 35%, #4a3520 0%, #2d1f0e 40%, #1a0f05 70%, #0d0702 100%);
+    box-shadow:
+        0 0 60px rgba(139, 105, 20, 0.25),
+        0 0 120px rgba(80, 40, 10, 0.15),
+        inset 0 0 80px rgba(0, 0, 0, 0.6),
+        0 0 0 3px #5a3a1a,
+        0 0 0 6px #2a1508,
+        0 0 0 8px #1a0a03;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* 桌面木纹纹理 */
+.table-wood-grain {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 999px;
+    background:
+        repeating-linear-gradient(
+            0.5deg,
+            transparent,
+            transparent 3px,
+            rgba(0, 0, 0, 0.05) 3px,
+            rgba(0, 0, 0, 0.05) 4px
+        ),
+        repeating-linear-gradient(
+            89deg,
+            transparent,
+            transparent 7px,
+            rgba(139, 105, 20, 0.03) 7px,
+            rgba(139, 105, 20, 0.03) 8px
+        );
+    pointer-events: none;
+}
+
+/* 桌面中央阶段文字 */
+.table-center-text {
+    position: relative;
+    z-index: 1;
+    font-size: 20px;
+    font-family: var(--font-gothic);
+    color: var(--gold-primary);
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
+    font-weight: bold;
+    pointer-events: none;
+}
+
+/* 玩家座位容器 */
+#seats-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* 空桌提示 */
+.table-empty-hint {
+    position: absolute;
+    pointer-events: none;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 16px;
+    z-index: 1;
+}
+.table-empty-hint .sub {
+    font-size: 13px;
+    margin-top: 8px;
+    opacity: 0.6;
+}
+
+/* 单个座位 */
+.player-seat {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: transform var(--transition-medium), filter var(--transition-fast);
+    z-index: 3;
+}
+
+.player-seat:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+    filter: brightness(1.2);
+}
+
+.player-seat.selected .seat-dot {
+    box-shadow: 0 0 18px 4px rgba(201, 168, 76, 0.9);
+    border-color: var(--gold-primary);
+    background: radial-gradient(circle at 40% 40%, #8b6914, #3a2008);
+}
+
+.player-seat.has-new .seat-dot {
+    animation: seatNewMsgPulse 2s infinite;
+}
+
+/* 空槽位 */
+.player-seat.seat-empty {
+    cursor: default;
+    pointer-events: none;
+}
+
+.player-seat.seat-empty .seat-dot {
+    width: 14px;
+    height: 14px;
+    background: rgba(90, 74, 58, 0.25);
+    border: 1.5px solid rgba(74, 53, 32, 0.3);
+    box-shadow: none;
+}
+
+/* 座位标记点 */
+.seat-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle at 40% 40%, #5a4a3a, #2a1a0a);
+    border: 2.5px solid #4a3520;
+    box-shadow: 0 0 10px rgba(139, 105, 20, 0.35);
+    transition: all var(--transition-medium);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 座位下方名字标签 */
+.seat-label {
+    font-size: 12px;
+    color: #c0b090;
+    text-align: center;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+    background: rgba(10, 10, 18, 0.75);
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid rgba(42, 42, 74, 0.5);
+    font-family: var(--font-body);
+}
+
+/* 生死状态切换图标（座位标记点中央小圆） */
+.status-toggle {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 8px;
+    line-height: 12px;
+    text-align: center;
+    transition: all var(--transition-fast);
+    background: rgba(10, 10, 18, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: transparent;
+    user-select: none;
+    z-index: 1;
+}
+
+.status-toggle:hover {
+    transform: scale(1.5);
+    background: rgba(10, 10, 18, 0.85);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 存活：微弱金点 */
+.player-seat.status-alive .status-toggle {
+    background: rgba(201, 168, 76, 0.2);
+    border-color: rgba(201, 168, 76, 0.15);
+}
+.player-seat.status-alive .status-toggle:hover {
+    background: rgba(201, 168, 76, 0.4);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 处决：血红 + X */
+.player-seat.status-executed .status-toggle {
+    background: var(--blood-red);
+    border-color: var(--blood-bright);
+    color: #fff;
+    font-size: 9px;
+    font-weight: bold;
+    box-shadow: 0 0 6px var(--blood-glow);
+}
+.player-seat.status-executed .status-toggle::after {
+    content: '✕';
+}
+
+/* 夜死：暗紫 + 月 */
+.player-seat.status-killed_at_night .status-toggle {
+    background: var(--purple-deep);
+    border-color: var(--purple-mid);
+    color: #c0a0e0;
+    font-size: 9px;
+    box-shadow: 0 0 6px var(--purple-glow);
+}
+.player-seat.status-killed_at_night .status-toggle::after {
+    content: '☽';
+}
+
+/* 处决座标：血红渐变 */
+.player-seat.status-executed .seat-dot {
+    background: radial-gradient(circle at 40% 40%, #a83220, #5a1010);
+    border-color: var(--blood-bright);
+    box-shadow: 0 0 14px var(--blood-glow), 0 0 6px rgba(200, 40, 20, 0.4);
+}
+.player-seat.status-executed.selected .seat-dot {
+    box-shadow: 0 0 18px 4px rgba(200, 60, 40, 0.85);
+    border-color: var(--blood-bright);
+}
+
+/* 夜死座标：暗紫渐变 */
+.player-seat.status-killed_at_night .seat-dot {
+    background: radial-gradient(circle at 40% 40%, #4a3080, #1a0840);
+    border-color: var(--purple-mid);
+    box-shadow: 0 0 14px var(--purple-glow), 0 0 6px rgba(80, 40, 120, 0.4);
+}
+.player-seat.status-killed_at_night.selected .seat-dot {
+    box-shadow: 0 0 18px 4px rgba(120, 60, 180, 0.7);
+    border-color: var(--purple-mid);
+}
+
+/* 右侧消息面板 */
+#rt-message-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-left: 1px solid var(--border-subtle);
+    background: var(--bg-deep);
+}
+
+#rt-message-panel .panel-header {
+    position: relative;
+}
+
+#rt-message-panel .hint,
+.hint {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+#rt-message-panel .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   角色系统
+   ============================================================ */
+
+/* 角色配置按钮 */
+.btn-board {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: linear-gradient(180deg, #3a3020 0%, #2a2015 50%, #1a1510 100%);
+    color: #d4c090;
+    border-color: #6a5a30;
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+.btn-board:hover {
+    box-shadow: 0 0 14px rgba(201, 168, 76, 0.3);
+    color: #e8d8a8;
+    opacity: 1;
+}
+
+/* ----- 版型配置弹窗 ----- */
+.board-panel {
+    max-width: 560px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px 32px 24px;
+    text-align: left;
+}
+
+.board-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0 12px;
+}
+
+.board-count-label {
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+.board-count-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--gold-primary);
+    font-family: var(--font-mono);
+    text-shadow: 0 0 8px var(--gold-glow);
+    min-width: 40px;
+    text-align: center;
+}
+
+.btn-count-stepper {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: var(--radius-full);
+    background: rgba(30, 30, 54, 0.6);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-mid);
+    cursor: pointer;
+}
+
+.board-joined-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 8px;
+}
+
+/* 分类数量概览 */
+.board-dist-summary {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 10px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+}
+
+.board-dist-item {
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-deepest);
+}
+
+/* 外来者修正值徽章 */
+.board-mod-badge {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    margin-left: 4px;
+    font-weight: bold;
+}
+.board-mod-badge--plus {
+    background: rgba(201, 160, 48, 0.12);
+    color: var(--gold-primary);
+    border: 1px solid rgba(201, 160, 48, 0.25);
+}
+.board-mod-badge--minus {
+    background: rgba(90, 158, 192, 0.12);
+    color: #5a9ec0;
+    border: 1px solid rgba(90, 158, 192, 0.25);
+}
+
+/* 角色列表 */
+.board-role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.board-cat-group {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.board-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    background: var(--bg-surface);
+    transition: background var(--transition-fast);
+}
+.board-cat-header:hover {
+    background: var(--bg-elevated);
+}
+
+.board-cat-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.board-cat-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: normal;
+}
+
+.board-cat-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 14px;
+    background: var(--bg-deepest);
+}
+
+.board-role-tag {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+/* 可点击交换的角色标签 */
+.board-role-tag--clickable {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+.board-role-tag--clickable:hover {
+    background: var(--bg-elevated);
+    border-color: var(--gold-dark);
+    color: var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow);
+    transform: translateY(-1px);
+}
+
+/* 标签内的交换图标（hover 时显示） */
+.board-role-swap-icon {
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    margin-left: 2px;
+    color: var(--gold-dim);
+}
+.board-role-tag--clickable:hover .board-role-swap-icon {
+    opacity: 1;
+}
+
+/* 角色交换内联下拉框 */
+.board-role-swap-select {
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold-primary);
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 0 10px var(--gold-glow);
+    min-width: 100px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.board-role-swap-select:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 14px var(--gold-glow);
+}
+.board-role-swap-select option {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+/* 操作按钮 */
+.board-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* 角色标签上的移除按钮（hover 时显示） */
+.board-role-remove-btn {
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity var(--transition-fast), color var(--transition-fast);
+    font-weight: bold;
+}
+.board-role-tag--clickable:hover .board-role-remove-btn {
+    opacity: 1;
+}
+.board-role-remove-btn:hover {
+    color: var(--blood-bright);
+}
+
+/* 类别分组末尾的添加角色按钮 */
+.board-cat-add-btn {
+    font-size: 14px;
+    font-weight: bold;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    border: 1px dashed var(--border-mid);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+.board-cat-add-btn:hover {
+    background: var(--bg-elevated);
+    border-color: var(--gold-primary);
+    color: var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow);
+}
+.board-cat-add-btn--none {
+    opacity: 0.25;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* 添加角色内联下拉框 */
+.board-cat-add-select {
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold-primary);
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 0 10px var(--gold-glow);
+    min-width: 100px;
+}
+.board-cat-add-select option {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+/* 外来者修正异常警告 */
+.board-outsider-warning {
+    margin: 8px 0 4px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #e8c840;
+    background: rgba(200, 150, 40, 0.08);
+    border: 1px solid rgba(200, 150, 40, 0.2);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+.board-outsider-warning:empty {
+    display: none;
+}
+
+/* 复原版型按钮 */
+.btn-restore {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px dashed var(--border-mid);
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+.btn-restore:not(:disabled):hover {
+    color: var(--gold-primary);
+    border-color: var(--gold-dark);
+    background: rgba(201, 168, 76, 0.06);
+    box-shadow: 0 0 8px var(--gold-glow);
+}
+.btn-restore:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* ----- 角色选择器（消息面板） ----- */
+.role-selector-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.role-selector-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.role-select {
+    flex: 1;
+    padding: 6px 10px;
+    background: var(--bg-deepest);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+.role-select:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 6px var(--gold-glow);
+}
+.role-select option {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+/* ----- 角色徽章（座位标签） ----- */
+.seat-role-badge {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-top: 2px;
+    white-space: nowrap;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.seat-role-townsfolk    { background: var(--role-town-bg); color: var(--role-town); border: 1px solid rgba(224, 214, 194, 0.25); }
+.seat-role-outsider     { background: var(--role-outsider-bg); color: var(--role-outsider); border: 1px solid rgba(74, 158, 90, 0.3); }
+.seat-role-minion       { background: var(--role-minion-bg); color: var(--role-minion); border: 1px solid rgba(201, 160, 48, 0.3); }
+.seat-role-demon        { background: var(--role-demon-bg); color: var(--role-demon); border: 1px solid rgba(168, 50, 32, 0.3); }
+
+/* ----- 角色文字（玩家列表） ----- */
+.player-role-name {
+    font-size: 12px;
+    margin-left: 8px;
+    opacity: 0.85;
+}
+
+.player-role-townsfolk    { color: var(--role-town); }
+.player-role-outsider     { color: var(--role-outsider); }
+.player-role-minion       { color: var(--role-minion); }
+.player-role-demon        { color: var(--role-demon); }
+
+/* ============================================================
+   动画关键帧
+   ============================================================ */
+
+@keyframes phasePulseNight {
+    0%, 100% { box-shadow: var(--shadow-purple); }
+    50% { box-shadow: 0 0 22px rgba(80, 40, 120, 0.6); }
+}
+
+@keyframes phasePulseDay {
+    0%, 100% { box-shadow: var(--shadow-gold); }
+    50% { box-shadow: 0 0 22px rgba(201, 168, 76, 0.5); }
+}
+
+@keyframes newMsgPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--blood-glow); }
+    50% { opacity: 0.5; box-shadow: 0 0 10px var(--blood-glow); }
+}
+
+@keyframes seatNewMsgPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(200, 60, 60, 0.6); }
+    50% { box-shadow: 0 0 18px rgba(200, 60, 60, 0.9); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   邪恶群聊 Tab 和内容区
+   ============================================================ */
+
+/* Tab 切换按钮栏 */
+.msg-panel-tabs {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.msg-tab {
+    padding: 4px 12px;
+    background: transparent;
+    border: 1px solid #2a2040;
+    border-radius: 4px;
+    color: #6a5a80;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.msg-tab:hover {
+    border-color: #5a4080;
+    color: #9080b0;
+}
+
+.msg-tab.active {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--gold-primary);
+    color: var(--gold-primary);
+}
+
+/* Tab 内容区 */
+.msg-tab-content {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.msg-tab-content.active {
+    display: flex;
+}
+
+/* 邪恶阵营成员名牌栏 */
+.evil-members-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #10081a;
+    border-bottom: 1px solid #2a1535;
+    overflow-x: auto;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    min-height: 32px;
+}
+
+.evil-members-label {
+    color: #9070c0;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.evil-members-empty {
+    color: #4a3a60;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.evil-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: #150922;
+    border: 1px solid #2a1540;
+    border-radius: 12px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.evil-chip-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.evil-chip-dot.minion { background: #c09030; box-shadow: 0 0 3px rgba(192,144,48,0.5); }
+.evil-chip-dot.demon { background: #e04040; box-shadow: 0 0 3px rgba(224,64,64,0.5); }
+
+.evil-chip-name {
+    color: #c0b0d0;
+    font-size: 12px;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.evil-chip-role {
+    font-size: 11px;
+}
+.evil-chip-role.minion { color: #d4a020; }
+.evil-chip-role.demon { color: #f06060; }
+
+/* 邪恶群聊消息列表 */
+#evil-message-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px;
+}
+
+/* 邪恶群聊消息行 */
+.evil-msg-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+.evil-msg-player { align-items: flex-start; }
+.evil-msg-self { align-items: flex-end; }
+.evil-msg-host { align-items: flex-start; }
+
+.evil-msg-sender {
+    font-size: 10px;
+    margin-bottom: 2px;
+    padding: 0 4px;
+}
+
+.evil-sender-role {
+    padding: 1px 3px;
+    border-radius: 2px;
+    font-size: 10px;
+}
+.evil-sender-role.minion {
+    color: #d4a020; background: rgba(212,160,32,0.12);
+}
+.evil-sender-role.demon {
+    color: #f06060; background: rgba(240,96,96,0.12);
+}
+
+.evil-sender-name {
+    color: #706080;
+    font-size: 10px;
+}
+
+.evil-sender-host {
+    color: #8b6914;
+    font-weight: bold;
+}
+
+/* 邪恶群聊消息气泡 */
+.evil-msg-bubble {
+    max-width: 80%;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.evil-bubble-player {
+    background: linear-gradient(135deg, #1a0825, #150520);
+    border: 1px solid #3a2060;
+    border-top-left-radius: 2px;
+    color: #d0c0e0;
+}
+
+.evil-bubble-self {
+    background: linear-gradient(135deg, #1e1030, #180828);
+    border: 1px solid #4a2560;
+    border-top-right-radius: 2px;
+    color: #d0c0e0;
+}
+
+.evil-bubble-host {
+    background: linear-gradient(135deg, #1a1810, #181408);
+    border: 1px solid #4a3a1a;
+    border-top-left-radius: 2px;
+    color: #e0d6c2;
+}
+
+/* 邪恶群聊回复区 */
+#evil-reply-area {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-top: 1px solid #1e1e36;
+    flex-shrink: 0;
+}
+
+#evil-reply-input {
+    flex: 1;
+}
+
+/* 调整 private-chat-area 为 flex column 布局 */
+#private-chat-area {
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+#evil-chat-area {
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}

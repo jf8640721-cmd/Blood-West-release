@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>西游纪 Blood-West · 主持后台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ========== 顶部工具栏 ========== -->
+    <header id="toolbar">
+        <h1 class="logo">
+            <span class="logo-main">西游纪</span>
+            <span class="logo-sub">Blood-West</span>
+            <span class="logo-version">v1.7.0</span>
+        </h1>
+
+        <div class="toolbar-actions">
+            <!-- 创建房间按钮 -->
+            <button id="btn-create-room" class="btn btn-gold">创建房间</button>
+
+            <!-- 邪恶群聊入口（有邪恶玩家时显示） -->
+            <button id="btn-evil-toolbar" class="btn btn-evil-toolbar" style="display:none;"
+                    title="邪恶群聊" onclick="switchToEvilTab()">👿</button>
+
+            <!-- 房间信息（创建后显示） -->
+            <div id="room-info" class="room-info" style="display:none;">
+                <span class="room-label">房间码</span>
+                <span id="room-code" class="room-code-value"></span>
+                <button id="btn-show-qr" class="btn btn-small">二维码</button>
+            </div>
+
+            <!-- 阶段切换 -->
+            <div class="phase-controls" id="phase-controls" style="display:none;">
+                <button id="btn-phase-prev" class="btn btn-phase-arrow" title="返回上一阶段" style="display:none;">◀</button>
+                <button id="btn-toggle-phase" class="btn btn-phase night">
+                    <span id="phase-icon">🌙</span>
+                    <span id="phase-text">首夜</span>
+                    <span id="next-phase-hint" class="next-hint"></span>
+                </button>
+            </div>
+
+            <!-- 角色配置 -->
+            <button id="btn-board-config" class="btn btn-board" style="display:none;">🎭 角色配置</button>
+
+            <!-- 退出房间 -->
+            <button id="btn-exit-room" class="btn btn-exit" style="display:none;">退出房间</button>
+        </div>
+    </header>
+
+    <!-- ========== 圆桌主视图 ========== -->
+    <main id="round-table-view">
+        <!-- 左侧：紧凑玩家列表 -->
+        <aside id="rt-player-panel">
+            <div class="panel-header">
+                <h2>玩家</h2>
+                <span id="rt-player-count" class="count-badge">0</span>
+            </div>
+            <ul id="rt-player-list" class="player-list"></ul>
+        </aside>
+
+        <!-- 中央：圆桌 -->
+        <section id="rt-table-area">
+            <div id="round-table">
+                <!-- 桌面 -->
+                <div class="table-surface">
+                    <div class="table-wood-grain"></div>
+                    <div class="table-center-text" id="table-phase-display">首夜</div>
+                </div>
+                <!-- 玩家座位由 JS 动态填充 -->
+                <div id="seats-container"></div>
+            </div>
+            <!-- 空桌提示 -->
+            <div id="table-empty-hint" class="table-empty-hint">
+                <p>等待玩家加入…</p>
+                <p class="sub">扫描二维码或输入房间码加入</p>
+            </div>
+        </section>
+
+        <!-- 右侧：消息面板 -->
+        <section id="rt-message-panel">
+            <div class="panel-header">
+                <h2 id="rt-msg-panel-title">消息记录</h2>
+                <div class="msg-panel-tabs">
+                    <button id="tab-private" class="msg-tab active" onclick="switchMsgTab('private')">私聊</button>
+                    <button id="tab-evil" class="msg-tab" onclick="switchMsgTab('evil')">😈 邪恶群聊</button>
+                </div>
+                <span class="hint">← 点击圆桌上玩家查看消息</span>
+            </div>
+
+            <!-- 私聊内容区 -->
+            <div id="private-chat-area" class="msg-tab-content active">
+                <!-- 角色选择器 -->
+                <div id="rt-role-selector" class="role-selector-area" style="display:none;">
+                    <label class="role-selector-label">角色：</label>
+                    <select id="rt-role-select" class="role-select">
+                        <option value="">选择角色…</option>
+                    </select>
+                </div>
+                <div id="rt-message-list" class="message-list">
+                    <div class="msg-placeholder">点击圆桌上的玩家查看私密消息</div>
+                </div>
+                <div id="rt-reply-area" class="reply-area" style="display:none;">
+                    <div class="reply-row">
+                        <input id="rt-reply-input" class="reply-input"
+                               placeholder="输入回复内容..." autocomplete="off" />
+                        <button id="rt-btn-send-reply" class="btn btn-gold">发送</button>
+                    </div>
+                    <div class="quick-reply-templates">
+                        <span class="quick-reply-label">快捷：</span>
+                        <button class="btn btn-quick-reply" data-reply="收到，主持人已知晓">✅ 已收到</button>
+                        <button class="btn btn-quick-reply" data-reply="请说明技能目标">❓ 请说明</button>
+                        <button class="btn btn-quick-reply" data-reply="技能已处理">🔒 已处理</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 邪恶群聊内容区 -->
+            <div id="evil-chat-area" class="msg-tab-content" style="display:none;">
+                <div class="evil-members-bar" id="evil-members-bar">
+                    <!-- JS 动态填充邪恶阵营玩家名牌 -->
+                </div>
+                <div id="evil-message-list" class="message-list">
+                    <div class="msg-placeholder">邪恶阵营玩家可在此群聊</div>
+                </div>
+                <div class="reply-area" id="evil-reply-area">
+                    <div class="reply-row">
+                        <input id="evil-reply-input" class="reply-input"
+                               placeholder="发送消息到邪恶群聊..." autocomplete="off" />
+                        <button id="btn-evil-send" class="btn btn-gold">发送</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========== 二维码弹窗 ========== -->
+    <div id="qr-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="modal-close" id="btn-close-qr">&times;</span>
+            <h3>扫描二维码加入房间</h3>
+            <div id="qrcode-container"></div>
+            <p class="qr-code-text">房间码：<strong id="qr-room-code"></strong></p>
+            <p class="qr-hint">使用微信小程序扫描此二维码</p>
+        </div>
+    </div>
+
+    <!-- ========== 版型配置弹窗 ========== -->
+    <div id="board-modal" class="modal" style="display:none;">
+        <div class="modal-content board-panel">
+            <span class="modal-close" id="btn-close-board">&times;</span>
+            <h3>版型配置</h3>
+
+            <!-- 人数调节 -->
+            <div class="board-count-row">
+                <span class="board-count-label">玩家人数</span>
+                <button id="btn-board-count-minus" class="btn btn-small btn-count-stepper">◀</button>
+                <span id="board-player-count" class="board-count-value">12</span>
+                <button id="btn-board-count-plus" class="btn btn-small btn-count-stepper">▶</button>
+                <span id="board-joined-hint" class="board-joined-hint"></span>
+            </div>
+
+            <!-- 分类数量概览 -->
+            <div id="board-dist-summary" class="board-dist-summary"></div>
+
+            <!-- 外来者修正异常警告 -->
+            <div id="board-outsider-warning"></div>
+
+            <!-- 角色列表（按类别分组） -->
+            <div id="board-role-list" class="board-role-list"></div>
+
+            <!-- 操作按钮 -->
+            <div class="board-actions">
+                <button id="btn-board-refresh" class="btn btn-copper">🔄 重新推荐</button>
+                <button id="btn-board-restore" class="btn btn-restore" disabled>↩ 复原</button>
+                <button id="btn-board-confirm" class="btn btn-gold">✅ 确认使用此版型</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 阶段切换确认弹窗 ========== -->
+    <div id="phase-confirm-modal" class="modal" style="display:none;">
+        <div class="modal-content modal-confirm">
+            <p id="phase-confirm-text" class="confirm-text"></p>
+            <div class="confirm-actions">
+                <button id="btn-phase-confirm-cancel" class="btn btn-copper">取消</button>
+                <button id="btn-phase-confirm-ok" class="btn btn-gold">确认切换</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CDN 依赖 ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <!-- ========== 角色数据层 ========== -->
+    <script src="data/teams.js"></script>
+    <script src="data/roles.js"></script>
+    <script src="data/boards.js"></script>
+
+    <!-- ========== 核心状态 ========== -->
+    <script src="js/state.js"></script>
+
+    <!-- ========== 业务模块 ========== -->
+    <script src="js/room.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/messages.js"></script>
+    <script src="js/evil-chat.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/roles-ui.js"></script>
+
+    <!-- ========== 主入口 ========== -->
+    <script src="app.js"></script>
+</body>
+</html>
