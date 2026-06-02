@@ -842,12 +842,12 @@ body::after {
 }
 #round-table {
     position: relative;
-    width: min(28vw, 38vh);
-    height: min(42vw, 50vh);
+    width: min(30vw, 42vh);
+    height: min(46vw, 56vh);
     max-width: 100%;
     max-height: 100%;
-    min-width: 200px;
-    min-height: 260px;
+    min-width: 210px;
+    min-height: 280px;
 }
 
 /* 桌面 - 长桌木纹 */
