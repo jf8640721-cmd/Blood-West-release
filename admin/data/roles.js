@@ -711,7 +711,7 @@ var ROLES = [
   {
     id: "shijia", name: "释迦", category: "demon",
     ability: "超度：说书人宣布天亮后，每个早晨，公开超度一名玩家；金刚咒：释迦免疫/无视任何角色技能；众生有别：释迦无法被投票出局；狂热信徒：失去所有爪牙信徒的释迦仅剩超度技能生效",
-    abilityType: "active", nightOrder: 11, firstNightOrder: 6,
+    abilityType: "active", nightOrder: null, firstNightOrder: 6,
     needsChoice: true, isDizzyable: false, deathImmune: true,
     inheritsDemon: false, teamSynergy: null,
     description: "释迦是近乎无敌的恶魔——免疫技能、不能被投票出局、每天早晨超度一名玩家。但失去所有爪牙后只剩超度。",
