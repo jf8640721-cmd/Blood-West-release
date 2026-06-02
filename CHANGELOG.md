@@ -2,11 +2,21 @@
 
 ## v1.8.8 (2026-06-02)
 
-### 修复首夜队列过滤遗漏
+### 修复首夜队列过滤遗漏（第二版）
 
-`firstNightBlocked` 过滤仅对 `nightOrder`（行动位）生效，`firstNightOrder`（信息位）列表未检查该字段，导致被封锁角色仍出现在首夜队列中。
+v1.8.7 补全了 10 个恶魔的 `firstNightBlocked: true`，但 `firstNightOrder` 不为 `null` 的角色仍会出现在首夜队列的 `pre`（信息位）列表中。
 
-- `admin/js/queue.js`：`pre` 列表（firstNightOrder）新增 `!e.roleObj.firstNightBlocked` 过滤条件
+**根因**：10 个恶魔的 `firstNightOrder: 6` 代表"学习爪牙和伪装"通用设定步骤，并非角色专属能力。该步骤对所有恶魔生效，但队伍中有 `✳` 标记恶魔时，主持人不需要在队列中看到它们。
+
+**修复方案**（v1.8.8 第二版）：
+- 将 10 个 `✳` 恶魔的 `firstNightOrder` 从 `6` 改为 `null`（仅影响队列显示，不影响游戏规则）
+- **保留** 狐狸精（firstNightOrder:4，魅惑）和金角大王（firstNightOrder:4，金葫芦）— 它们的首夜技能是主动目标选择，不应屏蔽
+- **保留** 毗蓝婆（firstNightOrder:7）— 首夜被动信息获取
+- **保留** 释迦、黑山老妖的 `firstNightOrder: 6` — 它们无 `✳` 标记，首夜可发动
+
+### 变更文件
+- `admin/data/roles.js` — 10 个恶魔 `firstNightOrder: 6` → `null`
+- `admin/js/queue.js` — 回退 v1.8.8 第一版的 pre 列表过滤（避免误伤）
 
 ## v1.8.7 (2026-06-02)
 

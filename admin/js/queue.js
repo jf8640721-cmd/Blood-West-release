@@ -39,7 +39,6 @@ function generateNightQueue(phase) {
         // 首夜：先 firstNightOrder（信息位），再 nightOrder（行动位）
         var pre = inPlay
             .filter(function(e) { return e.roleObj.firstNightOrder != null; })
-            .filter(function(e) { return !e.roleObj.firstNightBlocked; })
             .sort(function(a, b) { return a.roleObj.firstNightOrder - b.roleObj.firstNightOrder; });
         var normal = inPlay
             .filter(function(e) { return e.roleObj.nightOrder != null; })
