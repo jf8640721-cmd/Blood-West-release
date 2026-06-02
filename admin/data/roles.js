@@ -740,7 +740,7 @@ var ROLES = [
     id: "honghaier", name: "红孩儿", category: "demon",
     ability: "邪火：每晚选择一名玩家杀死；三昧真火：首夜随机得知三个登场角色（信息位优先），选择其一被三昧真火焚烧，全程晕眩。离三昧真火最远的善良玩家在第三个夜晚感受到灼热（外来者+1）",
     outsiderModifier: 1,
-    abilityType: "active", nightOrder: 11, firstNightOrder: null, firstNightBlocked: true,
+    abilityType: "active", nightOrder: 11, firstNightOrder: 6, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: "牛魔父子",
     description: "红孩儿每晚杀人，首夜获知三个在场角色并可焚烧一人使其全程晕眩。第三夜最远善良玩家感知灼热。",

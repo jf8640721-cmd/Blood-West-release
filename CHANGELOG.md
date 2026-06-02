@@ -2,16 +2,20 @@
 
 ## v1.8.11 (2026-06-02)
 
-### 修复阎王首夜技能缺失
+### 修复恶魔首夜技能缺失
 
-阎王「生死簿」首夜需编写死亡名单，此前 `firstNightOrder: null` 导致首夜不出现在队列中。
+两个恶魔的首夜技能未被配置 `firstNightOrder`，导致首夜不出现在队列中：
 
-**修复内容：**
+**阎王「生死簿」**：首夜需编写死亡名单
 - `firstNightOrder: null` → `6` — 首夜出现在队列中编写生死簿
-- `firstNightBlocked: true` 保持不变 — 阻止首夜触发每晚杀人（首夜只编写名单）
+- `firstNightBlocked: true` 保持不变 — 阻止首夜触发每晚杀人
+
+**红孩儿「三昧真火」**：首夜得知三个在场角色并选一人焚烧
+- `firstNightOrder: null` → `6` — 首夜出现在队列中获知信息+选焚烧目标
+- `firstNightBlocked: true` 保持不变 — 阻止首夜触发每晚杀人
 
 ### 变更文件
-- `admin/data/roles.js` — 阎王 `firstNightOrder` 修正
+- `admin/data/roles.js` — 阎王 + 红孩儿 `firstNightOrder` 修正
 
 ## v1.8.10 (2026-06-02)
 
