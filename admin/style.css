@@ -838,14 +838,12 @@ body::after {
     justify-content: center;
     min-width: 0;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
-
-/* 长桌容器（竖形，模拟血染钟楼长桌） */
 #round-table {
     position: relative;
-    width: min(30vw, 100%);
-    height: min(58vw, 100%);
+    width: min(30vw, 40vh);
+    height: min(58vw, 72vh);
     max-width: 100%;
     max-height: 100%;
     min-width: 180px;
@@ -1769,35 +1767,34 @@ body::after {
     overflow: hidden;
     /* JS控制 display: none/block */
 }
-/* 标题条（始终可见） */
+/* 标题条（始终可见，点击可展开/折叠） */
 .queue-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 14px;
+    gap: 12px;
+    padding: 8px 16px;
     background: linear-gradient(90deg, #1a1030, #0d0d1a);
     cursor: pointer;
     user-select: none;
-    min-height: 32px;
 }
 .queue-collapsed-icon {
-    font-size: 16px;
+    font-size: 18px;
 }
 .queue-collapsed-text {
-    font-size: 13px;
+    font-size: 14px;
     color: #c8b0e0;
     font-weight: 600;
     white-space: nowrap;
 }
 .queue-progress {
     flex: 1;
-    font-size: 12px;
+    font-size: 13px;
     color: #8a7a9a;
     white-space: nowrap;
 }
 .btn-queue-toggle {
-    font-size: 11px;
-    padding: 3px 10px;
+    font-size: 12px;
+    padding: 4px 12px;
     background: #2a1a40;
     color: #b8a0d0;
     border: 1px solid #3a2a55;
