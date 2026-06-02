@@ -1,5 +1,13 @@
 # 版本日志
 
+## v1.8.8 (2026-06-02)
+
+### 修复首夜队列过滤遗漏
+
+`firstNightBlocked` 过滤仅对 `nightOrder`（行动位）生效，`firstNightOrder`（信息位）列表未检查该字段，导致被封锁角色仍出现在首夜队列中。
+
+- `admin/js/queue.js`：`pre` 列表（firstNightOrder）新增 `!e.roleObj.firstNightBlocked` 过滤条件
+
 ## v1.8.7 (2026-06-02)
 
 ### 修复首夜封锁数据缺失
