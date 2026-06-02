@@ -1759,60 +1759,62 @@ body::after {
 }
 
 /* ============================================================
-   夜间行动队列面板（嵌入右侧消息面板顶部）
+   夜间行动队列面板（工具栏下方可折叠紧凑条）
    ============================================================ */
 .night-queue-panel {
-    display: none;            /* 默认隐藏，仅在 night-layout 下显示 */
-}
-/* 夜间模式：队列嵌入右侧面板 */
-.night-layout #night-queue-panel {
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    margin: 0;
-    border-radius: 0;
-    border: none;
-    border-bottom: 1px solid #2a2a50;
+    margin: 0 16px 6px;
     background: linear-gradient(135deg, #0d0d1a, #111128);
-    max-height: 45%;
+    border: 1px solid #2a2a50;
+    border-radius: 8px;
     overflow: hidden;
+    /* JS控制 display: none/block */
 }
-/* 折叠状态：只留标题条 */
-.night-layout #night-queue-panel.queue-folded .queue-list,
-.night-layout #night-queue-panel.queue-folded .queue-progress {
-    display: none;
-}
-
+/* 标题条（始终可见） */
 .queue-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
+    gap: 10px;
+    padding: 6px 14px;
     background: linear-gradient(90deg, #1a1030, #0d0d1a);
-    border-bottom: 1px solid #2a2a50;
+    cursor: pointer;
+    user-select: none;
+    min-height: 32px;
 }
-
-.queue-header h3 {
-    margin: 0;
-    font-size: 14px;
+.queue-collapsed-icon {
+    font-size: 16px;
+}
+.queue-collapsed-text {
+    font-size: 13px;
     color: #c8b0e0;
+    font-weight: 600;
     white-space: nowrap;
 }
-
 .queue-progress {
     flex: 1;
     font-size: 12px;
     color: #8a7a9a;
     white-space: nowrap;
 }
-
+.btn-queue-toggle {
+    font-size: 11px;
+    padding: 3px 10px;
+    background: #2a1a40;
+    color: #b8a0d0;
+    border: 1px solid #3a2a55;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.btn-queue-toggle:hover {
+    background: #3a2a55;
+    color: #d8c8f0;
+}
+/* 队列列表（展开时显示） */
 .queue-list {
+    max-height: 260px;
     overflow-y: auto;
     padding: 4px 0;
-}
-.night-layout .queue-list {
-    flex: 1;
-    max-height: none;
+    border-top: 1px solid #2a2a50;
 }
 
 .queue-list::-webkit-scrollbar {

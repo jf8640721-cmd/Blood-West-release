@@ -48,6 +48,17 @@
         </div>
     </header>
 
+    <!-- ========== 夜间行动队列（可折叠紧凑条） ========== -->
+    <div id="night-queue-panel" class="night-queue-panel" style="display:none;">
+        <div class="queue-header" id="queue-header-bar" onclick="toggleQueuePanel()">
+            <span class="queue-collapsed-icon">🌙</span>
+            <span id="queue-collapsed-text" class="queue-collapsed-text">夜间行动队列</span>
+            <span id="queue-progress" class="queue-progress">已处理: 0/0</span>
+            <button id="btn-toggle-queue" class="btn btn-xs btn-queue-toggle" onclick="event.stopPropagation(); toggleQueuePanel();">展开</button>
+        </div>
+        <div id="queue-list" class="queue-list" style="display:none;"></div>
+    </div>
+
     <!-- ========== 圆桌主视图 ========== -->
     <main id="round-table-view">
         <!-- 左侧：紧凑玩家列表 -->
@@ -86,16 +97,6 @@
                     <button id="tab-evil" class="msg-tab" onclick="switchMsgTab('evil')">😈 邪恶群聊</button>
                 </div>
                 <span class="hint">← 点击圆桌上玩家查看消息</span>
-            </div>
-
-            <!-- 夜间队列面板（夜晚阶段嵌入右侧面板顶部） -->
-            <div id="night-queue-panel" class="night-queue-panel">
-                <div class="queue-header">
-                    <h3>🌙 夜间行动队列</h3>
-                    <span id="queue-progress" class="queue-progress">已处理: 0/0</span>
-                    <button id="btn-toggle-queue" class="btn btn-small" onclick="toggleQueuePanel()">折叠</button>
-                </div>
-                <div id="queue-list" class="queue-list"></div>
             </div>
 
             <!-- 私聊内容区 -->

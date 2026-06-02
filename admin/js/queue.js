@@ -85,8 +85,9 @@ async function initNightQueue(phase) {
     var isNight = (phaseType === 'night');
 
     // 非夜晚阶段隐藏队列
+    var panel = $('#night-queue-panel');
     if (!isNight) {
-        document.body.classList.remove('night-layout');
+        if (panel) panel.style.display = 'none';
         state.nightQueue = [];
         state.queuePhase = null;
         return;
@@ -99,9 +100,12 @@ async function initNightQueue(phase) {
     // 加载本阶段已有的 skill_actions 记录
     await loadQueueActions(phase);
 
-    // 渲染面板并启用夜间布局
-    document.body.classList.add('night-layout');
+    // 渲染面板
     renderQueuePanel();
+    if (panel) panel.style.display = 'block';
+    // 默认折叠状态
+    state.queueVisible = false;
+    updateQueueToggleUI();
 }
 
 // ============================================================
@@ -656,15 +660,13 @@ function getSkillShortName(roleObj) {
 // ============================================================
 function toggleQueuePanel() {
     state.queueVisible = !state.queueVisible;
-    var panel = $('#night-queue-panel');
+    updateQueueToggleUI();
+}
+
+function updateQueueToggleUI() {
+    var list = $('#queue-list');
     var btn = $('#btn-toggle-queue');
-    if (panel) {
-        if (state.queueVisible) {
-            panel.classList.remove('queue-folded');
-        } else {
-            panel.classList.add('queue-folded');
-        }
-    }
+    if (list) list.style.display = state.queueVisible ? 'block' : 'none';
     if (btn) btn.textContent = state.queueVisible ? '折叠' : '展开';
 }
 
