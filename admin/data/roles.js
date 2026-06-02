@@ -749,7 +749,7 @@ var ROLES = [
   {
     id: "yanwang", name: "阎王", category: "demon",
     ability: "生死簿：阎王首夜按任意长度及顺序的号码编写生死簿，每晚发动，按顺序终结寿命，如遇到已死亡的号码则跳过。生死簿执行完毕后，阎王每晚决定第二天追加的处决号码；死神：身为神明，阎王被查验时不会被判定为邪恶阵营",
-    abilityType: "active", nightOrder: 11, firstNightOrder: null, firstNightBlocked: true,
+    abilityType: "active", nightOrder: 11, firstNightOrder: 6, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "阎王首夜编写死亡名单，之后按名单顺序杀人。名单用完后每晚追加处决。查验时不被判为邪恶。",

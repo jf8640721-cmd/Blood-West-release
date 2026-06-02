@@ -1,5 +1,18 @@
 # 版本日志
 
+## v1.8.11 (2026-06-02)
+
+### 修复阎王首夜技能缺失
+
+阎王「生死簿」首夜需编写死亡名单，此前 `firstNightOrder: null` 导致首夜不出现在队列中。
+
+**修复内容：**
+- `firstNightOrder: null` → `6` — 首夜出现在队列中编写生死簿
+- `firstNightBlocked: true` 保持不变 — 阻止首夜触发每晚杀人（首夜只编写名单）
+
+### 变更文件
+- `admin/data/roles.js` — 阎王 `firstNightOrder` 修正
+
 ## v1.8.10 (2026-06-02)
 
 ### 审计并修复白天/被动技能角色的 nightOrder 配置
