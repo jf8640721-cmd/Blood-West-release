@@ -838,14 +838,16 @@ body::after {
     justify-content: center;
     min-width: 0;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
 }
 
 /* 长桌容器（竖形，模拟血染钟楼长桌） */
 #round-table {
     position: relative;
-    width: min(30vw, 36vh);
-    height: min(58vw, 68vh);
+    width: min(30vw, 100%);
+    height: min(58vw, 100%);
+    max-width: 100%;
+    max-height: 100%;
     min-width: 180px;
     min-height: 340px;
 }
@@ -1757,16 +1759,28 @@ body::after {
 }
 
 /* ============================================================
-   夜间行动队列面板
+   夜间行动队列面板（嵌入右侧消息面板顶部）
    ============================================================ */
 .night-queue-panel {
-    margin: 0 16px 10px;
+    display: none;            /* 默认隐藏，仅在 night-layout 下显示 */
+}
+/* 夜间模式：队列嵌入右侧面板 */
+.night-layout #night-queue-panel {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #2a2a50;
     background: linear-gradient(135deg, #0d0d1a, #111128);
-    border: 1px solid #2a2a50;
-    border-radius: 8px;
+    max-height: 45%;
     overflow: hidden;
-    margin-bottom: 8px;
-    transition: all 0.3s ease;
+}
+/* 折叠状态：只留标题条 */
+.night-layout #night-queue-panel.queue-folded .queue-list,
+.night-layout #night-queue-panel.queue-folded .queue-progress {
+    display: none;
 }
 
 .queue-header {
@@ -1793,9 +1807,12 @@ body::after {
 }
 
 .queue-list {
-    max-height: 280px;
     overflow-y: auto;
     padding: 4px 0;
+}
+.night-layout .queue-list {
+    flex: 1;
+    max-height: none;
 }
 
 .queue-list::-webkit-scrollbar {
