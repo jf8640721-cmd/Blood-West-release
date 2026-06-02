@@ -576,7 +576,7 @@ var ROLES = [
   {
     id: "huangfeng_guai", name: "黄风怪", category: "minion",
     ability: "三昧神风：全局一次，早晨发动狂沙席卷到深夜，所有人晕眩，邪恶阵营除外。黄风怪死后也可发动技能",
-    abilityType: "once_per_game", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "once_per_game", nightOrder: null, firstNightOrder: 4,
     needsChoice: false, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "黄风怪的三昧神风是强力AOE——全局一次令全体善良玩家晕眩整日，死后仍可发动。",
@@ -585,7 +585,7 @@ var ROLES = [
   {
     id: "qingshi_jing", name: "青狮精", category: "minion",
     ability: "睚眦：提名过你的善良玩家将在隔夜死亡；负隅：若在处决前公开身份，将获得一次死亡豁免",
-    abilityType: "passive", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "passive", nightOrder: null, firstNightOrder: 4,
     needsChoice: false, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "青狮精的报复——提名过他的善良玩家隔夜必死。公开身份可获得一次死亡豁免。",
@@ -613,7 +613,7 @@ var ROLES = [
   {
     id: "shuishen_gonggong", name: "水神共工", category: "minion",
     ability: "宿敌：首夜，选择一名玩家建立生命链接，在他死亡之前你不会死亡，你死亡后可持续投票",
-    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "active", nightOrder: null, firstNightOrder: 4,
     needsChoice: true, isDizzyable: true, deathImmune: true,
     inheritsDemon: true, teamSynergy: null,
     description: "水神共工与一名玩家建立生命链接获得不死之身，即使死亡也能继续投票。",
@@ -631,7 +631,7 @@ var ROLES = [
   {
     id: "yutu_jing", name: "玉兔精", category: "minion",
     ability: "结亲：首夜选择一名玩家结亲。该玩家必须全程扮演玉兔精指定的角色，如果表现不够坚定，处决入夜；冥婚：玉兔精若被处决，可强行处决一名玩家陪葬",
-    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "active", nightOrder: null, firstNightOrder: 4,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "玉兔精强迫一名玩家扮演指定角色，不坚定则被处决。若玉兔精被处决可拉人陪葬。",
@@ -640,7 +640,7 @@ var ROLES = [
   {
     id: "liyu_jing", name: "鲤鱼精", category: "minion",
     ability: "莲台泡影：当你获得说书人给予的衣服时，确认选择一件，可幻化做该角色并获得对应技能",
-    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "active", nightOrder: null, firstNightOrder: 4,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "鲤鱼精可变身为其他角色并获得其技能，是最灵活的爪牙。",
@@ -668,7 +668,7 @@ var ROLES = [
     id: "qiannian_shuyao", name: "千年树妖", category: "minion",
     ability: "极度魔界：首夜向三名玩家发送魔界标记，任一标记玩家死亡，存活标记玩家之一将被秘密转换为另一名随机恶魔，并与树妖结识。树妖无法入群（外来者-1）；若被转换的玩家是邪恶阵营，则树妖入群且随机转换为一个不在场的爪牙",
     outsiderModifier: -1,
-    abilityType: "active", nightOrder: 5, firstNightOrder: 4,
+    abilityType: "active", nightOrder: null, firstNightOrder: 4,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "千年树妖首夜标记三名玩家——一旦有标记玩家死亡，另一存活标记者被秘密转为恶魔并与树妖结识。若被转者为邪恶则树妖入群转爪牙。",
