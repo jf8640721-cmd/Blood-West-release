@@ -26,6 +26,7 @@
 **新增文件：**
 - `cloudflare-worker/index.js` — Worker 中转代码
 - `cloudflare-worker/wrangler.toml` — 部署配置
+- `docs/技术架构.md` — 云端技术架构文档（三端架构、数据表、通信方式、安全设计、费用）
 
 **变更文件：**
 - `supabase/schema.sql` — 新字段 + 新表
