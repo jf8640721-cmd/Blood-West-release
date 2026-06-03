@@ -273,7 +273,7 @@ function renderQueueRow(item, index) {
         '<span class="queue-order">' + item.order + '</span>' +
         '<span class="queue-type-icon">' + typeIcon + '</span>' +
         '<span class="queue-player-name">' + escapeHtml(p.nickname || '玩家') + '</span>' +
-        '<span class="queue-role-name">' + r.name + '</span>' +
+        '<span class="queue-role-name queue-role-' + (r.category || 'townsfolk') + '">' + r.name + '</span>' +
         '<span class="queue-action-desc" title="' + escapeHtml(r.ability || '') + '">' + escapeHtml(actionDesc) + targetHtml + noteHtml + '</span>' +
         '<span class="queue-status ' + statusClass + '">' + statusText + '</span>' +
         '<span class="queue-buttons">' + actionButtons + '</span>' +

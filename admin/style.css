@@ -1893,11 +1893,14 @@ body::after {
 
 .queue-role-name {
     min-width: 70px;
-    color: #c8b060;
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
 }
+.queue-role-townsfolk { color: var(--role-town); }
+.queue-role-outsider  { color: var(--role-outsider); }
+.queue-role-minion    { color: var(--role-minion); }
+.queue-role-demon     { color: var(--role-demon); }
 
 .queue-action-desc {
     flex: 1;
