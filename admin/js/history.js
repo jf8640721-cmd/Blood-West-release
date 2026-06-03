@@ -4,6 +4,9 @@
    依赖：state.js, data/roles.js
    ============================================================ */
 
+// 当前历史记录筛选状态（null = 显示全部）
+let currentHistoryFilter = null;
+
 // 加载夜间行动历史
 async function loadNightHistory() {
     if (!state.room) return;
@@ -67,6 +70,9 @@ function renderNightHistory(phaseGroups) {
     const list = $('#history-list');
     const selector = $('#history-phase-selector');
 
+    // 数据刷新时重置筛选状态
+    currentHistoryFilter = null;
+
     // 渲染阶段选择器
     renderPhaseSelector(phaseGroups.map(g => g.phase));
 
@@ -80,18 +86,28 @@ function renderNightHistory(phaseGroups) {
     list.innerHTML = html;
 }
 
-// 渲染阶段快速跳转栏
+// 渲染阶段快速跳转栏（点击筛选 / 再次点击取消显示全部）
 function renderPhaseSelector(phaseNames) {
     const selector = $('#history-phase-selector');
     if (phaseNames.length <= 1) {
         selector.innerHTML = '';
         return;
     }
-    let html = '';
+    let html = '<button class="history-phase-btn" onclick="filterByPhase(null)" title="显示全部夜晚">全部</button>';
     for (const name of phaseNames) {
-        html += `<button class="history-phase-btn" onclick="scrollToPhase('${name}')" title="跳转到 ${name}">${name}</button>`;
+        html += `<button class="history-phase-btn" data-phase="${escapeHtml(name)}" onclick="filterByPhase('${name}')" title="仅显示 ${name}">${name}</button>`;
     }
     selector.innerHTML = html;
+
+    // 恢复之前的筛选状态（或默认高亮"全部"）
+    if (currentHistoryFilter) {
+        const activeBtn = selector.querySelector('[data-phase="' + currentHistoryFilter + '"]');
+        if (activeBtn) activeBtn.classList.add('active');
+    } else {
+        // 默认高亮"全部"
+        const allBtn = selector.querySelector('.history-phase-btn');
+        if (allBtn) allBtn.classList.add('active');
+    }
 }
 
 // 渲染单个夜晚的行动组
@@ -230,12 +246,48 @@ function togglePhaseGroup(phaseKey) {
     }
 }
 
-// 滚动到指定夜晚
-function scrollToPhase(phaseKey) {
-    const group = $('#history-group-' + phaseKey);
-    if (group) {
-        group.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// 按阶段筛选历史记录（再次点击同一按钮或点击"全部"则取消筛选）
+function filterByPhase(phaseName) {
+    const allGroups = document.querySelectorAll('.history-phase-group');
+    const allBtns = document.querySelectorAll('.history-phase-btn');
+
+    // 点击"全部"或传入 null → 显示全部
+    if (!phaseName) {
+        currentHistoryFilter = null;
+        allGroups.forEach(g => g.style.display = '');
+        allBtns.forEach(b => b.classList.remove('active'));
+        // 高亮"全部"按钮
+        const allBtn = document.querySelector('.history-phase-btn[onclick*="filterByPhase(null)"]');
+        if (allBtn) allBtn.classList.add('active');
+        return;
     }
+
+    const phaseKey = phaseName.replace(/[^a-zA-Z0-9一-龥]/g, '_');
+
+    // 再次点击已选中的按钮 → 取消筛选，显示全部
+    if (currentHistoryFilter === phaseName) {
+        currentHistoryFilter = null;
+        allGroups.forEach(g => g.style.display = '');
+        allBtns.forEach(b => b.classList.remove('active'));
+        const allBtn = document.querySelector('.history-phase-btn[onclick*="filterByPhase(null)"]');
+        if (allBtn) allBtn.classList.add('active');
+        return;
+    }
+
+    // 筛选：只显示选中的夜晚
+    currentHistoryFilter = phaseName;
+    allBtns.forEach(b => {
+        const match = b.getAttribute('data-phase') === phaseName;
+        b.classList.toggle('active', match);
+    });
+
+    allGroups.forEach(g => {
+        if (g.id === 'history-group-' + phaseKey) {
+            g.style.display = '';
+        } else {
+            g.style.display = 'none';
+        }
+    });
 }
 
 // 简单的 HTML 转义
