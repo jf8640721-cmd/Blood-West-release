@@ -408,14 +408,93 @@ function setupSeatSwap() {
 
     document.addEventListener('mouseup', async () => {
         if (!draggedSeat) return;
+        await finishDrag();
+    });
+
+    // ----- 触摸事件（iPad / 移动端支持）-----
+
+    document.addEventListener('touchstart', (e) => {
+        // 踢出按钮：不拦截，让原生 click 事件处理
+        if (e.target.closest('.kick-btn')) return;
+
+        // 生死状态切换图标：点击切换状态，不触发选人/拖拽
+        if (e.target.closest('.status-toggle')) {
+            const seat = e.target.closest('.player-seat:not(.seat-empty)');
+            if (seat && seat.dataset.playerId) {
+                e.preventDefault();
+                e.stopPropagation();
+                togglePlayerStatus(seat.dataset.playerId);
+            }
+            return;
+        }
+
+        const seat = e.target.closest('.player-seat:not(.seat-empty)');
+        if (!seat) return;
+
+        isDragging = true;
+        draggedSeat = seat;
+        startSlot = parseInt(seat.dataset.slot);
+        startPlayerId = seat.dataset.playerId;
+        hasDragged = false;
+
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        lastMouseX = touch.clientX;
+        lastMouseY = touch.clientY;
+        e.preventDefault(); // 阻止滚动
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!draggedSeat) return;
+
+        const touch = e.touches[0];
+        lastMouseX = touch.clientX;
+        lastMouseY = touch.clientY;
+
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+
+        if (!hasDragged && Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+
+        if (!hasDragged) {
+            hasDragged = true;
+            draggedSeat.style.zIndex = '10';
+            draggedSeat.style.opacity = '0.85';
+            draggedSeat.style.transition = 'none';
+        }
+
+        const tableEl = $('#round-table');
+        const rect = tableEl.getBoundingClientRect();
+        draggedSeat.style.left = (touch.clientX - rect.left) + 'px';
+        draggedSeat.style.top = (touch.clientY - rect.top) + 'px';
+    }, { passive: false });
+
+    document.addEventListener('touchend', async (e) => {
+        if (!draggedSeat) return;
+        // 没有移动时，用 changedTouches 记录最后坐标
+        if (!hasDragged && e.changedTouches.length > 0) {
+            const touch = e.changedTouches[0];
+            lastMouseX = touch.clientX;
+            lastMouseY = touch.clientY;
+        }
+        await finishDrag();
+    });
+
+    document.addEventListener('touchcancel', async () => {
+        if (!draggedSeat) return;
+        await finishDrag();
+    });
+
+    // 拖拽结束的公共逻辑
+    async function finishDrag() {
+        if (!draggedSeat) return;
 
         if (hasDragged) {
-            // 恢复样式
             draggedSeat.style.zIndex = '';
             draggedSeat.style.opacity = '';
             draggedSeat.style.transition = '';
 
-            // 直接用最后鼠标坐标找最近槽位（避免从元素 style 反推坐标的误差）
             const closestSlot = findClosestSlot(lastMouseX, lastMouseY);
 
             if (closestSlot !== startSlot) {
@@ -425,10 +504,8 @@ function setupSeatSwap() {
                     console.error('座位交换失败:', err);
                 }
             }
-            // 重新渲染（清除拖拽产生的临时样式）
             renderRoundTable();
         } else {
-            // 没有拖拽，视为点击：选中该玩家
             if (startPlayerId) selectPlayer(startPlayerId);
         }
 
@@ -437,7 +514,7 @@ function setupSeatSwap() {
         startSlot = -1;
         startPlayerId = null;
         hasDragged = false;
-    });
+    }
 }
 
 // 交换两个槽位上的玩家座位（仅更新数据，不渲染 DOM）

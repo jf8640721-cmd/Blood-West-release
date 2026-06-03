@@ -1,5 +1,14 @@
 # 版本日志
 
+## v1.8.15 (2026-06-03)
+
+### 修复 iPad 无法拖拽移动座位
+
+圆桌座位拖拽原先只监听鼠标事件（mousedown/mousemove/mouseup），iPad 触摸屏不触发这些事件。新增 touch 事件支持（touchstart/touchmove/touchend/touchcancel），并提取 `finishDrag()` 公共逻辑复用。
+
+**变更文件：**
+- `admin/js/table.js` — `setupSeatSwap()` 新增触摸事件监听 + 踢出按钮豁免
+
 ## v1.8.14 (2026-06-03)
 
 ### 夜间记录新增阶段筛选功能
