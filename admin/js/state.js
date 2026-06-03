@@ -55,6 +55,11 @@ let isDragging = false;
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
+// ----- 微信订阅消息 Worker URL（部署后替换为实际地址）-----
+const WORKER_URL = 'https://blood-west-notify.workers.dev';
+// 订阅消息模板 ID（需在微信公众平台配置后替换）
+const SUBSCRIBE_TEMPLATE_ID = 'SUBSCRIBE_TEMPLATE_ID';
+
 // ----- localStorage 键名 -----
 const STORAGE_KEY = 'botc_room';
 

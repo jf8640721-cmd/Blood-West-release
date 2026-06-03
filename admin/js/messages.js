@@ -150,7 +150,37 @@ async function replyToPlayer() {
     }
 
     input.value = '';
+    // 异步发送微信订阅通知（静默失败，不影响消息发送）
+    sendSubscribeNotify(content);
     // Realtime 会自动推送消息，renderMessages 在 subscribe 回调中触发
+}
+
+// ============================================================
+// 微信订阅消息通知（v1.8.18+）
+// ============================================================
+function sendSubscribeNotify(content) {
+    if (!state.selectedPlayer || !state.selectedPlayer.wechat_openid) return;
+    if (!SUBSCRIBE_TEMPLATE_ID || SUBSCRIBE_TEMPLATE_ID === 'SUBSCRIBE_TEMPLATE_ID') return;
+
+    var now = new Date();
+    var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+
+    fetch(WORKER_URL + '/send-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            openid: state.selectedPlayer.wechat_openid,
+            template_id: SUBSCRIBE_TEMPLATE_ID,
+            page: '/pages/chat/chat',
+            data: {
+                thing1: { value: content.substring(0, 20) },
+                thing2: { value: '房间 ' + (state.room ? state.room.code : '') },
+                time3: { value: timeStr }
+            }
+        })
+    }).catch(function() {
+        // 静默失败，不影响核心功能
+    });
 }
 
 // 快捷回复（模板消息，不透露技能结果）
@@ -175,6 +205,8 @@ async function sendQuickReply(content) {
         return;
     }
 
+    // 异步发送微信订阅通知
+    sendSubscribeNotify(content);
     // Realtime 会自动推送消息
 }
 

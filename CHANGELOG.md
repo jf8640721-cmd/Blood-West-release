@@ -1,5 +1,50 @@
 # 版本日志
 
+## v1.8.18 (2026-06-03)
+
+### 微信订阅消息通知（切屏提醒）
+
+主持人回复玩家时，玩家即使切到微信后台也能收到「服务通知」提醒。
+
+**架构：Cloudflare Worker（免费）** 充当中转服务器，处理：
+- `POST /exchange-openid` — 用 wx.login() code 换取真实 OpenID
+- `POST /send-notify` — 调用微信 `subscribeMessage.send` 发送通知
+
+**小程序端：**
+- 加入房间时异步换取真实 OpenID，存入 `players.wechat_openid`
+- 聊天页顶部显示「🔔 开启消息提醒」引导条（点击触发 `wx.requestSubscribeMessage`）
+- 授权记录存入 `subscriptions` 表
+
+**Web 主持端：**
+- `replyToPlayer()` / `sendQuickReply()` 成功后异步调用 Worker 发送通知
+- 静默失败，不影响消息发送
+
+**数据库：**
+- `players.wechat_openid` 字段（真 OpenID，与现有假 openid 并存）
+- 新建 `subscriptions` 表（记录用户订阅状态）
+
+**新增文件：**
+- `cloudflare-worker/index.js` — Worker 中转代码
+- `cloudflare-worker/wrangler.toml` — 部署配置
+
+**变更文件：**
+- `supabase/schema.sql` — 新字段 + 新表
+- `miniprogram/utils/api.js` — +4 个新函数
+- `miniprogram/utils/config.js` — 新增 WORKER_URL
+- `miniprogram/pages/scan/scan.js` — 加入时换真 OpenID
+- `miniprogram/pages/chat/chat.js` — 订阅提醒条逻辑
+- `miniprogram/pages/chat/chat.wxml` — 提醒条 UI
+- `miniprogram/pages/chat/chat.wxss` — 提醒条样式
+- `admin/js/state.js` — 新增 WORKER_URL + TEMPLATE_ID 常量
+- `admin/js/messages.js` — 回复后触发通知
+
+**部署前准备：**
+1. 微信公众平台配置订阅消息模板 → 获得模板 ID
+2. `npx wrangler deploy` 部署 Worker → 设置 `WECHAT_APPID` / `WECHAT_APPSECRET` 密钥
+3. 更新 `SUBSCRIBE_TEMPLATE_ID` 和 `WORKER_URL` 为实际值
+4. 小程序后台添加 Worker URL 到 request 合法域名
+5. 在 Supabase SQL Editor 执行 schema 新增部分
+
 ## v1.8.17 (2026-06-03)
 
 ### 名牌编辑规则：首夜后玩家锁定，主持人始终可改
