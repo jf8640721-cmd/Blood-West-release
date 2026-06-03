@@ -78,6 +78,71 @@ function bindEvents() {
 }
 
 // ============================================================
+// 调试工具：模拟玩家加入（浏览器控制台调用）
+// 用法：debugAddTestPlayers(15) — 添加15名测试玩家
+// ============================================================
+const TEST_NICKNAMES = [
+    '孙悟空', '猪八戒', '沙和尚', '唐三藏', '白龙马',
+    '牛魔王', '铁扇公主', '红孩儿', '哪吒', '二郎神',
+    '嫦娥', '观音', '如来', '玉皇大帝', '王母娘娘',
+    '太白金星', '李靖', '金角大王', '银角大王', '蜘蛛精'
+];
+
+async function debugAddTestPlayers(count) {
+    if (!state.room) {
+        console.error('❌ 请先创建房间');
+        return;
+    }
+    count = count || 15;
+
+    console.log(`正在添加 ${count} 名测试玩家...`);
+
+    const players = [];
+    for (let i = 0; i < count; i++) {
+        players.push({
+            room_id: state.room.id,
+            openid: 'test_' + Date.now() + '_' + i,
+            nickname: TEST_NICKNAMES[i] || ('测试玩家' + (i + 1))
+        });
+    }
+
+    const { data, error } = await state.supabase
+        .from('players')
+        .insert(players)
+        .select();
+
+    if (error) {
+        console.error('❌ 添加失败：', error.message);
+        return;
+    }
+
+    console.log(`✅ 成功添加 ${data.length} 名玩家（房间码：${state.room.code}）`);
+    console.log('玩家序号已自动分配，可通过小程序扫码或手动输入房间码加入');
+    return data;
+}
+
+// 调试工具：清除所有测试玩家
+async function debugClearTestPlayers() {
+    if (!state.room) {
+        console.error('❌ 请先创建房间');
+        return;
+    }
+
+    const { error } = await state.supabase
+        .from('players')
+        .delete()
+        .eq('room_id', state.room.id)
+        .like('openid', 'test_%');
+
+    if (error) {
+        console.error('❌ 清除失败：', error.message);
+        return;
+    }
+
+    console.log('✅ 已清除所有测试玩家');
+}
+
+// ============================================================
 // 启动
 // ============================================================
 document.addEventListener('DOMContentLoaded', init);
