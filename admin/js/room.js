@@ -434,3 +434,35 @@ function renderRoomInfo() {
     if (!state.room) return;
     $('#room-code').textContent = state.room.code;
 }
+
+// ============================================================
+// 主持人编辑玩家名牌（始终允许，不受阶段限制）
+// ============================================================
+async function editPlayerNickname(playerId) {
+    const player = state.players.find(p => p.id === playerId);
+    if (!player) return;
+
+    const currentName = player.nickname || '未命名玩家';
+    const newName = prompt('修改玩家 ' + player.player_number + ' 号名牌：', currentName);
+    if (newName === null) return; // 用户取消
+
+    const trimmed = newName.trim();
+    if (!trimmed) {
+        alert('名牌不能为空');
+        return;
+    }
+
+    const { error } = await state.supabase
+        .from('players')
+        .update({ nickname: trimmed })
+        .eq('id', playerId);
+
+    if (error) {
+        alert('修改失败：' + error.message);
+        return;
+    }
+
+    // 本地乐观更新
+    player.nickname = trimmed;
+    renderRoundTable();
+}

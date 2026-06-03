@@ -1,5 +1,28 @@
 # 版本日志
 
+## v1.8.17 (2026-06-03)
+
+### 名牌编辑规则：首夜后玩家锁定，主持人始终可改
+
+**规则定义：**
+- 玩家在首夜后可修改自己的名牌，首夜过后（切换到第1天起）锁定不可改
+- 主持人始终可以修改任意玩家的名牌，不受阶段限制
+
+**小程序端：**
+- `chat.js` / `evil-chat.js` — `onNicknameSave()` 增加阶段检查，非首夜时提示"首夜后无法修改名牌，请联系主持人"
+
+**Web 主持端：**
+- 左侧玩家列表和圆桌座位上，点击玩家名牌弹出修改对话框
+- 悬停时名牌变为金色 + 显示 ✎ 编辑图标
+- 新增 `editPlayerNickname()` 函数，直接更新 Supabase
+
+**变更文件：**
+- `miniprogram/pages/chat/chat.js` — 阶段检查
+- `miniprogram/pages/evil-chat/evil-chat.js` — 阶段检查
+- `admin/js/table.js` — 玩家列表/座位名牌可点击编辑
+- `admin/js/room.js` — 新增 `editPlayerNickname()` 函数
+- `admin/style.css` — 名牌悬停效果 + 编辑图标样式
+
 ## v1.8.16 (2026-06-03)
 
 ### 夜间队列迁移至消息面板顶部
