@@ -88,6 +88,46 @@ const TEST_NICKNAMES = [
     '太白金星', '李靖', '金角大王', '银角大王', '蜘蛛精'
 ];
 
+// UI 按钮调用：弹出输入框，默认15人
+async function debugAddPlayers() {
+    if (!state.room) {
+        alert('请先创建房间');
+        return;
+    }
+
+    // 检查是否已有玩家
+    const existingCount = state.players.length;
+    var defaultCount = Math.max(1, 15 - existingCount);
+    var hint = existingCount > 0
+        ? `（当前已有 ${existingCount} 名玩家，建议添加 ${defaultCount} 人凑满 15 人）`
+        : '（默认 15 人）';
+
+    var input = prompt('请输入要模拟加入的玩家人数：' + hint, defaultCount);
+    if (input === null) return; // 用户取消
+
+    var count = parseInt(input);
+    if (isNaN(count) || count < 1) {
+        alert('请输入有效的数字（1-20）');
+        return;
+    }
+    if (count > 20) {
+        alert('最多一次添加 20 人');
+        return;
+    }
+
+    // 检查是否超过19个座位
+    if (existingCount + count > 19) {
+        alert(`圆桌只有 19 个座位，当前已有 ${existingCount} 人，最多还能加 ${19 - existingCount} 人`);
+        return;
+    }
+
+    try {
+        await debugAddTestPlayers(count);
+    } catch (e) {
+        alert('添加失败：' + e.message);
+    }
+}
+
 async function debugAddTestPlayers(count) {
     if (!state.room) {
         console.error('❌ 请先创建房间');
@@ -97,27 +137,27 @@ async function debugAddTestPlayers(count) {
 
     console.log(`正在添加 ${count} 名测试玩家...`);
 
-    const players = [];
-    for (let i = 0; i < count; i++) {
+    var ts = Date.now();
+    var players = [];
+    for (var i = 0; i < count; i++) {
         players.push({
             room_id: state.room.id,
-            openid: 'test_' + Date.now() + '_' + i,
+            openid: 'test_' + ts + '_' + i,
             nickname: TEST_NICKNAMES[i] || ('测试玩家' + (i + 1))
         });
     }
 
-    const { data, error } = await state.supabase
+    var { data, error } = await state.supabase
         .from('players')
         .insert(players)
         .select();
 
     if (error) {
         console.error('❌ 添加失败：', error.message);
-        return;
+        throw error;
     }
 
     console.log(`✅ 成功添加 ${data.length} 名玩家（房间码：${state.room.code}）`);
-    console.log('玩家序号已自动分配，可通过小程序扫码或手动输入房间码加入');
     return data;
 }
 

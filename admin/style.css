@@ -154,6 +154,20 @@ body::after {
     box-shadow: var(--shadow-red);
 }
 
+/* 调试按钮 — 模拟玩家加入 */
+.btn-debug {
+    padding: 6px 12px;
+    font-size: 11px;
+    background: transparent;
+    color: #888;
+    border: 1px dashed #555;
+}
+.btn-debug:hover {
+    color: #ccc;
+    border-color: #999;
+    background: #1a1a2e;
+}
+
 /* 邪恶群聊工具栏按钮 */
 .btn-evil-toolbar {
     width: 36px;
