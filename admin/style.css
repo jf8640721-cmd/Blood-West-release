@@ -2237,6 +2237,14 @@ body::after {
     text-overflow: ellipsis;
     max-width: 80px;
 }
+.history-action-target-raw {
+    color: #5dade2;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}
 
 /* 状态标签 */
 .history-action-status {

@@ -129,6 +129,11 @@ function renderHistoryActionRow(action, orderNum) {
     const statusInfo = getStatusInfo(action.status);
     const targetInfo = action.target_player_id ? getPlayerInfo(action.target_player_id) : null;
 
+    // 尝试从 action_data 中提取 targetRaw（手动处理时的原始输入）
+    var actionData = {};
+    try { actionData = JSON.parse(action.action_data || '{}'); } catch(e) {}
+    var targetRaw = actionData.targetRaw || '';
+
     // 处理时间
     let timeStr = '';
     if (action.processed_at) {
@@ -152,6 +157,9 @@ function renderHistoryActionRow(action, orderNum) {
     if (targetInfo) {
         html += '<span class="history-action-arrow">→</span>';
         html += '<span class="history-action-target">' + escapeHtml(targetInfo.label) + '</span>';
+    } else if (targetRaw) {
+        html += '<span class="history-action-arrow">→</span>';
+        html += '<span class="history-action-target-raw">' + escapeHtml(targetRaw) + '</span>';
     }
 
     html += '<span class="history-action-status ' + statusInfo.className + '">' + statusInfo.label + '</span>';

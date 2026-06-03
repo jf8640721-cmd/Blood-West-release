@@ -383,6 +383,13 @@ async function processQueueItem(item) {
                 .eq('id', item.actionId);
         } else {
             // 玩家口头告知，主持人手动记录
+            var resolutionParts = ['主持人手动处理'];
+            if (item.targetRaw) {
+                resolutionParts.push('→ ' + item.targetRaw);
+            }
+            if (item.resolution) {
+                resolutionParts.push('[' + item.resolution + ']');
+            }
             var insertData = {
                 room_id: state.room.id,
                 phase: state.queuePhase,
@@ -390,9 +397,9 @@ async function processQueueItem(item) {
                 role_id: item.roleObj.id,
                 direction: 'player_initiated',
                 action_type: 'use_ability',
-                action_data: '{}',
+                action_data: JSON.stringify({ targetRaw: item.targetRaw || '', note: item.resolution || '' }),
                 status: 'completed',
-                resolution: '主持人手动处理（玩家口头告知）',
+                resolution: resolutionParts.join(' '),
                 processed_at: new Date().toISOString()
             };
             if (item.targetPlayerId) {
