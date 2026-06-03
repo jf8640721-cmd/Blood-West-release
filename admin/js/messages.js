@@ -165,17 +165,18 @@ function sendSubscribeNotify(content) {
     var now = new Date();
     var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
 
-    fetch(WORKER_URL + '/send-notify', {
+    fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+            action: 'send-notify',
             openid: state.selectedPlayer.wechat_openid,
             template_id: SUBSCRIBE_TEMPLATE_ID,
             page: '/pages/chat/chat',
             data: {
-                thing1: { value: content.substring(0, 20) },
-                thing2: { value: '房间 ' + (state.room ? state.room.code : '') },
-                time3: { value: timeStr }
+                thing3: { value: content.substring(0, 20) },
+                thing9: { value: '说书人' },
+                time2: { value: timeStr }
             }
         })
     }).catch(function() {

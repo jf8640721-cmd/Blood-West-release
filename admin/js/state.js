@@ -55,8 +55,9 @@ let isDragging = false;
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-// ----- 微信订阅消息 Worker URL（部署后替换为实际地址）-----
-const WORKER_URL = 'https://blood-west-notify.bloodwest.workers.dev';
+// ----- 微信订阅消息云函数 HTTP 地址（国内可达）-----
+const WORKER_URL = 'https://cloudbase-d4g9rcvtd370cce65.service.tcloudbase.com/notify';
+// HTTP 访问服务域名
 // 订阅消息模板 ID（需在微信公众平台配置后替换）
 const SUBSCRIBE_TEMPLATE_ID = 'ELYdEaBoZHItuthAfaj1l3upI8Z0yNGNMnFHC7QTUuI';
 
