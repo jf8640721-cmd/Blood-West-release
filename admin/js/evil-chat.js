@@ -12,16 +12,23 @@ function switchMsgTab(tabName, silent) {
     // 更新 Tab 按钮状态
     $('#tab-private').classList.toggle('active', tabName === 'private');
     $('#tab-evil').classList.toggle('active', tabName === 'evil');
+    $('#tab-history').classList.toggle('active', tabName === 'history');
 
     // 切换内容区显示
     $('#private-chat-area').style.display = tabName === 'private' ? 'flex' : 'none';
     $('#evil-chat-area').style.display = tabName === 'evil' ? 'flex' : 'none';
+    $('#history-area').style.display = tabName === 'history' ? 'flex' : 'none';
 
     // 更新标题
     if (tabName === 'evil') {
         $('#rt-msg-panel-title').textContent = '邪恶群聊';
         renderEvilMembers();
         if (!silent) loadEvilMessages();
+    } else if (tabName === 'history') {
+        $('#rt-msg-panel-title').textContent = '夜间行动记录';
+        if (!silent && typeof loadNightHistory === 'function') {
+            loadNightHistory();
+        }
     } else {
         const playerName = state.selectedPlayer
             ? (state.selectedPlayer.nickname || state.selectedPlayer.player_number + '号')

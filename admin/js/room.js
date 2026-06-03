@@ -120,6 +120,9 @@ function hideRoomUI() {
     $('#evil-message-list').innerHTML = '<div class="msg-placeholder">邪恶阵营玩家可在此群聊</div>';
     $('#evil-members-bar').innerHTML = '';
     $('#evil-reply-input').value = '';
+    // 重置历史记录面板
+    $('#history-list').innerHTML = '<div class="msg-placeholder">暂无夜间行动记录</div>';
+    $('#history-phase-selector').innerHTML = '';
     // 重置 Tab
     switchMsgTab('private', true);
     // 重置圆桌
