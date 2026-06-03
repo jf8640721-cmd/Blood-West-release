@@ -225,6 +225,10 @@ body::after {
     border-color: var(--gold-dark);
     animation: phasePulseDay 3s infinite;
 }
+.btn-phase[disabled] {
+    cursor: default;
+    pointer-events: none;
+}
 
 /* 阶段切换按钮组 */
 .phase-controls {

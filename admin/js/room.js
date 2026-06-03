@@ -403,6 +403,14 @@ async function togglePhase() {
     showPhaseConfirm(newPhase);
 }
 
+async function togglePhaseForward() {
+    if (!state.room) return;
+
+    const newPhase = getNextPhase(state.room.phase);
+    pendingPhaseDirection = 'forward';
+    showPhaseConfirm(newPhase);
+}
+
 async function togglePhaseBackward() {
     if (!state.room) return;
 

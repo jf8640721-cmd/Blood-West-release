@@ -16,8 +16,8 @@ function init() {
 // ----- 事件绑定 -----
 function bindEvents() {
     $('#btn-create-room').addEventListener('click', createRoom);
-    $('#btn-toggle-phase').addEventListener('click', togglePhase);
     $('#btn-phase-prev').addEventListener('click', togglePhaseBackward);
+    $('#btn-phase-next').addEventListener('click', togglePhaseForward);
     $('#btn-show-qr').addEventListener('click', showQRCode);
     $('#btn-close-qr').addEventListener('click', () => {
         $('#qr-modal').style.display = 'none';
