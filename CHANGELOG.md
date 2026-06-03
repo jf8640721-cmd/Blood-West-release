@@ -1,5 +1,30 @@
 # 版本日志
 
+## v1.8.19 (2026-06-04)
+
+### 微信订阅消息通知 — Cloudflare Worker → 微信云函数迁移
+
+Cloudflare Workers 的 `workers.dev` 域名在中国大陆被墙，导致小程序端无法换取真实 OpenID，通知功能完全不可用。本版本将后端从 Cloudflare Worker 迁移到**微信云开发云函数**，国内网络天然可达。
+
+**云函数 `notify`：**
+- 替代 Cloudflare Worker，处理 `/exchange-openid` 和 `/send-notify`
+- 通过微信云开发 HTTP 访问服务暴露端点，Web 端可直接调用
+- AppSecret 等配置通过环境变量/硬编码管理（私有仓库安全）
+
+**小程序端改动：**
+- 接入微信云开发，`app.js` 初始化 `wx.cloud.init()`
+- `scan.js` / `chat.js` 改用 `wx.cloud.callFunction('notify', ...)` 换取 OpenID
+- 聊天页 `onLoad` 时执行 OpenID 交换（避免 scan 页跳转打断异步请求）
+- 订阅按钮改用 `catchtap` + `<view>`（修复真机不弹出原生弹窗的问题）
+
+**Web 主持端改动：**
+- `WORKER_URL` 更新为云函数 HTTP 触发地址（国内可达）
+- 模板参数字段修正：`thing3`（消息内容）、`thing9`（发布人）、`time2`（时间）
+
+**修复的问题：**
+- 真机 `wx.requestSubscribeMessage` 不弹出授权弹窗（`<button>` → `<view>` + `catchtap`）
+- 模板参数 47003 错误（字段名与微信模板不匹配）
+
 ## v1.8.18 (2026-06-03)
 
 ### 微信订阅消息通知（切屏提醒）
