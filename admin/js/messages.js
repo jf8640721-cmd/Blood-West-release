@@ -159,11 +159,23 @@ async function replyToPlayer() {
 // 微信订阅消息通知（v1.8.18+）
 // ============================================================
 function sendSubscribeNotify(content) {
-    if (!state.selectedPlayer || !state.selectedPlayer.wechat_openid) return;
-    if (!SUBSCRIBE_TEMPLATE_ID || SUBSCRIBE_TEMPLATE_ID === 'SUBSCRIBE_TEMPLATE_ID') return;
+    if (!state.selectedPlayer) {
+        console.log('[订阅通知] 跳过：无选中玩家');
+        return;
+    }
+    if (!state.selectedPlayer.wechat_openid) {
+        console.log('[订阅通知] 跳过：wechat_openid 为空, player:', state.selectedPlayer.player_number);
+        return;
+    }
+    if (!SUBSCRIBE_TEMPLATE_ID || SUBSCRIBE_TEMPLATE_ID === 'SUBSCRIBE_TEMPLATE_ID') {
+        console.log('[订阅通知] 跳过：TEMPLATE_ID 未配置');
+        return;
+    }
 
     var now = new Date();
     var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+
+    console.log('[订阅通知] 发送中... openid:', (state.selectedPlayer.wechat_openid || '').substring(0, 12) + '...');
 
     fetch(WORKER_URL, {
         method: 'POST',
@@ -179,8 +191,10 @@ function sendSubscribeNotify(content) {
                 time2: { value: timeStr }
             }
         })
-    }).catch(function() {
-        // 静默失败，不影响核心功能
+    }).then(function(res) {
+        console.log('[订阅通知] 响应:', res.status);
+    }).catch(function(err) {
+        console.error('[订阅通知] 失败:', err);
     });
 }
 
