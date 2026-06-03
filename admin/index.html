@@ -52,17 +52,6 @@
         </div>
     </header>
 
-    <!-- ========== 夜间行动队列（可折叠紧凑条） ========== -->
-    <div id="night-queue-panel" class="night-queue-panel" style="display:none;">
-        <div class="queue-header" id="queue-header-bar" onclick="toggleQueuePanel()">
-            <span class="queue-collapsed-icon">🌙</span>
-            <span id="queue-collapsed-text" class="queue-collapsed-text">夜间行动队列</span>
-            <span id="queue-progress" class="queue-progress">已处理: 0/0</span>
-            <button id="btn-toggle-queue" class="btn btn-xs btn-queue-toggle" onclick="event.stopPropagation(); toggleQueuePanel();">展开</button>
-        </div>
-        <div id="queue-list" class="queue-list" style="display:none;"></div>
-    </div>
-
     <!-- ========== 圆桌主视图 ========== -->
     <main id="round-table-view">
         <!-- 左侧：紧凑玩家列表 -->
@@ -94,6 +83,17 @@
 
         <!-- 右侧：消息面板 -->
         <section id="rt-message-panel">
+            <!-- 夜间行动队列（嵌入消息面板顶部） -->
+            <div id="night-queue-panel" class="night-queue-panel" style="display:none;">
+                <div class="queue-header" id="queue-header-bar" onclick="toggleQueuePanel()">
+                    <span class="queue-collapsed-icon">🌙</span>
+                    <span id="queue-collapsed-text" class="queue-collapsed-text">夜间行动队列</span>
+                    <span id="queue-progress" class="queue-progress">已处理: 0/0</span>
+                    <button id="btn-toggle-queue" class="btn btn-xs btn-queue-toggle" onclick="event.stopPropagation(); toggleQueuePanel();">展开</button>
+                </div>
+                <div id="queue-list" class="queue-list" style="display:none;"></div>
+            </div>
+
             <div class="panel-header">
                 <h2 id="rt-msg-panel-title">消息记录</h2>
                 <div class="msg-panel-tabs">

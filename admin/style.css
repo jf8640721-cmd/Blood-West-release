@@ -1778,11 +1778,12 @@ body::after {
    夜间行动队列面板（工具栏下方可折叠紧凑条）
    ============================================================ */
 .night-queue-panel {
-    margin: 0 16px 6px;
+    margin: 0 0 4px;
     background: linear-gradient(135deg, #0d0d1a, #111128);
     border: 1px solid #2a2a50;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
+    flex-shrink: 0;
     /* JS控制 display: none/block */
 }
 /* 标题条（始终可见，点击可展开/折叠） */
