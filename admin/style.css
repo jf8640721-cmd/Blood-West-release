@@ -1041,12 +1041,6 @@ body::after {
 .seat-label:hover {
     color: var(--gold-primary);
 }
-    background: rgba(10, 10, 18, 0.75);
-    padding: 2px 8px;
-    border-radius: 3px;
-    border: 1px solid rgba(42, 42, 74, 0.5);
-    font-family: var(--font-body);
-}
 
 /* 生死状态切换图标（座位标记点中央小圆） */
 .status-toggle {

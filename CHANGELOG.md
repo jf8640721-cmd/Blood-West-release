@@ -1,5 +1,32 @@
 # 版本日志
 
+## v2.0.0 (2026-06-04)
+
+### 🎉 里程碑：项目全面审查 + 质量修复
+
+经过 88 角色数据、24 代码文件、数据库 Schema 的全面审查，修复了 2 个严重问题、3 个主要问题、4 个次要问题。这是项目进入稳定阶段前的质量里程碑。
+
+**严重修复：**
+- **initSkillStates 从未被调用** — `room.js` 中 `'第一天'`(汉字一) vs `'第1天'`(数字1) 字符串不匹配，导致首夜过后技能状态从未初始化
+- **CSS 孤立声明** — `style.css` 中 6 行无选择器的孤立 CSS 属性声明，现已移除
+
+**主要修复：**
+- **escapeHtml 重复定义** — `history.js` 的弱版覆盖了 `state.js` 的 DOM 强版（XSS 风险），已删除重复版本
+- **死代码移除** — `togglePhase()` 函数从未绑定，功能已被 `togglePhaseForward()` 替代
+- **退出房间队列状态泄露** — `exitRoom()` 未清理 `nightQueue`/`queueActions`/`skillChannel` 等队列状态
+
+**次要修复：**
+- **恢复房间 players 查询** — 补充了缺失的错误处理
+- **Schema players DELETE 策略** — 补充缺失的 RLS DELETE 策略，修复 `debugClearTestPlayers()` 静默失败
+- **云函数 AppSecret** — 改为优先读取环境变量，增强安全性
+- **roles.js 调试日志** — 移除生产环境 `console.log`
+
+**审查范围（4 维度并行）：**
+1. admin/ 前端代码质量（HTML/CSS/JS）
+2. 角色数据 vs 说明书一致性（88 角色逐条比对）
+3. 数据库 Schema vs 代码一致性（6 表 × 全部列）
+4. 小程序端代码质量（API/页面/云函数）
+
 ## v1.8.20 (2026-06-04)
 
 ### 新增 4 个角色（女娲、盘古、神农、刑天）

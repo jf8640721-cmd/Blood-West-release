@@ -290,12 +290,5 @@ function filterByPhase(phaseName) {
     });
 }
 
-// 简单的 HTML 转义
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
+// escapeHtml 由 state.js 提供（DOM-based，覆盖所有HTML特殊字符）
+// 此处不再重复定义，避免覆盖更强的版本

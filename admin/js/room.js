@@ -71,12 +71,13 @@ async function restoreRoom() {
     state.room = data;
 
     // 拉取已有玩家列表
-    const { data: players } = await state.supabase
+    const { data: players, error: playersErr } = await state.supabase
         .from('players')
         .select('*')
         .eq('room_id', data.id)
         .order('player_number', { ascending: true });
 
+    if (playersErr) console.error('恢复玩家列表失败:', playersErr);
     state.players = players || [];
 
     // 恢复 UI 和订阅
@@ -147,6 +148,12 @@ function exitRoom() {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('botc_active_board');
 
+    // 取消技能频道订阅
+    if (state.skillChannel) {
+        state.supabase.removeChannel(state.skillChannel);
+        state.skillChannel = null;
+    }
+
     // 重置状态
     state.room = null;
     state.players = [];
@@ -157,6 +164,13 @@ function exitRoom() {
     state.evilMessages = [];
     state.msgTab = 'private';
     state.evilUnread = false;
+
+    // 重置夜间队列状态
+    state.nightQueue = [];
+    state.queueActions = {};
+    state.queueProcessed = 0;
+    state.queuePhase = null;
+    state.queueVisible = true;
 
     // 重置 UI
     hideRoomUI();
@@ -389,20 +403,12 @@ async function executePhaseSwitch() {
     hidePhaseConfirm();
 
     // 首夜结束时初始化技能状态
-    if (newPhase === '第一天' && typeof initSkillStates === 'function') {
+    if (newPhase === '第1天' && typeof initSkillStates === 'function') {
         initSkillStates();
     }
 
     // 阶段切换后刷新技能队列
     if (typeof initNightQueue === 'function') initNightQueue(newPhase);
-}
-
-async function togglePhase() {
-    if (!state.room) return;
-
-    const newPhase = getNextPhase(state.room.phase);
-    pendingPhaseDirection = 'forward';
-    showPhaseConfirm(newPhase);
 }
 
 async function togglePhaseForward() {

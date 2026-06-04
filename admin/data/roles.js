@@ -838,5 +838,4 @@ var ROLES = [
 var ROLES_BY_ID = {};
 ROLES.forEach(function(r) { ROLES_BY_ID[r.id] = r; });
 
-// 校验
-console.log('西游纪角色加载完成，共 ' + ROLES.length + ' 个角色');
+// 西游纪角色数据加载完成（共 88 个角色）
