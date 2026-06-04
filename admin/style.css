@@ -2078,6 +2078,39 @@ body::after {
 }
 
 /* ============================================================
+   白天行动队列面板
+   ============================================================ */
+.day-queue-panel {
+    margin: 0 0 4px;
+    background: linear-gradient(135deg, #1a1200, #281e08);
+    border: 1px solid #4a3a1a;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.day-queue-header {
+    background: linear-gradient(90deg, #2a1a08, #1a0e00) !important;
+}
+
+/* 白天队列行高亮色 */
+.queue-row .day-order {
+    background: #2a1a08;
+    color: #c8a858;
+}
+
+/* 时间段分组标题 */
+.queue-timing-divider {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #c8a040;
+    background: linear-gradient(90deg, rgba(200, 160, 64, 0.08), transparent);
+    border-bottom: 1px solid #3a2a10;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
    夜间行动历史记录面板（右侧消息面板第三个Tab）
    ============================================================ */
 

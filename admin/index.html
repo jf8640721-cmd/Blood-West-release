@@ -94,6 +94,17 @@
                 <div id="queue-list" class="queue-list" style="display:none;"></div>
             </div>
 
+            <!-- 白天行动队列（嵌入消息面板顶部） -->
+            <div id="day-queue-panel" class="day-queue-panel" style="display:none;">
+                <div class="queue-header day-queue-header" onclick="toggleDayQueuePanel()">
+                    <span class="queue-collapsed-icon">☀️</span>
+                    <span class="queue-collapsed-text">白天行动队列</span>
+                    <span id="day-queue-progress" class="queue-progress">已处理: 0/0</span>
+                    <button id="btn-toggle-day-queue" class="btn btn-xs btn-queue-toggle" onclick="event.stopPropagation(); toggleDayQueuePanel();">展开</button>
+                </div>
+                <div id="day-queue-list" class="queue-list" style="display:none;"></div>
+            </div>
+
             <div class="panel-header">
                 <h2 id="rt-msg-panel-title">消息记录</h2>
                 <div class="msg-panel-tabs">

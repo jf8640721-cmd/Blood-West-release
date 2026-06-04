@@ -30,7 +30,9 @@ async function createRoom() {
 
     // 初始化技能队列（如果队列模块已加载）
     if (typeof initNightQueue === 'function') initNightQueue(data.phase);
+    if (typeof initDayQueue === 'function') initDayQueue(data.phase);
     if (typeof subscribeSkillActions === 'function') subscribeSkillActions(data.id);
+    if (typeof subscribeDaySkillActions === 'function') subscribeDaySkillActions(data.id);
 }
 
 // 生成 6 位房间码（大写字母 + 数字，排除易混淆字符）
@@ -91,7 +93,9 @@ async function restoreRoom() {
 
     // 初始化技能队列（如果队列模块已加载）
     if (typeof initNightQueue === 'function') initNightQueue(data.phase);
+    if (typeof initDayQueue === 'function') initDayQueue(data.phase);
     if (typeof subscribeSkillActions === 'function') subscribeSkillActions(data.id);
+    if (typeof subscribeDaySkillActions === 'function') subscribeDaySkillActions(data.id);
 }
 
 // 显示房间 UI（创建/恢复房间后）
@@ -153,6 +157,10 @@ function exitRoom() {
         state.supabase.removeChannel(state.skillChannel);
         state.skillChannel = null;
     }
+    if (state.daySkillChannel) {
+        state.supabase.removeChannel(state.daySkillChannel);
+        state.daySkillChannel = null;
+    }
 
     // 重置状态
     state.room = null;
@@ -171,6 +179,13 @@ function exitRoom() {
     state.queueProcessed = 0;
     state.queuePhase = null;
     state.queueVisible = true;
+
+    // 重置白天队列状态
+    state.dayQueue = [];
+    state.dayQueueActions = {};
+    state.dayQueueProcessed = 0;
+    state.dayQueuePhase = null;
+    state.dayQueueVisible = true;
 
     // 重置 UI
     hideRoomUI();
@@ -221,8 +236,9 @@ function subscribeToRoom(roomId) {
             state.players.push(payload.new);
             state.players.sort((a, b) => a.player_number - b.player_number);
             renderRoundTable();
-            // 新玩家加入时刷新夜间队列（若是夜晚阶段）
+            // 新玩家加入时刷新技能队列
             if (typeof initNightQueue === 'function') initNightQueue();
+            if (typeof initDayQueue === 'function') initDayQueue();
         })
 
         // 监听玩家信息更新（昵称变更、座位交换等）
@@ -254,6 +270,7 @@ function subscribeToRoom(roomId) {
                     }
                     // 角色变更时刷新夜间队列（若是夜晚阶段）
                     if (typeof initNightQueue === 'function') initNightQueue();
+                    if (typeof initDayQueue === 'function') initDayQueue();
                 }
             }
         })
@@ -409,6 +426,7 @@ async function executePhaseSwitch() {
 
     // 阶段切换后刷新技能队列
     if (typeof initNightQueue === 'function') initNightQueue(newPhase);
+    if (typeof initDayQueue === 'function') initDayQueue(newPhase);
 }
 
 async function togglePhaseForward() {
