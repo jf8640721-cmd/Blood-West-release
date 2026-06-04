@@ -1,13 +1,13 @@
 /**
  * 血染钟楼：西游纪 — 角色主注册表
- * 共84个角色，分属4个阵营类别
+ * 共88个角色，分属4个阵营类别
  * 数据来源：docs/西游纪角色说明书.txt
  * v1.6.1: 按说明书补全12个缺失角色 + 修正4个归类（镇元子/元始天尊/万圣公主/孔雀公主→外来者）
  */
 
 var ROLES = [
   // ============================================================
-  // 村民 (townsfolk) — 善良阵营，46个
+  // 村民 (townsfolk) — 善良阵营，49个
   // ============================================================
   {
     id: "tang_seng", name: "唐僧", category: "townsfolk",
@@ -429,6 +429,36 @@ var ROLES = [
     description: "宁采臣以笔墨丹青之术交换玩家号码——笔墨白天选人当夜交换，丹青夜晚选人白天交换。两项独立使用。",
     tips: "笔墨：白天选择两名玩家→当夜号码互换；丹青：夜晚选择→白天号码互换；各自独立使用"
   },
+  {
+    id: "nvwa", name: "女娲", category: "townsfolk",
+    ability: "造化敕令：首夜选择一个角色进行庇护，获得免疫一次死亡的能量护盾。护盾破碎后第三天将刷新重置；传承之火：若你死于处决，当夜离你最近的随机一名死亡善良玩家将转世重生为同阵营的不在场角色；离你最远的一名玩家将在第三个夜晚感到灼热（无论你是否存活）",
+    outsiderModifier: 1,
+    abilityType: "active", nightOrder: null, firstNightOrder: 4, firstNightBlocked: false,
+    needsChoice: true, isDizzyable: true, deathImmune: false,
+    inheritsDemon: false, teamSynergy: null,
+    description: "女娲首夜选择一个角色以造化敕令庇护，获得免疫一次死亡的护盾，破碎后第3天刷新。死于处决时传承之火触发：最近死亡善良角色转世+最远玩家灼热。",
+    tips: "首夜选择一个角色（非玩家）庇护→护盾免疫一次死亡→破碎后第3天刷新；死于处决→最近死亡善良转世+最远玩家第3夜灼热"
+  },
+  {
+    id: "pangu", name: "盘古", category: "townsfolk",
+    ability: "天地聚合：盘古死亡当夜，可选择四名玩家强制重抽角色卡牌，盘古将得知其中一张；混淹浩劫：全局一次，使用盘古斧击杀一名玩家，若目标为邪恶角色且因此死亡，与其最近的一名善良玩家将被波及死亡",
+    outsiderModifier: 1,
+    abilityType: "once_per_game", nightOrder: null, firstNightOrder: null, firstNightBlocked: true,
+    needsChoice: true, isDizzyable: true, deathImmune: false,
+    inheritsDemon: false, teamSynergy: null,
+    description: "盘古死亡当夜可强制四名玩家重抽角色（得知其中一张）；混淹浩劫可斩杀邪恶并波及邻近善良。两项技能均为一次性，需主持确认。",
+    tips: "死亡当夜：天地聚合→选四名玩家重抽→盘古得知其中一张；全局一次：混淹浩劫→选一名玩家→若为邪恶死亡→最近善良波及死"
+  },
+  {
+    id: "shennong", name: "神农", category: "townsfolk",
+    ability: "洗练神鼎：全局一次，在夜晚选择两名你认为的邪恶玩家并猜测其角色，若全对，其一将转为善良阵营；青鸢延苓：全局一次，由你提名并致死的首个善良玩家将在死后第三个早晨复活",
+    outsiderModifier: 1,
+    abilityType: "once_per_game", nightOrder: null, firstNightOrder: null, firstNightBlocked: true,
+    needsChoice: true, isDizzyable: true, deathImmune: false,
+    inheritsDemon: false, teamSynergy: null,
+    description: "神农拥有洗练神鼎（夜晚猜两名邪恶角色→全对则其一转善良）和青鸢延苓（提名致死的首个善良玩家在死后第3个早晨复活），两项各全局一次。",
+    tips: "洗练神鼎：选两名玩家+猜角色→全对则其一转善良；青鸢延苓：神农提名致死首个善良→第3个早晨复活"
+  },
 
   // ============================================================
   // 外来者 (outsider) — 善良阵营但能力有害，10个
@@ -525,7 +555,7 @@ var ROLES = [
   },
 
   // ============================================================
-  // 爪牙 (minion) — 邪恶帮手，16个
+  // 爪牙 (minion) — 邪恶帮手，17个
   // ============================================================
   {
     id: "pipa_jing", name: "琵琶精", category: "minion",
@@ -673,6 +703,16 @@ var ROLES = [
     inheritsDemon: true, teamSynergy: null,
     description: "千年树妖首夜标记三名玩家——一旦有标记玩家死亡，另一存活标记者被秘密转为恶魔并与树妖结识。若被转者为邪恶则树妖入群转爪牙。",
     tips: "首夜标记三名玩家；任一标记死亡→存活标记之一秘密转恶魔；被转者若原为邪恶→树妖入群转爪牙；树妖初始不在邪恶群"
+  },
+  {
+    id: "xingtian", name: "刑天", category: "minion",
+    ability: "不灭煞气：每晚猜测两名非明牌玩家的角色，如果全对，煞气随机杀死其中一名玩家。如果全错，刑天将被煞气杀死（当场上积聚煞气过重，刑天可能在非点将情况下登场）",
+    outsiderModifier: -1,
+    abilityType: "active", nightOrder: 5, firstNightOrder: null, firstNightBlocked: true,
+    needsChoice: true, isDizzyable: true, deathImmune: false,
+    inheritsDemon: false, teamSynergy: null,
+    description: "刑天每晚猜测两名非明牌玩家的角色——全对则随机杀其之一，全错则刑天被煞气反噬死亡。刑天可能在非点将情况下因煞气过重登场。",
+    tips: "每晚猜两名非明牌玩家的角色；全对→随机杀其一；全错→刑天死亡；煞气积聚时刑天可能强行登场"
   },
 
   // ============================================================
