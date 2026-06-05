@@ -25,9 +25,9 @@ function switchMsgTab(tabName, silent) {
         renderEvilMembers();
         if (!silent) loadEvilMessages();
     } else if (tabName === 'history') {
-        $('#rt-msg-panel-title').textContent = '夜间行动记录';
-        if (!silent && typeof loadNightHistory === 'function') {
-            loadNightHistory();
+        $('#rt-msg-panel-title').textContent = '行动记录';
+        if (!silent && typeof loadActionHistory === 'function') {
+            loadActionHistory();
         }
     } else {
         const playerName = state.selectedPlayer

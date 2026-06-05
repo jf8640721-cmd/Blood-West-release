@@ -1,14 +1,14 @@
 /* ============================================================
-   西游纪 Blood-West · 夜间行动历史记录模块
-   查询 skill_actions 表，按夜晚分组展示已处理的行动记录
+   西游纪 Blood-West · 行动历史记录模块（日夜统一）
+   查询 skill_actions 表，按阶段分组展示已处理的行动记录
    依赖：state.js, data/roles.js
    ============================================================ */
 
 // 当前历史记录筛选状态（null = 显示全部）
 let currentHistoryFilter = null;
 
-// 加载夜间行动历史
-async function loadNightHistory() {
+// 加载行动历史（日+夜统一）
+async function loadActionHistory() {
     if (!state.room) return;
 
     const list = $('#history-list');
@@ -35,20 +35,20 @@ async function loadNightHistory() {
         }
 
         if (!data || data.length === 0) {
-            list.innerHTML = '<div class="msg-placeholder">暂无夜间行动记录</div>';
+            list.innerHTML = '<div class="msg-placeholder">暂无行动记录</div>';
             return;
         }
 
-        // 按 phase 分组，只保留夜晚阶段
+        // 按 phase 分组，保留所有阶段（白天+夜晚）
         const phaseMap = new Map();
         for (const row of data) {
-            if (!row.phase || !row.phase.includes('夜')) continue;
+            if (!row.phase) continue;
             if (!phaseMap.has(row.phase)) phaseMap.set(row.phase, []);
             phaseMap.get(row.phase).push(row);
         }
 
         if (phaseMap.size === 0) {
-            list.innerHTML = '<div class="msg-placeholder">暂无夜间行动记录</div>';
+            list.innerHTML = '<div class="msg-placeholder">暂无行动记录</div>';
             return;
         }
 
@@ -58,7 +58,7 @@ async function loadNightHistory() {
             phaseGroups.push({ phase, actions });
         }
 
-        renderNightHistory(phaseGroups);
+        renderActionHistory(phaseGroups);
     } catch (err) {
         console.error('加载夜间历史异常:', err);
         list.innerHTML = '<div class="msg-placeholder">加载失败，请重试</div>';
@@ -66,7 +66,7 @@ async function loadNightHistory() {
 }
 
 // 渲染整个历史视图
-function renderNightHistory(phaseGroups) {
+function renderActionHistory(phaseGroups) {
     const list = $('#history-list');
     const selector = $('#history-phase-selector');
 
@@ -121,9 +121,11 @@ function renderPhaseGroup(phaseName, actions, expanded) {
 
     const phaseKey = phaseName.replace(/[^a-zA-Z0-9一-龥]/g, '_');
 
+    var phaseIcon = phaseName.includes('夜') ? '🌙' : '☀️';
+
     let html = '<div class="history-phase-group" id="history-group-' + phaseKey + '">';
     html += '<div class="history-phase-header" onclick="togglePhaseGroup(\'' + phaseKey + '\')">';
-    html += '<span class="history-phase-name">' + phaseName + '</span>';
+    html += '<span class="history-phase-name">' + phaseIcon + ' ' + phaseName + '</span>';
     html += '<span class="history-phase-count">' + parts.join(' · ') + '</span>';
     html += '<span class="history-phase-arrow ' + (expanded ? 'expanded' : '') + '" id="history-arrow-' + phaseKey + '">▼</span>';
     html += '</div>';
