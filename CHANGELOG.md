@@ -1,5 +1,13 @@
 # 版本日志
 
+## v3.0.2 (2026-06-09)
+
+### 🔧 调试日志 + try-catch 加固 + 版本号更新
+
+- `admin/js/table.js` — renderRoundTable 加 try-catch 防止渲染异常吞没，renderPlayerList 加日志
+- `admin/js/room.js` — Realtime INSERT 回调加日志追踪玩家加入
+- 版本号 v3.0.1 → v3.0.2
+
 ## v3.0.1 (2026-06-09)
 
 ### 🐛 紧急修复：Canvas 铜镜圆桌不加载 + 玩家加入不显示
