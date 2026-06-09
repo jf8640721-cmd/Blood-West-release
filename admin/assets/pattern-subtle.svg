@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+  <!-- 暗色如意纹循环图案 — 用于面板底纹 -->
+  <defs>
+    <g id="cloud" opacity="0.06">
+      <path d="M10,20 Q15,10 25,12 Q35,8 40,18 Q45,15 50,22 Q52,30 45,34 Q40,40 30,38 Q20,42 12,34 Q5,30 10,20Z"
+            fill="none" stroke="#a08040" stroke-width="1"/>
+      <!-- 中心小圆 -->
+      <circle cx="28" cy="24" r="3" fill="none" stroke="#a08040" stroke-width="0.8"/>
+    </g>
+    <g id="diamond" opacity="0.04">
+      <polygon points="30,0 33,5 30,10 27,5" fill="none" stroke="#c8a860" stroke-width="0.8"/>
+    </g>
+  </defs>
+
+  <rect width="60" height="60" fill="transparent"/>
+
+  <!-- 四朵云纹 -->
+  <use href="#cloud" x="0" y="0"/>
+  <use href="#cloud" x="30" y="0"/>
+  <use href="#cloud" x="0" y="30"/>
+  <use href="#cloud" x="30" y="30"/>
+
+  <!-- 四角菱形 -->
+  <use href="#diamond" x="0" y="0"/>
+  <use href="#diamond" x="30" y="0"/>
+  <use href="#diamond" x="0" y="30"/>
+  <use href="#diamond" x="30" y="30"/>
+</svg>

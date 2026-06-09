@@ -4,30 +4,31 @@
 
 /* ----- CSS 设计系统变量 ----- */
 :root {
-    /* 五级灰阶背景 — 中性暗灰棕，做"暗色画框"退后 */
-    --bg-deepest:   #08080a;
+    /* 五级灰阶背景 — 暗黑皮革底，更深邃 */
+    --bg-deepest:   #060608;
     --bg-deep:      #0e0e12;
     --bg-surface:   #14141a;
     --bg-elevated:  #1b1b24;
     --bg-card:      #22222e;
 
-    /* 金色强调 — 唯一的"前进色"，做视觉路标 */
-    --gold-primary: #b8860b;
-    --gold-dim:     #8b6914;
-    --gold-dark:    #5a3e0e;
-    --gold-glow:    rgba(184, 134, 11, 0.25);
+    /* 金色强调 — 古铜金，更暖更亮 */
+    --gold-primary: #c09850;
+    --gold-bright:  #d4a860;
+    --gold-dim:     #8b7020;
+    --gold-dark:    #5a4010;
+    --gold-glow:    rgba(192, 152, 80, 0.28);
 
     /* 血红 — 恶魔/处决/删除 */
     --blood-red:    #8b2020;
     --blood-bright: #a83232;
     --blood-glow:   rgba(139, 32, 32, 0.3);
 
-    /* 暗紫 — 仅邪恶阵营/夜死，收窄使用 */
+    /* 暗紫 — 仅邪恶阵营/夜死 */
     --purple-deep:  #2a1040;
     --purple-mid:   #3a2060;
     --purple-glow:  rgba(50, 25, 80, 0.3);
 
-    /* 文字色 — 暖灰白，减少白色刺眼感 */
+    /* 文字色 — 暖灰白 */
     --text-primary:   #d4ccbc;
     --text-secondary: #908878;
     --text-muted:     #5e5648;
@@ -38,13 +39,17 @@
     --border-mid:    #24242e;
     --border-gold:   #3a3018;
 
-    /* 阴影 — 克制辉光，重实体阴影 */
+    /* 阴影 */
     --shadow-gold:    0 0 8px var(--gold-glow);
     --shadow-gold-lg: 0 0 16px var(--gold-glow), 0 0 32px rgba(139, 105, 20, 0.1);
     --shadow-red:     0 0 8px var(--blood-glow);
     --shadow-purple:  0 0 10px var(--purple-glow);
     --shadow-card:    0 2px 16px rgba(0, 0, 0, 0.5);
     --shadow-inset:   inset 0 1px 6px rgba(0, 0, 0, 0.5);
+
+    /* 装饰色 */
+    --ornament-color: #a08040;
+    --ornament-bright:#c8a860;
 
     /* 字体 */
     --font-gothic: 'STKaiti', 'KaiTi', 'STSong', 'SimSun', 'Georgia', serif;
@@ -83,7 +88,10 @@
 
 body {
     font-family: var(--font-body);
-    background: var(--bg-deepest);
+    background:
+        var(--bg-deepest)
+        url("assets/leather-dark.svg");
+    background-size: 200px 200px;
     color: var(--text-primary);
     height: 100vh;
     display: flex;
@@ -91,17 +99,19 @@ body {
     overflow: hidden;
 }
 
-/* 细微噪点纹理叠加 */
+/* 细微噪点 + 暗纹纹理叠加 */
 body::after {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none;
     z-index: 9999;
-    opacity: 0.012;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 200px 200px;
+    opacity: 0.018;
+    background:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        url("assets/pattern-subtle.svg");
+    background-repeat: repeat, repeat;
+    background-size: 200px 200px, 60px 60px;
 }
 
 /* ----- 按钮通用 ----- */
@@ -118,15 +128,16 @@ body::after {
 .btn:active { transform: scale(0.97); }
 
 .btn-gold {
-    background: linear-gradient(180deg, #5a3e18 0%, #3a2810 50%, #2a1a08 100%);
-    color: #e8d090;
-    border-color: var(--gold-dark);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+    background: linear-gradient(180deg, #6b4820 0%, #4a3014 40%, #2e1c08 70%, #1a0e04 100%);
+    color: #f0d898;
+    border-color: #5a4010;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .btn-gold:hover {
-    box-shadow: var(--shadow-gold-lg), 0 2px 4px rgba(0,0,0,0.5);
-    color: #f0d898;
+    box-shadow: var(--shadow-gold-lg), 0 2px 8px rgba(0,0,0,0.6);
+    color: #f8e8b0;
+    border-color: #8b7020;
     opacity: 1;
 }
 
@@ -229,15 +240,17 @@ body::after {
 }
 .btn-phase.night {
     background: linear-gradient(135deg, #1a0a20, #251238);
-    color: #b8a0d0;
-    border-color: #4a2a7a;
+    color: #c0a8e0;
+    border-color: #5a3080;
     animation: phasePulseNight 3s infinite;
+    box-shadow: 0 0 10px rgba(60, 30, 90, 0.2);
 }
 .btn-phase.day {
-    background: linear-gradient(135deg, #2e1e08, #4a3014);
-    color: #f0d68a;
-    border-color: var(--gold-dark);
+    background: linear-gradient(135deg, #3a240c, #5a3a18);
+    color: #f0d898;
+    border-color: #7a5828;
     animation: phasePulseDay 3s infinite;
+    box-shadow: 0 0 10px rgba(160, 128, 64, 0.2);
 }
 .btn-phase[disabled] {
     cursor: default;
@@ -307,16 +320,163 @@ body::after {
 
 /* 铜色按钮 */
 .btn-copper {
-    background: linear-gradient(180deg, #3a2820 0%, #2a1a12 50%, #1a0e0a 100%);
+    background: linear-gradient(180deg, #4a2a18 0%, #301a0e 50%, #1a0c06 100%);
     color: #d4a090;
     border-color: #5a3020;
     box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .btn-copper:hover {
-    box-shadow: 0 0 12px rgba(139, 55, 35, 0.4);
+    box-shadow: 0 0 14px rgba(139, 55, 35, 0.45);
     color: #e8b8a8;
     opacity: 1;
+}
+
+/* ============================================================
+   装饰系统 — 华丽边框 / 角花 / 分隔线
+   ============================================================ */
+
+/* 华丽面板 — 金色双线边框 + 角花 */
+.ornate-panel {
+    position: relative;
+    border: 1.5px solid #4a3820;
+    box-shadow:
+        0 0 0 1px #2a1e10,
+        0 0 16px rgba(160, 128, 64, 0.1),
+        inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+/* 角花 — 左上 */
+.ornate-panel::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px;
+    width: 28px; height: 28px;
+    pointer-events: none;
+    z-index: 2;
+    background:
+        linear-gradient(135deg, var(--ornament-bright) 0%, var(--ornament-color) 30%, transparent 50%);
+    mask-image: url("assets/ornament-corner.svg");
+    mask-size: 120px 120px;
+    mask-position: 0 0;
+    -webkit-mask-image: url("assets/ornament-corner.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-position: 0 0;
+    opacity: 0.7;
+}
+
+/* 角花 — 右上 */
+.ornate-panel::after {
+    content: '';
+    position: absolute;
+    top: -2px; right: -2px;
+    width: 28px; height: 28px;
+    pointer-events: none;
+    z-index: 2;
+    background:
+        linear-gradient(225deg, var(--ornament-bright) 0%, var(--ornament-color) 30%, transparent 50%);
+    mask-image: url("assets/ornament-corner.svg");
+    mask-size: 120px 120px;
+    mask-position: -92px 0;
+    -webkit-mask-image: url("assets/ornament-corner.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-position: -92px 0;
+    opacity: 0.7;
+}
+
+/* 华丽弹窗 — 更厚重的装饰框 */
+.ornate-modal {
+    position: relative;
+    border: 2px solid #5a4028;
+    box-shadow:
+        0 0 0 1px #2a1a0c,
+        0 0 0 4px rgba(10, 10, 18, 0.6),
+        0 0 0 6px rgba(60, 45, 18, 0.2),
+        0 0 24px rgba(160, 128, 64, 0.15),
+        0 8px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* 华丽弹窗角花 */
+.ornate-modal::before,
+.ornate-modal::after {
+    position: absolute;
+    width: 32px; height: 32px;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.75;
+}
+.ornate-modal::before {
+    content: '';
+    top: -3px; left: -3px;
+    background:
+        linear-gradient(135deg, var(--ornament-bright) 0%, var(--ornament-color) 30%, transparent 50%);
+    mask-image: url("assets/ornament-corner.svg");
+    mask-size: 120px 120px;
+    mask-position: 0 0;
+    -webkit-mask-image: url("assets/ornament-corner.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-position: 0 0;
+}
+.ornate-modal::after {
+    content: '';
+    top: -3px; right: -3px;
+    background:
+        linear-gradient(225deg, var(--ornament-bright) 0%, var(--ornament-color) 30%, transparent 50%);
+    mask-image: url("assets/ornament-corner.svg");
+    mask-size: 120px 120px;
+    mask-position: -88px 0;
+    -webkit-mask-image: url("assets/ornament-corner.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-position: -88px 0;
+}
+
+/* 金色 SVG 分隔线（替代字符分隔线） */
+.gold-divider-svg {
+    display: block;
+    width: 60%;
+    height: 12px;
+    margin: 0 auto;
+    background: url("assets/divider-gold.svg") center center / contain no-repeat;
+    border: none;
+    opacity: 0.6;
+}
+
+/* 面板底部角花容器（用于4角完整装饰） */
+.ornate-corners-bottom {
+    position: absolute;
+    bottom: -2px; left: -2px; right: -2px;
+    height: 28px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.7;
+}
+.ornate-corners-bottom::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 28px; height: 28px;
+    background:
+        linear-gradient(45deg, var(--ornament-bright) 0%, var(--ornament-color) 30%, transparent 50%);
+    mask-image: url("assets/ornament-corner.svg");
+    mask-size: 120px 120px;
+    mask-position: 0 -92px;
+    -webkit-mask-image: url("assets/ornament-corner.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-position: 0 -92px;
+}
+.ornate-corners-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 28px; height: 28px;
+    background:
+        linear-gradient(315deg, var(--ornament-bright) 0%, var(--ornament-color) 30%, transparent 50%);
+    mask-image: url("assets/ornament-corner.svg");
+    mask-size: 120px 120px;
+    mask-position: -92px -92px;
+    -webkit-mask-image: url("assets/ornament-corner.svg");
+    -webkit-mask-size: 120px 120px;
+    -webkit-mask-position: -92px -92px;
 }
 
 /* ----- 顶部工具栏 ----- */
@@ -325,20 +485,21 @@ body::after {
     align-items: center;
     justify-content: space-between;
     padding: 12px 24px;
-    background: linear-gradient(180deg, #0e0e14 0%, var(--bg-deep) 100%);
-    border-bottom: 1px solid var(--border-mid);
+    background: linear-gradient(180deg, #0c0a08 0%, #0a0806 50%, var(--bg-deep) 100%);
+    border-bottom: 1px solid #2a1e12;
     flex-shrink: 0;
     position: relative;
 }
-/* 工具栏底部分隔装饰线 */
+/* 工具栏底部分隔装饰线 — 金色渐变 */
 #toolbar::after {
     content: '';
     position: absolute;
     bottom: 0; left: 50%;
     transform: translateX(-50%);
     width: 60%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #5a4010, #8b7020, #5a4010, transparent);
+    opacity: 0.6;
 }
 
 .logo {
@@ -352,26 +513,27 @@ body::after {
 .logo-main {
     font-size: 24px;
     font-family: 'STKaiti', 'KaiTi', 'STSong', 'SimSun', var(--font-gothic);
-    color: var(--gold-primary);
+    color: var(--gold-bright);
     letter-spacing: 6px;
     text-shadow:
-        0 0 10px var(--gold-glow),
-        0 0 20px rgba(184, 134, 11, 0.15),
+        0 0 12px var(--gold-glow),
+        0 0 28px rgba(192, 152, 80, 0.2),
+        0 0 48px rgba(160, 128, 64, 0.1),
         0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .logo-sub {
     font-size: 11px;
     font-family: 'Georgia', 'Times New Roman', serif;
-    color: #8b7858;
+    color: #9b8868;
     letter-spacing: 3px;
     text-transform: uppercase;
-    text-shadow: 0 0 4px rgba(139, 120, 88, 0.2);
+    text-shadow: 0 0 6px rgba(160, 128, 64, 0.25);
 }
 
 .logo-version {
     font-size: 9px;
-    color: #4a4030;
+    color: #5a4a30;
     letter-spacing: 1px;
     font-family: var(--font-mono);
 }
@@ -388,9 +550,9 @@ body::after {
     gap: 10px;
     padding: 6px 14px;
     background: var(--bg-surface);
-    border: 1px solid var(--border-mid);
+    border: 1.5px solid #4a3820;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-inset);
+    box-shadow: var(--shadow-inset), 0 0 8px rgba(160, 128, 64, 0.06);
 }
 
 .room-label {
@@ -415,18 +577,15 @@ body::after {
     border-bottom: 1px solid var(--border-subtle);
     position: relative;
 }
-/* 面板标题装饰分隔线 */
+/* 面板标题装饰分隔线 — 金色渐变线 */
 .panel-header::after {
-    content: '✦   ❧   ✦';
+    content: '';
     display: block;
     position: absolute;
-    bottom: -1px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 8px;
-    color: var(--gold-dark);
-    letter-spacing: 6px;
-    white-space: nowrap;
-    opacity: 0.3;
+    bottom: 0; left: 10%; right: 10%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, #5a4010, #8b7020, #5a4010, transparent);
+    opacity: 0.5;
 }
 
 .panel-header h2 {
@@ -477,9 +636,11 @@ body::after {
 
 .player-item.active {
     background: var(--bg-elevated);
-    border-left: 3px solid var(--gold-primary);
+    border-left: 3px solid var(--gold-bright);
     padding-left: 13px;
-    box-shadow: var(--shadow-gold), inset 2px 0 8px rgba(201, 168, 76, 0.08);
+    box-shadow:
+        0 0 12px rgba(192, 152, 80, 0.2),
+        inset 2px 0 12px rgba(192, 152, 80, 0.1);
 }
 
 .drag-handle {
@@ -653,7 +814,7 @@ body::after {
     border: 1px solid #301824;
     color: #d8c0d0;
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 1px rgba(160, 120, 160, 0.1);
 }
 
 .msg-row.host-msg {
@@ -661,10 +822,10 @@ body::after {
 }
 .msg-row.host-msg .msg-bubble {
     background: linear-gradient(135deg, #141008 0%, #1a1408 100%);
-    border: 1px solid #302410;
+    border: 1px solid #3a2a14;
     color: #d0c8a0;
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 2px rgba(160, 128, 64, 0.1);
 }
 
 .msg-time {
@@ -769,13 +930,18 @@ body::after {
 
 .modal-content {
     background: var(--bg-elevated);
-    border: 1px solid var(--border-gold);
+    border: 2px solid #5a4028;
     border-radius: var(--radius-xl);
     padding: 32px;
     text-align: center;
     position: relative;
     max-width: 90vw;
-    box-shadow: var(--shadow-gold-lg), 0 0 0 4px rgba(10,10,18,0.8), 0 0 0 6px rgba(60,45,18,0.2);
+    box-shadow:
+        0 0 0 1px #2a1a0c,
+        0 0 0 4px rgba(10, 10, 18, 0.6),
+        0 0 0 6px rgba(60, 45, 18, 0.2),
+        0 0 30px rgba(160, 128, 64, 0.15),
+        0 8px 48px rgba(0, 0, 0, 0.7);
     animation: fadeInUp var(--transition-medium);
 }
 
@@ -856,9 +1022,10 @@ body::after {
     width: 180px;
     flex-shrink: 0;
     background: var(--bg-deep);
-    border-right: 1px solid var(--border-subtle);
+    border-right: 1.5px solid #2a1e12;
     display: flex;
     flex-direction: column;
+    box-shadow: inset -4px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 /* 中央圆桌区域 */
@@ -892,12 +1059,13 @@ body::after {
     background:
         radial-gradient(ellipse at 35% 35%, #4a3520 0%, #2d1f0e 40%, #1a0f05 70%, #0d0702 100%);
     box-shadow:
-        0 0 60px rgba(139, 105, 20, 0.25),
-        0 0 120px rgba(80, 40, 10, 0.15),
+        0 0 60px rgba(160, 128, 64, 0.3),
+        0 0 120px rgba(80, 40, 10, 0.2),
         inset 0 0 80px rgba(0, 0, 0, 0.6),
-        0 0 0 3px #4a3018,
-        0 0 0 6px #1a0e06,
-        0 0 0 8px #0e0602;
+        0 0 0 3px #5a3a18,
+        0 0 0 4.5px #3a2210,
+        0 0 0 7px #1a0e06,
+        0 0 0 9px #0e0602;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -957,14 +1125,16 @@ body::after {
     position: absolute;
     pointer-events: none;
     text-align: center;
-    color: var(--text-muted);
+    color: #8b7858;
     font-size: 16px;
     z-index: 1;
+    text-shadow: 0 0 16px rgba(160, 128, 64, 0.3);
 }
 .table-empty-hint .sub {
     font-size: 13px;
     margin-top: 8px;
-    opacity: 0.6;
+    opacity: 0.5;
+    color: #6a5a40;
 }
 
 /* 单个座位 */
@@ -1015,8 +1185,8 @@ body::after {
     width: 22px;
     height: 22px;
     border-radius: var(--radius-full);
-    background: radial-gradient(circle at 40% 40%, #5a4a3a, #2a1a0a);
-    border: 2.5px solid #4a3520;
+    background: radial-gradient(circle at 40% 40%, #6a5a4a, #3a2810);
+    border: 2.5px solid #5a4028;
     box-shadow: 0 0 10px rgba(139, 105, 20, 0.35);
     transition: all var(--transition-medium);
     position: relative;
@@ -1128,8 +1298,9 @@ body::after {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    border-left: 1px solid var(--border-subtle);
+    border-left: 1.5px solid #2a1e12;
     background: var(--bg-deep);
+    box-shadow: inset 4px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 #rt-message-panel .panel-header {
@@ -1155,17 +1326,18 @@ body::after {
 .btn-board {
     padding: 8px 16px;
     font-size: 14px;
-    background: linear-gradient(180deg, #3a3020 0%, #2a2018 50%, #1a1510 100%);
-    color: #d4c090;
-    border-color: #5a4a28;
+    background: linear-gradient(180deg, #4a3820 0%, #2e1e10 50%, #1a1008 100%);
+    color: #e0d0a0;
+    border-color: #6b4a28;
     border-radius: var(--radius-md);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 .btn-board:hover {
-    box-shadow: 0 0 14px rgba(201, 168, 76, 0.3);
-    color: #e8d8a8;
+    box-shadow: 0 0 16px rgba(192, 152, 80, 0.35);
+    color: #f0e0b8;
+    border-color: #8b6828;
     opacity: 1;
 }
 
@@ -1629,12 +1801,13 @@ body::after {
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    background: #0e0818;
-    border-bottom: 1px solid #221230;
+    background: #0a0614;
+    border-bottom: 1.5px solid #2a1840;
     overflow-x: auto;
     flex-shrink: 0;
     flex-wrap: wrap;
     min-height: 32px;
+    box-shadow: inset 0 -4px 12px rgba(60, 20, 80, 0.1);
 }
 
 .evil-members-label {
@@ -1742,23 +1915,26 @@ body::after {
 
 .evil-bubble-player {
     background: linear-gradient(135deg, #1a0820, #15051a);
-    border: 1px solid #302050;
+    border: 1px solid #3a2060;
     border-top-left-radius: 2px;
     color: #d0c0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 2px rgba(80, 40, 120, 0.15);
 }
 
 .evil-bubble-self {
     background: linear-gradient(135deg, #1e0e28, #180820);
-    border: 1px solid #3a1850;
+    border: 1px solid #4a2068;
     border-top-right-radius: 2px;
     color: #d0c0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 2px rgba(80, 40, 120, 0.15);
 }
 
 .evil-bubble-host {
     background: linear-gradient(135deg, #1a1810, #141008);
-    border: 1px solid #3a2a18;
+    border: 1px solid #4a3a20;
     border-top-left-radius: 2px;
     color: #e0d6c2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 2px rgba(160, 128, 64, 0.12);
 }
 
 /* 邪恶群聊回复区 */
@@ -1793,10 +1969,11 @@ body::after {
 .night-queue-panel {
     margin: 0 0 4px;
     background: linear-gradient(135deg, #0d0d16, #101020);
-    border: 1px solid #222240;
+    border: 1.5px solid #2a2040;
     border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(60, 30, 80, 0.2);
     /* JS控制 display: none/block */
 }
 /* 标题条（始终可见，点击可展开/折叠） */
@@ -2083,10 +2260,11 @@ body::after {
 .day-queue-panel {
     margin: 0 0 4px;
     background: linear-gradient(135deg, #1a1200, #221808);
-    border: 1px solid #3a2a14;
+    border: 1.5px solid #4a3a1c;
     border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(160, 128, 48, 0.12);
 }
 
 .day-queue-header {
