@@ -133,7 +133,7 @@ function hideRoomUI() {
     // 重置 Tab
     switchMsgTab('private', true);
     // 重置圆桌
-    $('#seats-container').innerHTML = '';
+    $('#seats-overlay').innerHTML = '';
     $('#rt-player-list').innerHTML = '<li class="player-empty">暂无玩家</li>';
     $('#rt-player-count').textContent = '0';
 }
@@ -447,10 +447,10 @@ async function togglePhaseBackward() {
     showPhaseConfirm(prevPhase);
 }
 
-// 更新圆桌中央阶段显示
+// 更新圆桌中央阶段显示（Canvas 重绘）
 function updateRoundTablePhase(phase) {
-    const display = $('#table-phase-display');
-    if (display) display.textContent = phase;
+    window._tablePhase = phase;
+    if (typeof drawRoundTable === 'function') drawRoundTable();
 }
 
 // 渲染房间信息

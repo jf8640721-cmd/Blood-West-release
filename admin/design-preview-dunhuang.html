@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>西游纪 · 敦煌岩彩设计预览</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   敦煌岩彩 · CSS 设计系统变量
+   ============================================================ */
+:root {
+    /* ★ 以下色值均从 bg-frame.png 20阶量化提取 ★ */
+    /* 背景层 — 图片暗区 → 最深棕 */
+    --bg-deepest:    #120904;   /* 图片最暗像素加深 */
+    --bg-deep:       #1f1006;   /* 图片暗区调和 */
+    --bg-surface:    #2d180b;   /* 暗区均值 #56341d 的暗化 */
+    --bg-elevated:   #3e2212;   /* 中暗过渡 */
+    --bg-card:       #4f2e1a;   /* 亮暗交界 */
+
+    /* 鎏金系 — 图片亮金素 #dba851 → 铜金素 #c47a3b → 暗区 #824924 */
+    --gold-pale:     #efcf98;   /* 图片最亮区 avg */
+    --gold-primary:  #dba851;   /* 图片亮金素 avg */
+    --gold-deep:     #c47a3b;   /* 图片铜金素 avg */
+    --gold-dark:     #824924;   /* 图片暗区 avg（金→棕过渡） */
+    --gold-glow:     rgba(219, 168, 81, 0.4);
+
+    /* 朱砂红系 — 图片朱砂红素 #ab6954 */
+    --cinnabar:      #ab6954;   /* 图片朱砂红素 avg（真实陶土赤） */
+    --cinnabar-deep: #7f3a28;   /* 朱砂红素暗化 */
+    --cinnabar-glow: rgba(171, 105, 84, 0.4);
+
+    /* 冷色素 — 图片唯一冷色调 #6f6266（青铜锈/灰褐） */
+    --stone-blue:    #6f6266;   /* 图片冷色素 avg */
+    --stone-blue-bg: rgba(111, 98, 102, 0.12);
+
+    --stone-green:   #3e9e7b;   /* 保留石绿（无图片映射） */
+
+    /* 文字 — 图片亮度分层 */
+    --cream:         #d4b87a;   /* 最亮区 */
+    --cream-dim:     #b87848;   /* 亮区 avg 加深 */
+    --cream-muted:   #8b5a38;   /* 中区 avg 加深 */
+
+    /* 边框 */
+    --border-subtle: #2d180b;
+    --border-mid:    #56341d;   /* 最暗区 avg */
+    --border-gold:   #824924;   /* 暗区 avg */
+    --border-gilt:   #dba851;   /* 亮金素 */
+
+    /* 阴影 */
+    --shadow-gold:     0 0 12px var(--gold-glow);
+    --shadow-gold-lg:  0 0 24px var(--gold-glow), 0 0 48px rgba(180, 120, 60, 0.2);
+    --shadow-cinnabar: 0 0 10px var(--cinnabar-glow);
+    --shadow-card:     0 4px 24px rgba(0, 0, 0, 0.5), 0 0 1px rgba(219, 168, 81, 0.15);
+    --shadow-inset:    inset 0 2px 8px rgba(0, 0, 0, 0.5);
+
+    /* 字体 */
+    --font-display: 'Noto Serif SC', 'STKaiti', 'KaiTi', serif;
+    --font-body:    'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+    --font-accent:  'Playfair Display', 'Georgia', serif;
+    --font-mono:    'Courier New', 'Consolas', monospace;
+
+    /* 圆角 / 过渡 */
+    --radius-sm:   4px;
+    --radius-md:   8px;
+    --radius-lg:  12px;
+    --radius-xl:  20px;
+    --radius-full: 50%;
+    --transition-fast:   0.15s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow:   0.5s ease;
+
+    /* 角色阵营 */
+    --role-town:       #efcf98;
+    --role-town-bg:    rgba(239, 207, 152, 0.12);
+    --role-outsider:   #3e9e7b;
+    --role-outsider-bg:rgba(62, 158, 123, 0.15);
+    --role-minion:     #dba851;
+    --role-minion-bg:  rgba(219, 168, 81, 0.15);
+    --role-demon:      #ab6954;
+    --role-demon-bg:   rgba(171, 105, 84, 0.15);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: var(--font-body);
+    font-weight: 500;
+    background-color: var(--bg-deepest);
+    background-image: url('bg-frame.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--cream);
+    min-height: 100vh;
+    position: relative;
+}
+body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+}
+body::after {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(26,14,6,0.6) 85%, rgba(26,14,6,0.85) 100%);
+}
+.page-wrap { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+/* 标题 */
+.page-header {
+    text-align: center; padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border-gold); margin-bottom: 40px; position: relative;
+}
+.page-header::after {
+    content: '◆   ◇   ◆';
+    display: block; position: absolute;
+    bottom: -1px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; color: var(--gold-primary); letter-spacing: 8px; opacity: 0.5;
+}
+.page-header h1 {
+    font-family: var(--font-display); font-size: 42px; color: var(--gold-primary);
+    letter-spacing: 12px;
+    text-shadow: 0 0 20px var(--gold-glow), 0 0 40px rgba(212,154,58,0.3), 0 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 8px;
+}
+.page-header .sub { font-family: var(--font-accent); font-size: 14px; color: #8b7355; letter-spacing: 6px; }
+.page-header .style-tag {
+    display: inline-block; margin-top: 12px; padding: 4px 16px;
+    background: rgba(212,154,58,0.1); border: 1px solid var(--border-gold);
+    border-radius: var(--radius-full); font-size: 13px; color: var(--gold-primary); letter-spacing: 2px;
+}
+.section { margin-bottom: 48px; }
+.section-title {
+    font-family: var(--font-display); font-size: 20px; color: var(--gold-primary);
+    letter-spacing: 4px; margin-bottom: 20px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-gold);
+    display: flex; align-items: center; gap: 10px;
+}
+
+/* ============================================================
+   色板
+   ============================================================ */
+.swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.swatch { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-mid); }
+.swatch-color { height: 60px; display: flex; align-items: flex-end; padding: 8px 10px; font-size: 10px; font-family: var(--font-mono); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.swatch-label { padding: 8px 10px; background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px); font-size: 12px; color: var(--cream-dim); }
+.swatch-label strong { color: var(--cream); display: block; font-size: 13px; }
+
+/* ============================================================
+   按钮
+   ============================================================ */
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.btn {
+    cursor: pointer; border-radius: var(--radius-sm); padding: 10px 20px;
+    font-size: 14px; font-family: var(--font-body);
+    transition: all var(--transition-medium);
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+}
+.btn:hover { opacity: 0.9; }
+.btn:active { transform: scale(0.97); }
+/* ★ 按钮使用 bg-frame.png 纹理 + 色调渐变叠加 ★
+   每个按钮变体采样图片不同区域 + 不同色温叠加 */
+.btn {
+    background-size: 400% 400%;
+    background-repeat: no-repeat;
+}
+/* ① 鎏金主按钮 — 采样图片中心偏上亮区（金色集中区）+ 鎏金叠加 */
+.btn-gold {
+    background-image:
+        linear-gradient(180deg, rgba(219,168,81,0.55) 0%, rgba(196,122,59,0.7) 40%, rgba(100,50,25,0.9) 100%),
+        url('bg-frame.png');
+    background-position: 50% 28%;
+    color: #fff8e8; border: 2px solid #dba851; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.btn-gold:hover {
+    box-shadow: 0 0 16px rgba(219,168,81,0.5), 0 0 32px rgba(196,122,59,0.3);
+    background-image:
+        linear-gradient(180deg, rgba(239,207,152,0.5) 0%, rgba(219,168,81,0.6) 40%, rgba(130,73,36,0.85) 100%),
+        url('bg-frame.png');
+    color: #fff;
+}
+/* ② 石青次按钮 — 图片冷色区域 + 青铜锈灰褐叠加 */
+.btn-stone {
+    background-image:
+        linear-gradient(180deg, rgba(133,120,124,0.6) 0%, rgba(111,98,102,0.75) 40%, rgba(60,50,52,0.9) 100%),
+        url('bg-frame.png');
+    background-position: 65% 60%;
+    color: #e8e2e4; border: 1px solid #6f6266;
+}
+.btn-stone:hover {
+    box-shadow: 0 0 10px rgba(111,98,102,0.4);
+    background-image:
+        linear-gradient(180deg, rgba(160,148,152,0.55) 0%, rgba(111,98,102,0.7) 40%, rgba(74,62,64,0.85) 100%),
+        url('bg-frame.png');
+}
+/* ③ 朱砂危险按钮 — 图片暖红陶土区域 + 朱砂红叠加 */
+.btn-cinnabar {
+    background-image:
+        linear-gradient(180deg, rgba(192,112,88,0.6) 0%, rgba(171,105,84,0.75) 40%, rgba(127,58,40,0.9) 100%),
+        url('bg-frame.png');
+    background-position: 35% 50%;
+    color: #ffe8e0; border: 1px solid #ab6954;
+}
+.btn-cinnabar:hover {
+    box-shadow: 0 0 14px rgba(171,105,84,0.5);
+    background-image:
+        linear-gradient(180deg, rgba(210,140,115,0.55) 0%, rgba(171,105,84,0.7) 40%, rgba(140,70,48,0.85) 100%),
+        url('bg-frame.png');
+}
+/* ④ 幽灵按钮 — 仅鎏金描边，透明可见下方背景 */
+.btn-ghost {
+    background: transparent; color: #dba851; border: 2px solid #dba851;
+}
+.btn-ghost:hover { background: rgba(219,168,81,0.1); box-shadow: 0 0 12px rgba(219,168,81,0.3); }
+/* ⑤ 铜色按钮 — 图片中暖区 + 铜色叠加 */
+.btn-copper {
+    background-image:
+        linear-gradient(180deg, rgba(186,116,74,0.6) 0%, rgba(154,80,48,0.75) 40%, rgba(86,52,29,0.9) 100%),
+        url('bg-frame.png');
+    background-position: 50% 70%;
+    color: #efcf98; border: 1px solid #ba744a;
+}
+.btn-copper:hover {
+    box-shadow: 0 0 12px rgba(186,116,74,0.4); color: #fff5e0;
+    background-image:
+        linear-gradient(180deg, rgba(210,145,100,0.55) 0%, rgba(186,116,74,0.7) 40%, rgba(110,70,40,0.85) 100%),
+        url('bg-frame.png');
+}
+/* ⑥ 小按钮 — 轻纹理微透明 */
+.btn-small {
+    padding: 4px 10px; font-size: 12px;
+    background-image:
+        linear-gradient(180deg, rgba(186,116,74,0.15) 0%, rgba(86,52,29,0.25) 100%),
+        url('bg-frame.png');
+    background-position: 50% 50%;
+    color: #d49565; border: 1px solid #56341d;
+}
+.btn-small:hover {
+    border-color: #dba851; color: #dba851;
+    box-shadow: 0 0 8px rgba(219,168,81,0.3);
+    background-image:
+        linear-gradient(180deg, rgba(219,168,81,0.25) 0%, rgba(130,73,36,0.35) 100%),
+        url('bg-frame.png');
+}
+
+/* ============================================================
+   工具栏
+   ============================================================ */
+.toolbar-demo {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 24px;
+    background: rgba(26, 14, 6, 0.5); backdrop-filter: blur(10px);
+    border: 1px solid var(--border-gold);
+    border-radius: var(--radius-md);
+    position: relative; margin-bottom: 8px;
+}
+.toolbar-demo::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+}
+.logo { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; }
+.logo-main {
+    font-family: var(--font-display); font-size: 24px; color: var(--gold-primary);
+    letter-spacing: 6px;
+    text-shadow: 0 0 12px var(--gold-glow), 0 0 24px rgba(212,154,58,0.25), 0 2px 4px rgba(0,0,0,0.8);
+}
+.logo-sub { font-family: var(--font-accent); font-size: 11px; color: #8b7355; letter-spacing: 3px; }
+.logo-version { font-size: 9px; color: #5a4a38; font-family: var(--font-mono); }
+.toolbar-actions { display: flex; align-items: center; gap: 12px; }
+.room-info-demo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px; background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px);
+    border: 1px solid var(--border-mid); border-radius: var(--radius-md);
+    box-shadow: var(--shadow-inset);
+}
+.room-label { color: var(--cream-muted); font-size: 13px; }
+.room-code-value {
+    color: var(--gold-primary); font-size: 20px; font-weight: bold;
+    letter-spacing: 3px; font-family: var(--font-mono);
+    text-shadow: 0 0 8px var(--gold-glow);
+}
+
+/* ============================================================
+   ★ CANVAS 圆桌区域 ★
+   ============================================================ */
+.table-demo-area {
+    background: rgba(18, 9, 4, 0.55); backdrop-filter: blur(6px);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-mid);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 600px;
+    overflow: hidden;
+}
+#round-table-container {
+    position: relative;
+    /* Canvas + 座位容器 */
+}
+#table-canvas {
+    display: block;
+    /* 光晕 */
+    filter: drop-shadow(0 0 60px rgba(180, 130, 40, 0.35))
+            drop-shadow(0 0 120px rgba(100, 60, 20, 0.25));
+}
+#seats-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.player-seat {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; pointer-events: auto;
+    transition: transform var(--transition-medium), filter var(--transition-fast);
+    z-index: 3;
+}
+.player-seat:hover { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.2); }
+.seat-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #8a6840, #3a2010);
+    border: 2.5px solid #8b6914;
+    box-shadow: 0 0 12px rgba(180,130,40,0.5), 0 0 4px rgba(0,0,0,0.6);
+    transition: all var(--transition-medium);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+}
+.seat-dot.townsfolk { box-shadow: 0 0 12px rgba(245,230,211,0.6); border-color: #c4b59a; }
+.seat-dot.outsider { box-shadow: 0 0 12px rgba(62,158,123,0.6); border-color: #3e9e7b; }
+.seat-dot.minion { box-shadow: 0 0 14px rgba(212,154,58,0.7); border-color: #d49a3a; }
+.seat-dot.demon { box-shadow: 0 0 16px rgba(200,62,62,0.7); border-color: #c83e3e; }
+.seat-dot.selected {
+    box-shadow: 0 0 22px 6px rgba(212,154,58,0.9);
+    border-color: var(--gold-pale);
+    background: radial-gradient(circle at 40% 40%, #c89848, #7a4020);
+    animation: seatSelPulse 2s ease-in-out infinite;
+}
+@keyframes seatSelPulse {
+    0%, 100% { box-shadow: 0 0 18px 4px rgba(212,154,58,0.8); }
+    50% { box-shadow: 0 0 30px 8px rgba(237,195,121,0.95); }
+}
+.seat-dot .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(10,10,18,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.seat-label {
+    font-size: 12px; color: #c0b090; text-align: center;
+    max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    text-shadow: 0 0 8px rgba(0,0,0,0.9);
+}
+.seat-role-badge {
+    font-size: 10px; padding: 1px 5px; border-radius: 3px;
+    white-space: nowrap; text-shadow: 0 0 4px rgba(0,0,0,0.8);
+    margin-top: 1px;
+}
+.role-townsfolk { color: var(--role-town); background: var(--role-town-bg); border: 1px solid rgba(245,230,211,0.25); }
+.role-outsider { color: var(--role-outsider); background: var(--role-outsider-bg); border: 1px solid rgba(62,158,123,0.3); }
+.role-minion { color: var(--role-minion); background: var(--role-minion-bg); border: 1px solid rgba(212,154,58,0.3); }
+.role-demon { color: var(--role-demon); background: var(--role-demon-bg); border: 1px solid rgba(200,62,62,0.3); }
+
+/* 空槽位 */
+.player-seat.seat-empty { cursor: default; pointer-events: none; }
+.player-seat.seat-empty .seat-dot {
+    width: 12px; height: 12px;
+    background: rgba(90,74,58,0.2);
+    border: 1.5px solid rgba(74,53,32,0.2);
+    box-shadow: none;
+}
+
+/* ============================================================
+   面板 / 玩家列表 / 消息等
+   ============================================================ */
+.panel-demo { background: rgba(18, 9, 4, 0.55); backdrop-filter: blur(6px); border: 1px solid var(--border-mid); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
+.panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid var(--border-mid); position: relative;
+}
+.panel-header::after {
+    content: '◆   ◇   ◆';
+    display: block; position: absolute;
+    bottom: -1px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; color: var(--gold-primary); letter-spacing: 8px; opacity: 0.4;
+}
+.panel-header h2 { font-size: 15px; color: var(--gold-primary); font-family: var(--font-display); letter-spacing: 2px; font-weight: 500; }
+.count-badge { background: var(--border-mid); color: var(--cream-dim); font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+.player-item {
+    padding: 14px 16px; cursor: pointer;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px);
+    transition: all var(--transition-fast);
+    font-size: 14px;
+}
+.player-item:hover { background: rgba(62, 34, 18, 0.55); backdrop-filter: blur(8px); }
+.player-item.active {
+    background: rgba(62, 34, 18, 0.55); backdrop-filter: blur(8px);
+    border-left: 3px solid var(--gold-primary);
+    padding-left: 13px;
+    box-shadow: 0 0 12px rgba(212,154,58,0.2), inset 2px 0 8px rgba(212,154,58,0.08);
+}
+.player-name { color: var(--cream-dim); }
+
+/* 标签页 */
+.tab-demo { display: flex; gap: 4px; padding: 8px 16px; background: rgba(18, 9, 4, 0.55); backdrop-filter: blur(6px); }
+.msg-tab {
+    padding: 4px 12px; background: transparent;
+    border: 1px solid var(--border-mid); border-radius: var(--radius-sm);
+    color: var(--cream-muted); font-size: 12px;
+    cursor: pointer; transition: all var(--transition-fast);
+}
+.msg-tab:hover { border-color: var(--border-gold); color: var(--cream-dim); }
+.msg-tab.active {
+    background: rgba(212,154,58,0.1); border-color: var(--gold-primary);
+    color: var(--gold-primary); border-bottom: 2px solid var(--gold-primary);
+}
+
+/* 消息气泡 */
+.msg-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.msg-row { display: flex; flex-direction: column; max-width: 75%; }
+.msg-row.player-msg { align-self: flex-end; align-items: flex-end; }
+.msg-row.host-msg { align-self: flex-start; align-items: flex-start; }
+.msg-meta { font-size: 11px; color: var(--cream-muted); margin-bottom: 3px; }
+.msg-bubble { padding: 10px 14px; border-radius: var(--radius-lg); font-size: 14px; line-height: 1.6; word-break: break-all; }
+.msg-row.player-msg .msg-bubble {
+    background-image:
+        linear-gradient(135deg, rgba(180,130,70,0.5) 0%, rgba(140,90,40,0.6) 40%, rgba(80,45,20,0.75) 100%),
+        url('msg-bg-parchment.jpg');
+    background-size: 350% 350%;
+    background-position: 50% 22%;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(3px);
+    border: 1px solid rgba(212,154,58,0.3); color: #fff8e8;
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    box-shadow: inset 0 0 20px rgba(180,130,40,0.08);
+}
+.msg-row.host-msg .msg-bubble {
+    background-image:
+        linear-gradient(135deg, rgba(100,110,105,0.5) 0%, rgba(80,90,85,0.6) 40%, rgba(50,55,50,0.75) 100%),
+        url('msg-bg-parchment.jpg');
+    background-size: 350% 350%;
+    background-position: 50% 65%;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(3px);
+    border: 1px solid rgba(111,98,102,0.3); color: #e8f0e8;
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    box-shadow: inset 0 0 20px rgba(100,120,100,0.06);
+}
+.msg-time { font-size: 10px; color: var(--cream-muted); margin-top: 4px; }
+.reply-area-demo { display: flex; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-subtle); background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px); }
+.reply-input {
+    flex: 1; padding: 10px 14px;
+    background: rgba(18, 9, 4, 0.4); border: 1px solid var(--border-mid);
+    border-radius: var(--radius-md); color: var(--cream); font-size: 14px;
+    font-family: var(--font-body); outline: none; box-shadow: var(--shadow-inset);
+}
+.reply-input:focus { border-color: var(--gold-primary); box-shadow: 0 0 8px var(--gold-glow), var(--shadow-inset); }
+.reply-input::placeholder { color: var(--cream-muted); }
+.quick-reply-row { display: flex; gap: 6px; padding: 8px 16px 12px; flex-wrap: wrap; align-items: center; }
+.quick-reply-label { font-size: 11px; color: var(--cream-muted); }
+.btn-quick-reply {
+    padding: 4px 10px; font-size: 11px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-mid); background: rgba(62, 34, 18, 0.55); backdrop-filter: blur(8px);
+    color: var(--cream-dim); cursor: pointer; transition: all var(--transition-fast); white-space: nowrap;
+}
+.btn-quick-reply:hover { border-color: var(--gold-primary); color: var(--gold-primary); box-shadow: 0 0 6px rgba(212,154,58,0.2); }
+
+/* 弹窗 */
+.modal-demo {
+    background: rgba(62, 34, 18, 0.55); backdrop-filter: blur(8px); border: 2px solid var(--border-gold);
+    border-radius: var(--radius-xl); padding: 32px; max-width: 500px; margin: 0 auto;
+    text-align: center; position: relative;
+    box-shadow: 0 0 24px rgba(180,130,40,0.3), 0 0 0 4px rgba(26,14,6,0.8), 0 0 0 6px rgba(139,105,20,0.25);
+}
+.modal-demo h3 { font-family: var(--font-display); font-size: 20px; color: var(--gold-primary); letter-spacing: 4px; margin-bottom: 20px; }
+.modal-close-demo { position: absolute; top: 12px; right: 16px; font-size: 24px; color: var(--gold-primary); cursor: pointer; }
+.board-count-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0; }
+.board-count-value { font-size: 28px; font-weight: bold; color: var(--gold-primary); font-family: var(--font-mono); text-shadow: 0 0 8px var(--gold-glow); min-width: 40px; text-align: center; }
+.btn-count-stepper { width: 28px; height: 28px; padding: 0; font-size: 12px; line-height: 28px; text-align: center; border-radius: var(--radius-full); background: rgba(30,30,54,0.6); color: var(--cream-dim); border: 1px solid var(--border-mid); cursor: pointer; }
+.board-dist-summary { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; padding: 10px; background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+.board-dist-item { font-size: 13px; padding: 3px 10px; border-radius: var(--radius-sm); background: rgba(18, 9, 4, 0.4); }
+.board-actions { display: flex; gap: 12px; justify-content: center; padding-top: 16px; }
+
+/* 邪恶群聊 */
+.evil-demo { background: rgba(58, 20, 20, 0.35); backdrop-filter: blur(6px); border: 1px solid rgba(200,62,62,0.3); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
+.evil-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(42, 14, 14, 0.4); backdrop-filter: blur(4px); border-bottom: 1px solid rgba(200,62,62,0.2); }
+.evil-label { color: #c08070; font-size: 12px; font-weight: bold; }
+.evil-chip { padding: 2px 8px; background: rgba(58,18,18,0.8); border: 1px solid rgba(200,62,62,0.3); border-radius: 12px; font-size: 12px; color: #e0c0c0; }
+.evil-msg-bubble {
+    background-image:
+        linear-gradient(135deg, rgba(120,40,35,0.6) 0%, rgba(80,25,20,0.7) 40%, rgba(50,15,12,0.85) 100%),
+        url('msg-bg-parchment.jpg');
+    background-size: 350% 350%;
+    background-position: 50% 85%;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(3px);
+    border: 1px solid rgba(200,62,62,0.35); color: #f5e0e0;
+    padding: 8px 12px; border-radius: 8px; font-size: 13px; line-height: 1.5; max-width: 75%;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 16px rgba(180,40,30,0.1);
+}
+
+/* 队列 */
+.queue-demo { background: rgba(26, 14, 6, 0.5); backdrop-filter: blur(6px); border: 1px solid var(--border-gold); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 16px; }
+.queue-header-demo { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: rgba(42, 20, 10, 0.5); backdrop-filter: blur(4px); cursor: pointer; }
+.queue-collapsed-text { font-size: 14px; color: #c8b090; font-weight: 600; }
+.queue-progress { flex: 1; font-size: 13px; color: #8a7a65; }
+.queue-row { display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 13px; border-bottom: 1px solid rgba(42,26,14,0.5); transition: background 0.2s; background: rgba(45, 24, 11, 0.2); }
+.queue-row:hover { background: rgba(255,255,255,0.02); }
+.queue-order { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px); border-radius: 50%; font-size: 11px; color: var(--cream-muted); flex-shrink: 0; }
+.queue-player-name { min-width: 50px; font-weight: 600; color: var(--cream); white-space: nowrap; }
+.queue-role-name { min-width: 70px; font-weight: 500; white-space: nowrap; }
+.queue-action-desc { flex: 1; color: #8a7a65; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 对比表 */
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table th { padding: 10px 14px; background: rgba(45, 24, 11, 0.5); backdrop-filter: blur(4px); border: 1px solid var(--border-mid); color: var(--gold-primary); font-family: var(--font-display); letter-spacing: 2px; font-weight: 500; }
+.compare-table td { padding: 8px 14px; border: 1px solid var(--border-subtle); color: var(--cream-dim); }
+.compare-table td.old { color: var(--cream-muted); text-decoration: line-through; }
+.compare-table td.new { color: var(--cream); font-weight: 500; }
+
+/* 三栏布局示意 */
+.layout-demo {
+    display: flex; height: 500px;
+    border: 1px solid var(--border-mid); border-radius: var(--radius-lg); overflow: hidden;
+}
+.layout-left { width: 180px; background: rgba(18, 9, 4, 0.55); backdrop-filter: blur(6px); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; overflow-y: auto; }
+.layout-center { flex: 1; background: rgba(18, 9, 4, 0.4); display: flex; align-items: center; justify-content: center; position: relative; min-width: 0; }
+.layout-right { flex: 1; background: rgba(18, 9, 4, 0.55); backdrop-filter: blur(6px); border-left: 1px solid var(--border-subtle); display: flex; flex-direction: column; min-width: 0; }
+
+@media (max-width: 768px) {
+    .page-header h1 { font-size: 28px; letter-spacing: 6px; }
+    .layout-demo { flex-direction: column; height: auto; }
+    .layout-left, .layout-center, .layout-right { width: 100%; min-height: 200px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <!-- ============ 标题 ============ -->
+    <header class="page-header">
+        <span class="sub">Blood-West</span>
+        <h1>西 游 纪</h1>
+        <span class="style-tag">敦煌岩彩 · Dunhuang Mineral</span>
+    </header>
+
+    <!-- ============ 一、色彩系统（全部从 bg-frame.png 提取） ============ -->
+    <section class="section">
+        <h2 class="section-title">一、色彩系统（从 bg-frame.png 20阶量化提取）</h2>
+        <div class="swatch-grid">
+            <div class="swatch"><div class="swatch-color" style="background:#120904;">#120904</div><div class="swatch-label"><strong>最深棕</strong>body底色</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#2d180b;">#2d180b</div><div class="swatch-label"><strong>表面棕</strong>卡片/输入框</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#56341d;">#56341d</div><div class="swatch-label"><strong>最暗区均值</strong>Panel浮层</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#824924;">#824924</div><div class="swatch-label"><strong>暗区色</strong>边框/渐变深端</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#ba744a;">#ba744a</div><div class="swatch-label"><strong>中区均值</strong>暖陶土</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#c47a3b;">#c47a3b</div><div class="swatch-label"><strong>铜金素</strong>按钮渐变中端</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#dba851;">#dba851</div><div class="swatch-label"><strong>亮金素</strong>主按钮/描边</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#efcf98;">#efcf98</div><div class="swatch-label"><strong>最亮区</strong>高光/主文字</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#ab6954;">#ab6954</div><div class="swatch-label"><strong>朱砂红素</strong>危险/恶魔</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#d49565;">#d49565</div><div class="swatch-label"><strong>亮区均值</strong>辅助文字</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#6f6266;">#6f6266</div><div class="swatch-label"><strong>冷色素</strong>次按钮/青铜锈</div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#3e9e7b;">#3e9e7b</div><div class="swatch-label"><strong>石绿</strong>成功/外来者</div></div>
+        </div>
+    </section>
+
+    <!-- ============ 二、按钮系统 ============ -->
+    <section class="section">
+        <h2 class="section-title">二、按钮系统</h2>
+        <div class="btn-row">
+            <button class="btn btn-gold">确认使用</button>
+            <button class="btn btn-stone">返回</button>
+            <button class="btn btn-cinnabar">退出房间</button>
+            <button class="btn btn-ghost">查看详情</button>
+            <button class="btn btn-copper">重新推荐</button>
+            <button class="btn btn-small">二维码</button>
+        </div>
+    </section>
+
+    <!-- ============ 三、工具栏 ============ -->
+    <section class="section">
+        <h2 class="section-title">三、顶部工具栏</h2>
+        <div class="toolbar-demo">
+            <div class="logo">
+                <span class="logo-main">西游纪</span>
+                <span class="logo-sub">Blood-West</span>
+                <span class="logo-version">v3.0.0</span>
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-gold">创建房间</button>
+                <div class="room-info-demo">
+                    <span class="room-label">房间码</span>
+                    <span class="room-code-value">ABC123</span>
+                    <button class="btn btn-small">二维码</button>
+                </div>
+                <button class="btn btn-gold" style="padding:10px 20px;min-width:140px;">🌙 首夜</button>
+                <button class="btn btn-stone">角色配置</button>
+                <button class="btn btn-cinnabar">退出房间</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ★ 四、Canvas 圆桌主视图 ★ ============ -->
+    <section class="section">
+        <h2 class="section-title">四、Canvas 圆桌 — 敦煌铜镜星盘</h2>
+
+        <!-- 三栏布局 -->
+        <div class="layout-demo">
+            <!-- 左：玩家列表 -->
+            <div class="layout-left">
+                <div class="panel-header"><h2>玩家</h2><span class="count-badge">7</span></div>
+                <div class="player-item">
+                    <span class="player-name">孙悟空</span>
+                </div>
+                <div class="player-item active">
+                    <span class="player-name">唐僧</span>
+                </div>
+                <div class="player-item">
+                    <span class="player-name">白骨精</span>
+                </div>
+                <div class="player-item">
+                    <span class="player-name">牛魔王</span>
+                </div>
+                <div class="player-item">
+                    <span class="player-name">沙悟净</span>
+                </div>
+                <div class="player-item">
+                    <span class="player-name">猪八戒</span>
+                </div>
+                <div class="player-item">
+                    <span class="player-name">观音</span>
+                </div>
+            </div>
+
+            <!-- 中：Canvas 圆桌 -->
+            <div class="layout-center" id="table-center">
+                <div id="round-table-container" style="position:relative;">
+                    <canvas id="table-canvas"></canvas>
+                    <div id="seats-overlay"></div>
+                </div>
+            </div>
+
+            <!-- 右：消息面板 -->
+            <div class="layout-right">
+                <div class="panel-header"><h2>消息记录</h2></div>
+                <div class="tab-demo">
+                    <button class="msg-tab active">私聊</button>
+                    <button class="msg-tab">邪恶群聊</button>
+                    <button class="msg-tab">行动记录</button>
+                </div>
+                <div class="msg-list">
+                    <div class="msg-row player-msg">
+                        <span class="msg-meta">孙悟空 · 夜间</span>
+                        <div class="msg-bubble">我今晚查看了唐僧的身份</div>
+                        <span class="msg-time">22:14</span>
+                    </div>
+                    <div class="msg-row host-msg">
+                        <span class="msg-meta">主持人回复</span>
+                        <div class="msg-bubble">收到，主持人已知晓</div>
+                        <span class="msg-time">22:15</span>
+                    </div>
+                    <div class="msg-row player-msg">
+                        <span class="msg-meta">白骨精 · 夜间</span>
+                        <div class="msg-bubble">我对唐僧使用了毒药</div>
+                        <span class="msg-time">22:16</span>
+                    </div>
+                </div>
+                <div class="reply-area-demo">
+                    <input class="reply-input" placeholder="输入回复内容..." style="flex:1;">
+                    <button class="btn btn-gold">发送</button>
+                </div>
+                <div class="quick-reply-row">
+                    <span class="quick-reply-label">快捷：</span>
+                    <button class="btn-quick-reply">✅ 已收到</button>
+                    <button class="btn-quick-reply">❓ 请说明</button>
+                    <button class="btn-quick-reply">🔒 已处理</button>
+                    <button class="btn-quick-reply">🌪️ 选元素</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas 渲染说明 -->
+        <p style="margin-top:12px; font-size:12px; color:var(--cream-muted); text-align:center;">
+            ★ Canvas 绘制：8环铜镜结构（鎏金外框 → 暗铜 → 星宿刻度 → 鎏金铭文 → 木纹 → 青铜 → 罗盘 → 朱砂魂芯）
+        </p>
+    </section>
+
+    <!-- ============ 五、夜间队列 ============ -->
+    <section class="section">
+        <h2 class="section-title">五、夜间行动队列</h2>
+        <div class="queue-demo">
+            <div class="queue-header-demo">
+                <span style="font-size:18px;">🌙</span>
+                <span class="queue-collapsed-text">夜间行动队列</span>
+                <span class="queue-progress">已处理: 2/3</span>
+            </div>
+            <div class="queue-row">
+                <span class="queue-order">1</span><span class="queue-player-name">孙悟空</span>
+                <span class="queue-role-name" style="color:var(--role-town);">齐天大圣</span>
+                <span class="queue-action-desc">选择一名玩家，得知其角色类别</span>
+                <span style="font-size:11px;color:#3e9e7b;">已完成</span>
+            </div>
+            <div class="queue-row">
+                <span class="queue-order">2</span><span class="queue-player-name">白骨精</span>
+                <span class="queue-role-name" style="color:var(--role-minion);">白骨夫人</span>
+                <span class="queue-action-desc">每夜可使一名玩家中毒</span>
+                <span style="font-size:11px;color:#3e9e7b;">已处理</span>
+            </div>
+            <div class="queue-row">
+                <span class="queue-order">3</span><span class="queue-player-name">牛魔王</span>
+                <span class="queue-role-name" style="color:var(--role-demon);">混世魔王</span>
+                <span class="queue-action-desc">选择一名玩家，将其杀死</span>
+                <span style="font-size:11px;color:#f9a825;">等待中…</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 六、弹窗 ============ -->
+    <section class="section">
+        <h2 class="section-title">六、版型配置弹窗</h2>
+        <div class="modal-demo">
+            <span class="modal-close-demo">&times;</span>
+            <h3>版型配置</h3>
+            <div class="board-count-row">
+                <span style="color:var(--cream-dim);">玩家人数</span>
+                <button class="btn-count-stepper">◀</button>
+                <span class="board-count-value">12</span>
+                <button class="btn-count-stepper">▶</button>
+            </div>
+            <div class="board-dist-summary">
+                <span class="board-dist-item" style="color:var(--role-town);">镇民 7</span>
+                <span class="board-dist-item" style="color:var(--role-outsider);">外来者 1</span>
+                <span class="board-dist-item" style="color:var(--role-minion);">爪牙 2</span>
+                <span class="board-dist-item" style="color:var(--role-demon);">恶魔 1</span>
+            </div>
+            <p style="color:var(--cream-muted);font-size:13px;margin:16px 0;">角色选择列表（类别分组 + 点击交换）</p>
+            <div class="board-actions">
+                <button class="btn btn-copper">重新推荐</button>
+                <button class="btn btn-stone">复原</button>
+                <button class="btn btn-gold">确认使用此版型</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 七、邪恶群聊 ============ -->
+    <section class="section">
+        <h2 class="section-title">七、邪恶群聊</h2>
+        <div class="evil-demo">
+            <div class="evil-bar">
+                <span class="evil-label">😈 邪恶阵营</span>
+                <span class="evil-chip">白骨精 · 爪牙</span>
+                <span class="evil-chip">牛魔王 · 恶魔</span>
+                <span class="evil-chip">铁扇公主 · 爪牙</span>
+            </div>
+            <div style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+                <div class="evil-msg-bubble">今晚我建议杀唐僧</div>
+                <div class="evil-msg-bubble" style="align-self:flex-end; background-image:linear-gradient(135deg, rgba(180,130,70,0.5), rgba(100,60,30,0.65)), url('msg-bg-parchment.jpg'); background-size:350% 350%; background-position:50% 40%;">同意，他是最危险的外来者</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ 八、新旧对比 ============ -->
+    <section class="section">
+        <h2 class="section-title">八、新旧设计对照</h2>
+        <table class="compare-table">
+            <thead><tr><th>维度</th><th>旧版（冷调暗黑）</th><th>新版（敦煌岩彩）</th></tr></thead>
+            <tbody>
+                <tr><td>底色</td><td class="old">#07060e 冷调黑蓝</td><td class="new">#1a0e06 暖调深棕</td></tr>
+                <tr><td>面板</td><td class="old">#0a0a12 冷黑</td><td class="new">#2a1a0e 深棕</td></tr>
+                <tr><td>主强调</td><td class="old">#c9a84c 冷金</td><td class="new">#d49a3a 鎏金</td></tr>
+                <tr><td>危险色</td><td class="old">#8b2500 暗红</td><td class="new">#c83e3e 朱砂红</td></tr>
+                <tr><td>圆桌</td><td class="old">CSS 简单渐变椭圆</td><td class="new">Canvas 8环铜镜星盘</td></tr>
+                <tr><td>背景</td><td class="old">纯色 + 噪点</td><td class="new">bg-frame.png + 岩彩颗粒 + 聚光</td></tr>
+                <tr><td>字体</td><td class="old">Georgia/宋体</td><td class="new">Noto Serif SC + Noto Sans SC</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<!-- ============================================================
+     ★ Canvas 圆桌绘制引擎 ★
+     敦煌铜镜星盘 — 8层环结构
+     ============================================================ -->
+<script>
+(function() {
+    const container = document.getElementById('round-table-container');
+    const canvas = document.getElementById('table-canvas');
+    const seatsOverlay = document.getElementById('seats-overlay');
+    const ctx = canvas.getContext('2d');
+
+    // 响应式尺寸
+    const SIZE = 560;  // 画布逻辑尺寸
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+        const parent = container.parentElement;
+        const maxSize = Math.min(parent.clientWidth * 0.9, parent.clientHeight * 0.9, SIZE);
+        const scale = maxSize / SIZE;
+        canvas.width = SIZE * DPR;
+        canvas.height = SIZE * DPR;
+        canvas.style.width = maxSize + 'px';
+        canvas.style.height = maxSize + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        // 座位覆盖层同步尺寸
+        seatsOverlay.style.width = maxSize + 'px';
+        seatsOverlay.style.height = maxSize + 'px';
+
+        drawTable();
+        positionSeats(maxSize);
+    }
+
+    // ============================================================
+    //  绘制函数
+    // ============================================================
+    // ★ 经卷纸纹理图片（用于环层肌理叠加）
+    var texImg = null;
+    var texLoaded = false;
+    function loadTexture() {
+        texImg = new Image();
+        texImg.onload = function() { texLoaded = true; drawTable(); };
+        texImg.src = 'msg-bg-parchment.jpg';
+    }
+    loadTexture();
+
+    // 辅助：在环形区域内叠加纹理
+    function texRing(rOuter, rInner, sx, sy, sw, sh, alpha) {
+        if (!texLoaded) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
+        if (rInner > 0) ctx.arc(cx, cy, rInner, 0, Math.PI * 2, true);
+        ctx.clip();
+        ctx.globalAlpha = alpha;
+        var tableSize = rOuter * 2;
+        ctx.drawImage(texImg, sx, sy, sw, sh, cx - rOuter, cy - rOuter, tableSize, tableSize);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    var cx, cy;
+
+    function drawTable() {
+        cx = SIZE / 2;
+        cy = SIZE / 2;
+        const R = SIZE * 0.46; // 最大外径
+
+        ctx.clearRect(0, 0, SIZE, SIZE);
+
+        // ---- 第1层：最外鎏金框 (R~R-8) ----
+        const r1 = R;
+        const r1i = R - 10;
+        const grad1 = ctx.createRadialGradient(cx, cy, r1i, cx, cy, r1);
+        grad1.addColorStop(0, '#8b6914');
+        grad1.addColorStop(0.5, '#d49a3a');
+        grad1.addColorStop(0.85, '#edc379');
+        grad1.addColorStop(1, '#5a3e10');
+        ctx.beginPath();
+        ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r1i, 0, Math.PI * 2, true);
+        ctx.fillStyle = grad1;
+        ctx.fill();
+        // ★ 鎏金框经卷纹理 — 采样亮金区
+        texRing(r1, r1i, 300, 100, 900, 900, 0.10);
+
+        // 鎏金外框高光环
+        ctx.beginPath();
+        ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(237, 195, 121, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // ---- 第2层：钉饰环 ----
+        const r2o = r1i - 2;
+        const r2i = r2o - 16;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r2o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r2i, 0, Math.PI * 2, true);
+        const grad2 = ctx.createRadialGradient(cx, cy, r2i, cx, cy, r2o);
+        grad2.addColorStop(0, '#4a3020');
+        grad2.addColorStop(1, '#2a1808');
+        ctx.fillStyle = grad2;
+        ctx.fill();
+        texRing(r2o, r2i, 350, 400, 800, 800, 0.10);
+
+        // 铆钉（12颗，简化）
+        const rivetCount = 12;
+        const rivetR = (r2o + r2i) / 2;
+        for (let i = 0; i < rivetCount; i++) {
+            const angle = (i / rivetCount) * Math.PI * 2 - Math.PI / 2;
+            const rx = cx + Math.cos(angle) * rivetR;
+            const ry = cy + Math.sin(angle) * rivetR;
+            ctx.beginPath();
+            ctx.arc(rx + 1, ry + 1, 3.5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fill();
+            const rivetGrad = ctx.createRadialGradient(rx - 1, ry - 1, 0.5, rx, ry, 3.5);
+            rivetGrad.addColorStop(0, '#edc379');
+            rivetGrad.addColorStop(0.6, '#d49a3a');
+            rivetGrad.addColorStop(1, '#8b6914');
+            ctx.beginPath();
+            ctx.arc(rx, ry, 3.2, 0, Math.PI * 2);
+            ctx.fillStyle = rivetGrad;
+            ctx.fill();
+        }
+
+        // ---- 第3层：星宿刻度环 ----
+        const r3o = r2i - 2;
+        const r3i = r3o - 20;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r3o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r3i, 0, Math.PI * 2, true);
+        const grad3 = ctx.createRadialGradient(cx, cy, r3i, cx, cy, r3o);
+        grad3.addColorStop(0, '#3a2818');
+        grad3.addColorStop(0.5, '#2a1808');
+        grad3.addColorStop(1, '#1a0a03');
+        ctx.fillStyle = grad3;
+        ctx.fill();
+        // ★ 刻度环纹理 — 采样经卷墨绿暗区，模拟青铜锈
+        texRing(r3o, r3i, 400, 700, 700, 700, 0.14);
+
+        // 刻度线（24条，简化）
+        const tickCount = 24;
+        for (let i = 0; i < tickCount; i++) {
+            const angle = (i / tickCount) * Math.PI * 2 - Math.PI / 2;
+            const isMajor = i % 3 === 0;
+            const len = isMajor ? 14 : 6;
+            const outerR = r3o - 3;
+            const innerR = outerR - len;
+            const x1 = cx + Math.cos(angle) * outerR;
+            const y1 = cy + Math.sin(angle) * outerR;
+            const x2 = cx + Math.cos(angle) * innerR;
+            const y2 = cy + Math.sin(angle) * innerR;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = isMajor ? 'rgba(212,154,58,0.8)' : 'rgba(180,120,50,0.35)';
+            ctx.lineWidth = isMajor ? 1.5 : 0.7;
+            ctx.stroke();
+        }
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+            const dotR = r3o - 19;
+            const dx = cx + Math.cos(angle) * dotR;
+            const dy = cy + Math.sin(angle) * dotR;
+            ctx.beginPath();
+            ctx.arc(dx, dy, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#edc379';
+            ctx.fill();
+        }
+
+        // ---- 第4层：鎏金铭文分隔环 ----
+        const r4o = r3i - 2;
+        const r4i = r4o - 6;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r4o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r4i, 0, Math.PI * 2, true);
+        const grad4 = ctx.createRadialGradient(cx, cy, r4i, cx, cy, r4o);
+        grad4.addColorStop(0, '#8b6914');
+        grad4.addColorStop(0.5, '#d49a3a');
+        grad4.addColorStop(1, '#5a3e10');
+        ctx.fillStyle = grad4;
+        ctx.fill();
+        texRing(r4o, r4i, 250, 200, 1000, 1000, 0.10);
+
+        // ---- 第5层：木纹桌面 ★ 主纹理区 ----
+        const r5o = r4i - 1;
+        const r5i = r5o - 140;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
+        const grad5 = ctx.createRadialGradient(cx, cy, r5i, cx, cy, r5o);
+        grad5.addColorStop(0, '#2a1808');
+        grad5.addColorStop(0.5, '#1a0c03');
+        grad5.addColorStop(1, '#0d0400');
+        ctx.fillStyle = grad5;
+        ctx.fill();
+        // ★ 桌面主纹理 — 采样经卷暖金区
+        texRing(r5o, r5i, 200, 150, 1100, 1100, 0.22);
+
+        // 木纹纹理
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
+        ctx.clip();
+        for (let r = r5i + 4; r < r5o; r += 12 + Math.random() * 5) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            const alpha = 0.02 + Math.random() * 0.04;
+            ctx.strokeStyle = 'rgba(180,140,100,' + alpha + ')';
+            ctx.lineWidth = 0.5 + Math.random() * 1;
+            ctx.stroke();
+        }
+        for (let i = 0; i < 30; i++) {
+            const angle = (i / 30) * Math.PI * 2 + (Math.random() - 0.5) * 0.1;
+            const sr = r5i + Math.random() * (r5o - r5i) * 0.6;
+            const er = sr + 10 + Math.random() * 30;
+            const sx2 = cx + Math.cos(angle) * sr;
+            const sy2 = cy + Math.sin(angle) * sr;
+            const ex = cx + Math.cos(angle) * Math.min(er, r5o);
+            const ey = cy + Math.sin(angle) * Math.min(er, r5o);
+            ctx.beginPath();
+            ctx.moveTo(sx2, sy2);
+            ctx.lineTo(ex, ey);
+            ctx.strokeStyle = 'rgba(160,120,80,' + (0.02 + Math.random() * 0.03) + ')';
+            ctx.lineWidth = 0.3 + Math.random() * 0.5;
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        // ---- 第6层：鎏金内框 ----
+        const r6o = r5i;
+        const r6i = r6o - 8;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r6o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r6i, 0, Math.PI * 2, true);
+        const grad6 = ctx.createRadialGradient(cx, cy, r6i, cx, cy, r6o);
+        grad6.addColorStop(0, '#6a4a1a');
+        grad6.addColorStop(0.4, '#c49a3a');
+        grad6.addColorStop(0.7, '#d49a3a');
+        grad6.addColorStop(1, '#4a2a08');
+        ctx.fillStyle = grad6;
+        ctx.fill();
+        texRing(r6o, r6i, 300, 300, 900, 900, 0.10);
+
+        // ---- 第7层：内圈青铜面板 ----
+        const r7o = r6i - 1;
+        const r7i = r7o - 60;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r7o, 0, Math.PI * 2);
+        ctx.arc(cx, cy, r7i, 0, Math.PI * 2, true);
+        const grad7 = ctx.createRadialGradient(cx, cy, r7i, cx, cy, r7o);
+        grad7.addColorStop(0, '#5a4028');
+        grad7.addColorStop(0.6, '#3a2410');
+        grad7.addColorStop(1, '#1a0a03');
+        ctx.fillStyle = grad7;
+        ctx.fill();
+        // ★ 青铜面板纹理 — 采样经卷冷色/墨绿区
+        texRing(r7o, r7i, 450, 650, 600, 600, 0.16);
+
+        // 内圈简化为十字方位线
+        for (let i = 0; i < 4; i++) {
+            const angle = (i / 4) * Math.PI - Math.PI / 2;
+            const innerX = cx + Math.cos(angle) * (r7i + 6);
+            const innerY = cy + Math.sin(angle) * (r7i + 6);
+            const outerX = cx + Math.cos(angle) * (r7o - 6);
+            const outerY = cy + Math.sin(angle) * (r7o - 6);
+            ctx.beginPath();
+            ctx.moveTo(innerX, innerY);
+            ctx.lineTo(outerX, outerY);
+            ctx.strokeStyle = 'rgba(212,154,58,0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        // ---- 第8层：中央罗盘/魂芯 ----
+        const r8 = r7i + 1;
+        const grad8_ring = ctx.createRadialGradient(cx, cy, r8 - 4, cx, cy, r8);
+        grad8_ring.addColorStop(0, '#8b6914');
+        grad8_ring.addColorStop(0.5, '#d49a3a');
+        grad8_ring.addColorStop(1, '#4a2a08');
+        ctx.beginPath();
+        ctx.arc(cx, cy, r8, 0, Math.PI * 2);
+        ctx.fillStyle = grad8_ring;
+        ctx.fill();
+
+        // 核心暗面
+        const rCore = r8 - 4;
+        const gradCore = ctx.createRadialGradient(cx - 2, cy - 2, rCore * 0.1, cx, cy, rCore);
+        gradCore.addColorStop(0, '#8b3a20');
+        gradCore.addColorStop(0.4, '#4a1810');
+        gradCore.addColorStop(1, '#1a0402');
+        ctx.beginPath();
+        ctx.arc(cx, cy, rCore, 0, Math.PI * 2);
+        ctx.fillStyle = gradCore;
+        ctx.fill();
+        // ★ 魂芯纹理 — 采样经卷暗红区
+        texRing(rCore, 0, 500, 1200, 500, 500, 0.14);
+
+        // 核心十字准线
+        ctx.beginPath();
+        ctx.moveTo(cx - rCore * 0.7, cy);
+        ctx.lineTo(cx + rCore * 0.7, cy);
+        ctx.moveTo(cx, cy - rCore * 0.7);
+        ctx.lineTo(cx, cy + rCore * 0.7);
+        ctx.strokeStyle = 'rgba(237, 195, 121, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 中心亮点
+        const gradCenter = ctx.createRadialGradient(cx, cy, 0, cx, cy, 6);
+        gradCenter.addColorStop(0, '#fff8e0');
+        gradCenter.addColorStop(0.3, '#edc379');
+        gradCenter.addColorStop(0.6, '#d49a3a');
+        gradCenter.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+        ctx.fillStyle = gradCenter;
+        ctx.fill();
+    }
+    // ============================================================
+    //  座位定位（基于最外层鎏金框的外围）
+    // ============================================================
+    function positionSeats(canvasSize) {
+        seatsOverlay.innerHTML = '';
+
+        const players = [
+            { name: '孙悟空', role: '齐天大圣', type: 'townsfolk', selected: false },
+            { name: '唐僧', role: '金蝉子', type: 'townsfolk', selected: true },
+            { name: '白骨精', role: '白骨夫人', type: 'minion', selected: false },
+            { name: '牛魔王', role: '混世魔王', type: 'demon', selected: false },
+            { name: '沙悟净', role: '卷帘大将', type: 'townsfolk', selected: false },
+            { name: '猪八戒', role: '天蓬元帅', type: 'outsider', selected: false },
+            { name: '观音', role: '南海观音', type: 'townsfolk', selected: false },
+        ];
+
+        const cx = canvasSize / 2;
+        const cy = canvasSize / 2;
+        const tableOuterR = canvasSize * 0.46; // 与 Canvas 中 R 对应
+        const seatDistance = tableOuterR + 28;  // 座位在桌面外沿
+
+        // 分配角度：从顶部开始，均匀分布
+        const count = players.length;
+        const startAngle = -Math.PI / 2; // 顶部开始
+
+        players.forEach((p, i) => {
+            // 留出顶部缺口（阶段文字上方）
+            let angle;
+            if (count <= 7) {
+                // 从顶部略偏开始绕圈排布
+                const offset = Math.PI * 0.08;
+                angle = startAngle - offset + (i / (count - 1)) * (Math.PI * 2 - offset * 2);
+                if (count === 1) angle = startAngle;
+            } else {
+                angle = startAngle + (i / count) * Math.PI * 2;
+            }
+
+            const sx = cx + Math.cos(angle) * seatDistance;
+            const sy = cy + Math.sin(angle) * seatDistance;
+
+            const typeClass = ({ townsfolk: 'townsfolk', outsider: 'outsider', minion: 'minion', demon: 'demon' })[p.type];
+            const roleClass = ({ townsfolk: 'role-townsfolk', outsider: 'role-outsider', minion: 'role-minion', demon: 'role-demon' })[p.type];
+            const selClass = p.selected ? ' selected' : '';
+
+            const seat = document.createElement('div');
+            seat.className = `player-seat`;
+            seat.style.left = sx + 'px';
+            seat.style.top = sy + 'px';
+            seat.innerHTML = `
+                <div class="seat-dot ${typeClass}${selClass}">
+                    <div class="status-dot"></div>
+                </div>
+                <span class="seat-label">${p.name}</span>
+                <span class="seat-role-badge ${roleClass}">${p.role}</span>
+            `;
+            seat.addEventListener('click', () => {
+                // 点击切换选中
+                seatsOverlay.querySelectorAll('.seat-dot').forEach(d => d.classList.remove('selected'));
+                seat.querySelector('.seat-dot').classList.add('selected');
+            });
+            seatsOverlay.appendChild(seat);
+        });
+    }
+
+    // 初始化
+    resize();
+    window.addEventListener('resize', resize);
+
+    // 悬停座位时增强光晕
+    seatsOverlay.addEventListener('mouseover', (e) => {
+        const seat = e.target.closest('.player-seat');
+        if (seat) {
+            const dot = seat.querySelector('.seat-dot');
+            dot.style.filter = 'brightness(1.3)';
+        }
+    });
+    seatsOverlay.addEventListener('mouseout', (e) => {
+        const seat = e.target.closest('.player-seat');
+        if (seat) {
+            const dot = seat.querySelector('.seat-dot');
+            dot.style.filter = '';
+        }
+    });
+})();
+</script>
+</body>
+</html>

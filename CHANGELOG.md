@@ -1,5 +1,32 @@
 # 版本日志
 
+## v3.0.0 (2026-06-09)
+
+### 🎨 UI 风格全面升级 — 敦煌岩彩主题
+
+将主持后台从冷调暗蓝主题全面替换为敦煌岩彩（Dunhuang Mineral Pigment）暖棕鎏金风格。设计系统基于 bg-frame.png 画框纹理 20 阶色彩量化提取，搭配经卷纸纹理（msg-bg-parchment.jpg）和磨砂玻璃透明面板。
+
+**设计系统：**
+- 色彩：从 bg-frame.png 提取 5 级暖棕背景 + 4 阶鎏金 + 朱砂红 + 冷色素青铜锈 + 石绿
+- 字体：Noto Serif SC（标题）+ Noto Sans SC（正文）+ Playfair Display（装饰）
+- 材质：bg-frame.png 全屏背景 + 23处 backdrop-filter 磨砂玻璃 + 经卷纸纹理
+- 按钮：6种变体（鎏金/石青/朱砂/铜色/幽灵/小按钮），每种采样 bg-frame.png 不同区域
+
+**改动文件：**
+- `admin/style.css` — 全量重写（2347→1161行），:root 变量完全替换，所有组件适配敦煌岩彩
+  - body：bg-frame.png 背景 + 暗角遮罩 + font-weight:500
+  - 工具栏/面板/弹窗/队列：统一磨砂玻璃透明化
+  - 按钮：bg-frame.png 纹理叠加 + 渐变色调
+  - 消息气泡：玩家→经卷暖金区 / 主持→经卷冷色区 / 邪恶→经卷暗朱砂区
+  - 文字色系加深（cream #d4b87a / cream-dim #b87848 / cream-muted #8b5a38）
+- `admin/index.html` — Google Fonts CDN + Canvas 圆桌容器替换 CSS 圆桌 + 版本号 v2.0.2→v3.0.0
+- `admin/js/table.js` — Canvas 8环铜镜星盘引擎（12铆钉 + 24刻度 + 4十字方位线 + 经卷纹理叠加）
+- `admin/js/room.js` — 圆桌容器引用适配（#seats-container → #seats-overlay）
+
+**新增资源：**
+- `admin/bg-frame.png` — 画框纹理背景（已有）
+- `admin/msg-bg-parchment.jpg` — 经卷纸纹理（用于消息气泡 + 铜镜桌面）
+
 ## v2.0.2 (2026-06-05)
 
 ### 📋 行动记录本统一：白天+夜晚融合

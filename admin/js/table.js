@@ -1,161 +1,332 @@
 /* ============================================================
-   西游纪 Blood-West · 圆桌与座位模块
-   圆桌渲染、座位计算、拖拽排序、座位交换
+   西游纪 Blood-West · Canvas 铜镜圆桌模块
+   8环敦煌铜镜星盘 + 经卷纸纹理 + 圆形座位布局
    依赖：state.js, data/roles.js
    ============================================================ */
 
-// 计算座位在 pill（长圆）轮廓上的像素坐标
-// 桌面是 CSS pill 形状（矩形 + 两端半圆），座位沿同形外扩轮廓排列
-function computeSeatPosition(angle) {
-    const tableEl = $('#round-table');
-    const W = tableEl.offsetWidth;
-    const H = tableEl.offsetHeight;
-    const cx = W / 2;
-    const cy = H / 2;
+// ---- Canvas 状态 ----
+let _tableCtx = null;
+let _tableCanvas = null;
+let _tableTexImg = null;
+let _tableTexLoaded = false;
+let _tableSize = 560;
+let _tableDPR = Math.min(window.devicePixelRatio || 1, 2);
+let _tableCx = 0, _tableCy = 0, _tableR = 0;
 
-    // 桌面表面参数（.table-surface: top/left 8%, width/height 84%, border-radius 999px）
-    const surfW = W * 0.84;
-    const surfH = H * 0.84;
-    const endR = surfW / 2;             // 两端半圆半径（W < H，两端完全圆角）
-    const rectHalfH = surfH / 2 - endR; // 矩形段半高
+// 当前阶段文字（由 room.js 设置）
+window._tablePhase = window._tablePhase || '首夜';
 
-    // 座位路径 = 表面外扩 gap px
-    const gap = 24;
-    const seatR = endR + gap;           // 两端半圆外扩
-    const seatHalfH = rectHalfH + gap;  // 矩形段外扩
+// ---- 纹理加载 ----
+(function initTexture() {
+    _tableTexImg = new Image();
+    _tableTexImg.onload = function() {
+        _tableTexLoaded = true;
+        drawRoundTable();
+    };
+    _tableTexImg.src = 'msg-bg-parchment.jpg';
+})();
 
-    // 归一化角度到 [0, 2π)
-    let θ = ((angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    const sinθ = Math.sin(θ);
-    const cosθ = Math.cos(θ);
-
-    let bestT = Infinity;
-    let bestX = 0, bestY = 0;
-
-    // 射线：(cx + t*sinθ, cy - t*cosθ), t > 0
-    // 找射线与座位 pill 轮廓最近的交点
-
-    // 右侧直边：x = cx + seatR, |y - cy| ≤ seatHalfH
-    if (sinθ > 0.0001) {
-        const t = seatR / sinθ;
-        const y = cy - t * cosθ;
-        if (Math.abs(y - cy) <= seatHalfH + 1) {
-            bestT = t; bestX = cx + seatR; bestY = y;
-        }
-    }
-
-    // 左侧直边：x = cx - seatR
-    if (sinθ < -0.0001) {
-        const t = -seatR / sinθ;
-        const y = cy - t * cosθ;
-        if (Math.abs(y - cy) <= seatHalfH + 1 && t < bestT) {
-            bestT = t; bestX = cx - seatR; bestY = y;
-        }
-    }
-
-    // 顶部半圆：圆心 (cx, cy - seatHalfH)，半径 seatR
-    // 方程：t² - 2*seatHalfH*cosθ*t + (seatHalfH² - seatR²) = 0
-    {
-        const A = 1;
-        const B = -2 * seatHalfH * cosθ;
-        const C = seatHalfH * seatHalfH - seatR * seatR;
-        const disc = B * B - 4 * A * C;
-        if (disc >= 0) {
-            const sqrtD = Math.sqrt(disc);
-            for (const t of [(-B + sqrtD) / (2 * A), (-B - sqrtD) / (2 * A)]) {
-                if (t > 0.001 && t < bestT) {
-                    const y = cy - t * cosθ;
-                    if (y <= cy - seatHalfH + 1) {
-                        bestT = t;
-                        bestX = cx + t * sinθ;
-                        bestY = y;
-                    }
-                }
-            }
-        }
-    }
-
-    // 底部半圆：圆心 (cx, cy + seatHalfH)，半径 seatR
-    // 方程：t² + 2*seatHalfH*cosθ*t + (seatHalfH² - seatR²) = 0
-    {
-        const B = 2 * seatHalfH * cosθ;
-        const C = seatHalfH * seatHalfH - seatR * seatR;
-        const disc = B * B - 4 * C;
-        if (disc >= 0) {
-            const sqrtD = Math.sqrt(disc);
-            for (const t of [(-B + sqrtD) / 2, (-B - sqrtD) / 2]) {
-                if (t > 0.001 && t < bestT) {
-                    const y = cy - t * cosθ;
-                    if (y >= cy + seatHalfH - 1) {
-                        bestT = t;
-                        bestX = cx + t * sinθ;
-                        bestY = y;
-                    }
-                }
-            }
-        }
-    }
-
-    // 兜底（极端情况）：用大椭圆
-    if (bestT === Infinity) {
-        const a = W * 0.55; const b = H * 0.55;
-        return { x: cx + a * sinθ, y: cy - b * cosθ };
-    }
-
-    return { x: bestX, y: bestY };
+// 辅助：在环形区域内叠加经卷纸纹理
+function _texRing(rOuter, rInner, sx, sy, sw, sh, alpha) {
+    if (!_tableTexLoaded || !_tableCtx) return;
+    const ctx = _tableCtx;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(_tableCx, _tableCy, rOuter, 0, Math.PI * 2);
+    if (rInner > 0) ctx.arc(_tableCx, _tableCy, rInner, 0, Math.PI * 2, true);
+    ctx.clip();
+    ctx.globalAlpha = alpha;
+    const ts = rOuter * 2;
+    ctx.drawImage(_tableTexImg, sx, sy, sw, sh, _tableCx - rOuter, _tableCy - rOuter, ts, ts);
+    ctx.globalAlpha = 1;
+    ctx.restore();
 }
 
-// 找到离鼠标最近的槽位（用于拖拽调座，复用 pill 轮廓计算）
+// ---- Canvas 圆桌绘制 ----
+function drawRoundTable() {
+    const canvas = document.getElementById('table-canvas');
+    if (!canvas) return;
+    _tableCanvas = canvas;
+    _tableCtx = canvas.getContext('2d');
+    const ctx = _tableCtx;
+
+    // 响应式尺寸
+    const container = document.getElementById('round-table-container');
+    const parent = container ? container.parentElement : null;
+    if (!parent) return;
+
+    const maxSize = Math.min(parent.clientWidth * 0.88, parent.clientHeight * 0.88, _tableSize);
+    const scale = maxSize / _tableSize;
+    const DPR = _tableDPR;
+    canvas.width = _tableSize * DPR;
+    canvas.height = _tableSize * DPR;
+    canvas.style.width = maxSize + 'px';
+    canvas.style.height = maxSize + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    // 座位覆盖层同步尺寸
+    const overlay = document.getElementById('seats-overlay');
+    if (overlay) {
+        overlay.style.width = maxSize + 'px';
+        overlay.style.height = maxSize + 'px';
+    }
+
+    const cx = _tableSize / 2;
+    const cy = _tableSize / 2;
+    const R = _tableSize * 0.46;
+    _tableCx = cx; _tableCy = cy; _tableR = R;
+
+    ctx.clearRect(0, 0, _tableSize, _tableSize);
+
+    // ---- 第1层：鎏金外框 ----
+    const r1 = R, r1i = R - 10;
+    const grad1 = ctx.createRadialGradient(cx, cy, r1i, cx, cy, r1);
+    grad1.addColorStop(0, '#8b6914');
+    grad1.addColorStop(0.5, '#d49a3a');
+    grad1.addColorStop(0.85, '#edc379');
+    grad1.addColorStop(1, '#5a3e10');
+    ctx.beginPath();
+    ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r1i, 0, Math.PI * 2, true);
+    ctx.fillStyle = grad1; ctx.fill();
+    _texRing(r1, r1i, 300, 100, 900, 900, 0.10);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(237,195,121,0.6)';
+    ctx.lineWidth = 2; ctx.stroke();
+
+    // ---- 第2层：铆钉环（12颗） ----
+    const r2o = r1i - 2, r2i = r2o - 16;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r2o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r2i, 0, Math.PI * 2, true);
+    const grad2 = ctx.createRadialGradient(cx, cy, r2i, cx, cy, r2o);
+    grad2.addColorStop(0, '#4a3020'); grad2.addColorStop(1, '#2a1808');
+    ctx.fillStyle = grad2; ctx.fill();
+    _texRing(r2o, r2i, 350, 400, 800, 800, 0.10);
+
+    const rivetCount = 12;
+    const rivetR = (r2o + r2i) / 2;
+    for (let i = 0; i < rivetCount; i++) {
+        const angle = (i / rivetCount) * Math.PI * 2 - Math.PI / 2;
+        const rx = cx + Math.cos(angle) * rivetR;
+        const ry = cy + Math.sin(angle) * rivetR;
+        ctx.beginPath();
+        ctx.arc(rx + 1, ry + 1, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fill();
+        const rivetGrad = ctx.createRadialGradient(rx - 1, ry - 1, 0.5, rx, ry, 3.5);
+        rivetGrad.addColorStop(0, '#edc379');
+        rivetGrad.addColorStop(0.6, '#d49a3a');
+        rivetGrad.addColorStop(1, '#8b6914');
+        ctx.beginPath();
+        ctx.arc(rx, ry, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = rivetGrad; ctx.fill();
+    }
+
+    // ---- 第3层：星宿刻度环 ----
+    const r3o = r2i - 2, r3i = r3o - 20;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r3o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r3i, 0, Math.PI * 2, true);
+    const grad3 = ctx.createRadialGradient(cx, cy, r3i, cx, cy, r3o);
+    grad3.addColorStop(0, '#3a2818'); grad3.addColorStop(0.5, '#2a1808'); grad3.addColorStop(1, '#1a0a03');
+    ctx.fillStyle = grad3; ctx.fill();
+    _texRing(r3o, r3i, 400, 700, 700, 700, 0.14);
+
+    const tickCount = 24;
+    for (let i = 0; i < tickCount; i++) {
+        const angle = (i / tickCount) * Math.PI * 2 - Math.PI / 2;
+        const isMajor = i % 3 === 0;
+        const len = isMajor ? 14 : 6;
+        const outerR = r3o - 3, innerR = outerR - len;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * outerR, cy + Math.sin(angle) * outerR);
+        ctx.lineTo(cx + Math.cos(angle) * innerR, cy + Math.sin(angle) * innerR);
+        ctx.strokeStyle = isMajor ? 'rgba(212,154,58,0.8)' : 'rgba(180,120,50,0.35)';
+        ctx.lineWidth = isMajor ? 1.5 : 0.7;
+        ctx.stroke();
+    }
+    for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        const dotR = r3o - 19;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(angle) * dotR, cy + Math.sin(angle) * dotR, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#edc379'; ctx.fill();
+    }
+
+    // ---- 第4层：鎏金铭文分隔环 ----
+    const r4o = r3i - 2, r4i = r4o - 6;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r4o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r4i, 0, Math.PI * 2, true);
+    const grad4 = ctx.createRadialGradient(cx, cy, r4i, cx, cy, r4o);
+    grad4.addColorStop(0, '#8b6914'); grad4.addColorStop(0.5, '#d49a3a'); grad4.addColorStop(1, '#5a3e10');
+    ctx.fillStyle = grad4; ctx.fill();
+    _texRing(r4o, r4i, 250, 200, 1000, 1000, 0.10);
+
+    // ---- 第5层：木纹桌面 ----
+    const r5o = r4i - 1, r5i = r5o - 140;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
+    const grad5 = ctx.createRadialGradient(cx, cy, r5i, cx, cy, r5o);
+    grad5.addColorStop(0, '#2a1808'); grad5.addColorStop(0.5, '#1a0c03'); grad5.addColorStop(1, '#0d0400');
+    ctx.fillStyle = grad5; ctx.fill();
+    _texRing(r5o, r5i, 200, 150, 1100, 1100, 0.22);
+
+    // 木纹
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
+    ctx.clip();
+    for (let r = r5i + 4; r < r5o; r += 12 + Math.random() * 5) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(180,140,100,' + (0.02 + Math.random() * 0.04) + ')';
+        ctx.lineWidth = 0.5 + Math.random() * 1;
+        ctx.stroke();
+    }
+    for (let i = 0; i < 30; i++) {
+        const angle = (i / 30) * Math.PI * 2 + (Math.random() - 0.5) * 0.1;
+        const sr = r5i + Math.random() * (r5o - r5i) * 0.6;
+        const er = sr + 10 + Math.random() * 30;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * sr, cy + Math.sin(angle) * sr);
+        ctx.lineTo(cx + Math.cos(angle) * Math.min(er, r5o), cy + Math.sin(angle) * Math.min(er, r5o));
+        ctx.strokeStyle = 'rgba(160,120,80,' + (0.02 + Math.random() * 0.03) + ')';
+        ctx.lineWidth = 0.3 + Math.random() * 0.5;
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    // ---- 第6层：鎏金内框 ----
+    const r6o = r5i, r6i = r6o - 8;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r6o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r6i, 0, Math.PI * 2, true);
+    const grad6 = ctx.createRadialGradient(cx, cy, r6i, cx, cy, r6o);
+    grad6.addColorStop(0, '#6a4a1a'); grad6.addColorStop(0.4, '#c49a3a');
+    grad6.addColorStop(0.7, '#d49a3a'); grad6.addColorStop(1, '#4a2a08');
+    ctx.fillStyle = grad6; ctx.fill();
+    _texRing(r6o, r6i, 300, 300, 900, 900, 0.10);
+
+    // ---- 第7层：青铜罗盘 ----
+    const r7o = r6i - 1, r7i = r7o - 60;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r7o, 0, Math.PI * 2);
+    ctx.arc(cx, cy, r7i, 0, Math.PI * 2, true);
+    const grad7 = ctx.createRadialGradient(cx, cy, r7i, cx, cy, r7o);
+    grad7.addColorStop(0, '#5a4028'); grad7.addColorStop(0.6, '#3a2410'); grad7.addColorStop(1, '#1a0a03');
+    ctx.fillStyle = grad7; ctx.fill();
+    _texRing(r7o, r7i, 450, 650, 600, 600, 0.16);
+
+    // 十字方位线
+    for (let i = 0; i < 4; i++) {
+        const angle = (i / 4) * Math.PI - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * (r7i + 6), cy + Math.sin(angle) * (r7i + 6));
+        ctx.lineTo(cx + Math.cos(angle) * (r7o - 6), cy + Math.sin(angle) * (r7o - 6));
+        ctx.strokeStyle = 'rgba(212,154,58,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    // ---- 第8层：魂芯 ----
+    const r8 = r7i + 1;
+    const grad8 = ctx.createRadialGradient(cx, cy, r8 - 4, cx, cy, r8);
+    grad8.addColorStop(0, '#8b6914'); grad8.addColorStop(0.5, '#d49a3a'); grad8.addColorStop(1, '#4a2a08');
+    ctx.beginPath(); ctx.arc(cx, cy, r8, 0, Math.PI * 2);
+    ctx.fillStyle = grad8; ctx.fill();
+
+    const rCore = r8 - 4;
+    const gradCore = ctx.createRadialGradient(cx - 2, cy - 2, rCore * 0.1, cx, cy, rCore);
+    gradCore.addColorStop(0, '#8b3a20'); gradCore.addColorStop(0.4, '#4a1810'); gradCore.addColorStop(1, '#1a0402');
+    ctx.beginPath(); ctx.arc(cx, cy, rCore, 0, Math.PI * 2);
+    ctx.fillStyle = gradCore; ctx.fill();
+    _texRing(rCore, 0, 500, 1200, 500, 500, 0.14);
+
+    // 十字准线
+    ctx.beginPath();
+    ctx.moveTo(cx - rCore * 0.7, cy); ctx.lineTo(cx + rCore * 0.7, cy);
+    ctx.moveTo(cx, cy - rCore * 0.7); ctx.lineTo(cx, cy + rCore * 0.7);
+    ctx.strokeStyle = 'rgba(237,195,121,0.45)'; ctx.lineWidth = 1; ctx.stroke();
+
+    // 中心亮点 + 阶段文字
+    const gradCenter = ctx.createRadialGradient(cx, cy, 0, cx, cy, 6);
+    gradCenter.addColorStop(0, '#fff8e0'); gradCenter.addColorStop(0.3, '#edc379');
+    gradCenter.addColorStop(0.6, '#d49a3a'); gradCenter.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fillStyle = gradCenter; ctx.fill();
+
+    // 阶段文字
+    const phase = window._tablePhase || '首夜';
+    ctx.fillStyle = '#d4b87a';
+    ctx.font = 'bold 16px "Noto Serif SC", "STKaiti", "KaiTi", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(219,168,81,0.6)';
+    ctx.shadowBlur = 12;
+    ctx.fillText(phase, cx, cy - rCore - 18);
+    ctx.shadowBlur = 0;
+}
+
+// ---- 座位位置计算（圆形，基于 Canvas 容器） ----
+function computeSeatPosition(angle) {
+    const canvas = document.getElementById('table-canvas');
+    if (!canvas || !canvas.style.width) return { x: 0, y: 0 };
+    const canvasDisplaySize = parseFloat(canvas.style.width);
+    const cx = canvasDisplaySize / 2;
+    const cy = canvasDisplaySize / 2;
+    const seatR = canvasDisplaySize * 0.46 + 28; // 桌面半径 + 座位偏移
+    return {
+        x: cx + Math.cos(angle) * seatR,
+        y: cy + Math.sin(angle) * seatR
+    };
+}
+
+// ---- 找最近的槽位 ----
 function findClosestSlot(clientX, clientY) {
-    const tableEl = $('#round-table');
-    const rect = tableEl.getBoundingClientRect();
-
-    let bestSlot = 0;
-    let bestDist = Infinity;
-
+    const canvas = document.getElementById('table-canvas');
+    if (!canvas) return 0;
+    const rect = canvas.getBoundingClientRect();
+    let bestSlot = 0, bestDist = Infinity;
     for (let i = 0; i < SEAT_SLOTS; i++) {
         const pos = computeSeatPosition(SLOT_ANGLES[i]);
         const sx = rect.left + pos.x;
         const sy = rect.top + pos.y;
         const dist = Math.hypot(clientX - sx, clientY - sy);
-        if (dist < bestDist) {
-            bestDist = dist;
-            bestSlot = i;
-        }
+        if (dist < bestDist) { bestDist = dist; bestSlot = i; }
     }
-
     return bestSlot;
 }
 
-// 获取槽位被哪个玩家占用（返回玩家对象或 null）
+// ---- 槽位 ↔ 玩家 ----
 function getPlayerAtSlot(slotIndex) {
     const slotAngle = SLOT_ANGLES[slotIndex];
     return state.players.find(p => angleEquals(p.seat_angle, slotAngle)) || null;
 }
-
-// 获取玩家的槽位索引（-1 = 未就座）
 function getPlayerSlot(player) {
     return angleToSlot(player.seat_angle);
 }
 
-// 渲染圆桌（主视图）
+// ---- 渲染圆桌 ----
 function renderRoundTable() {
-    const container = $('#seats-container');
-    const emptyHint = $('#table-empty-hint');
-    const phaseDisplay = $('#table-phase-display');
+    const overlay = document.getElementById('seats-overlay');
+    const emptyHint = document.getElementById('table-empty-hint');
 
-    if (state.room) {
-        phaseDisplay.textContent = state.room.phase;
-    }
+    // 绘制 Canvas
+    drawRoundTable();
+
+    if (!overlay) return;
 
     if (state.players.length === 0) {
-        container.innerHTML = '';
-        emptyHint.style.display = 'block';
+        overlay.innerHTML = '';
+        if (emptyHint) emptyHint.style.display = 'block';
         renderPlayerList();
         return;
     }
 
-    emptyHint.style.display = 'none';
+    if (emptyHint) emptyHint.style.display = 'none';
 
     // 为新玩家分配空槽位
     const usedSlots = new Set(
@@ -164,45 +335,34 @@ function renderRoundTable() {
             .map(p => angleToSlot(p.seat_angle))
             .filter(idx => idx !== -1)
     );
-
     state.players.forEach(player => {
-        // 无角度 或 角度不匹配任何槽位（浮点精度/数据异常），重新分配
         if (player.seat_angle === null || player.seat_angle === undefined
             || angleToSlot(player.seat_angle) === -1) {
-            // 找到第一个未被占用的槽位
             for (let i = 0; i < SEAT_SLOTS; i++) {
                 if (!usedSlots.has(i)) {
                     player.seat_angle = SLOT_ANGLES[i];
-                    usedSlots.add(i);
-                    break;
+                    usedSlots.add(i); break;
                 }
             }
         }
     });
 
-    // 渲染所有槽位标记 + 已就座玩家
-    container.innerHTML = '';
-
-    // 先渲染空槽位标记（灰色小圆点）
+    // 渲染座位到 overlay
+    overlay.innerHTML = '';
     for (let i = 0; i < SEAT_SLOTS; i++) {
         const angle = SLOT_ANGLES[i];
         const pos = computeSeatPosition(angle);
         const occupied = getPlayerAtSlot(i);
-
         if (occupied) {
-            // 已占用槽位：渲染玩家座位
             const displayName = occupied.nickname || '未命名玩家';
-            const selectedClass =
-                state.selectedPlayer && state.selectedPlayer.id === occupied.id ? 'selected' : '';
+            const selectedClass = state.selectedPlayer && state.selectedPlayer.id === occupied.id ? 'selected' : '';
             const newClass = state.newMsgPlayers.has(occupied.id) ? 'has-new' : '';
             const statusClass = 'status-' + (occupied.status || 'alive');
             const statusTitle = occupied.status === 'executed' ? '处决' :
                                 occupied.status === 'killed_at_night' ? '夜死' : '存活';
-
-            container.insertAdjacentHTML('beforeend',
+            overlay.insertAdjacentHTML('beforeend',
                 `<div class="player-seat ${selectedClass} ${newClass} ${statusClass}"
-                     data-player-id="${occupied.id}"
-                     data-slot="${i}"
+                     data-player-id="${occupied.id}" data-slot="${i}"
                      style="left:${pos.x}px;top:${pos.y}px;">
                   <div class="seat-dot">
                     <span class="status-toggle" title="点击切换状态 · 当前：${statusTitle}"></span>
@@ -212,42 +372,34 @@ function renderRoundTable() {
                   <span class="kick-btn seat-kick-btn" data-player-id="${occupied.id}" title="踢出房间">⛔</span>
                 </div>`);
         } else {
-            // 空槽位：半透明标记点
-            container.insertAdjacentHTML('beforeend',
-                `<div class="player-seat seat-empty"
-                     data-slot="${i}"
+            overlay.insertAdjacentHTML('beforeend',
+                `<div class="player-seat seat-empty" data-slot="${i}"
                      style="left:${pos.x}px;top:${pos.y}px;">
                   <div class="seat-dot"></div>
                 </div>`);
         }
     }
-
     renderPlayerList();
 }
 
-// 渲染左侧玩家列表（含拖拽排序）
+// ---- 渲染左侧玩家列表 ----
 function renderPlayerList() {
-    const list = $('#rt-player-list');
+    const list = document.getElementById('rt-player-list');
+    if (!list) return;
     if (state.players.length === 0) {
         list.innerHTML = '<li class="player-empty">暂无玩家</li>';
     } else {
         list.innerHTML = state.players.map((p, index) => {
-            const activeClass =
-                state.selectedPlayer && state.selectedPlayer.id === p.id ? 'active' : '';
+            const activeClass = state.selectedPlayer && state.selectedPlayer.id === p.id ? 'active' : '';
             const newClass = state.newMsgPlayers.has(p.id) ? 'has-new' : '';
             const displayName = p.nickname || '未命名玩家';
             const statusBadge = (p.status && p.status !== 'alive')
-                ? `<span class="status-badge status-badge-${p.status}" title="${p.status === 'executed' ? '处决' : '夜死'}"></span>`
-                : '';
-            // 角色名显示
+                ? `<span class="status-badge status-badge-${p.status}" title="${p.status === 'executed' ? '处决' : '夜死'}"></span>` : '';
             const roleObj = getPlayerRoleObj(p);
             const roleNameHtml = roleObj
-                ? `<span class="player-role-name player-role-${roleObj.category}">${roleObj.name}</span>`
-                : '';
+                ? `<span class="player-role-name player-role-${roleObj.category}">${roleObj.name}</span>` : '';
             return `<li class="player-item ${activeClass} ${newClass}"
-                        data-player-id="${p.id}"
-                        data-index="${index}"
-                        draggable="true">
+                        data-player-id="${p.id}" data-index="${index}" draggable="true">
                       <span class="drag-handle">⠿</span>
                       <span class="player-name" onclick="editPlayerNickname('${p.id}');event.stopPropagation();" title="点击修改名牌">${escapeHtml(displayName)} <span class="name-edit-icon">✎</span></span>${roleNameHtml}
                       ${statusBadge}
@@ -256,15 +408,14 @@ function renderPlayerList() {
                     </li>`;
         }).join('');
     }
-    $('#rt-player-count').textContent = state.players.length;
+    const countEl = document.getElementById('rt-player-count');
+    if (countEl) countEl.textContent = state.players.length;
 }
 
-// ============================================================
-// 左侧玩家列表拖拽排序
-// ============================================================
+// ---- 拖拽排序（玩家列表） ----
 function setupRtDragAndDrop() {
-    const list = $('#rt-player-list');
-
+    const list = document.getElementById('rt-player-list');
+    if (!list) return;
     list.addEventListener('dragstart', (e) => {
         const item = e.target.closest('.player-item');
         if (!item) return;
@@ -272,51 +423,32 @@ function setupRtDragAndDrop() {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', item.dataset.index);
     });
-
     list.addEventListener('dragend', () => {
-        list.querySelectorAll('.player-item').forEach(el => {
-            el.classList.remove('dragging', 'drag-over');
-        });
+        list.querySelectorAll('.player-item').forEach(el => el.classList.remove('dragging', 'drag-over'));
     });
-
     list.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         const item = e.target.closest('.player-item');
         if (!item) return;
-        list.querySelectorAll('.player-item').forEach(el => {
-            if (el !== item) el.classList.remove('drag-over');
-        });
+        list.querySelectorAll('.player-item').forEach(el => { if (el !== item) el.classList.remove('drag-over'); });
         item.classList.add('drag-over');
     });
-
     list.addEventListener('drop', (e) => {
         e.preventDefault();
         const item = e.target.closest('.player-item');
         if (!item) return;
         item.classList.remove('drag-over');
-
         const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
         const toIndex = parseInt(item.dataset.index);
-
         if (fromIndex === toIndex || isNaN(fromIndex) || isNaN(toIndex)) return;
-
         const [moved] = state.players.splice(fromIndex, 1);
         state.players.splice(toIndex, 0, moved);
-
         renderPlayerList();
     });
-
-    // 点击左侧列表选中玩家（排除拖拽操作和踢出按钮）
     list.addEventListener('click', (e) => {
-        // 踢出按钮单独处理
         const kickBtn = e.target.closest('.kick-btn');
-        if (kickBtn) {
-            e.stopPropagation();
-            kickPlayer(kickBtn.dataset.playerId);
-            return;
-        }
-
+        if (kickBtn) { e.stopPropagation(); kickPlayer(kickBtn.dataset.playerId); return; }
         const item = e.target.closest('.player-item');
         if (!item) return;
         const playerId = item.dataset.playerId;
@@ -324,183 +456,123 @@ function setupRtDragAndDrop() {
     });
 }
 
-// 圆桌座位点击事件（排除拖拽操作和踢出按钮）
+// ---- 座位点击 ----
 function setupSeatClickHandler() {
-    const container = $('#seats-container');
-    // 鼠标按下 → 上抬期间不移动 → 视为点击
-    container.addEventListener('click', (e) => {
-        // 踢出按钮单独处理
+    const overlay = document.getElementById('seats-overlay');
+    if (!overlay) return;
+    overlay.addEventListener('click', (e) => {
         const kickBtn = e.target.closest('.kick-btn');
-        if (kickBtn) {
-            e.stopPropagation();
-            kickPlayer(kickBtn.dataset.playerId);
-            return;
-        }
+        if (kickBtn) { e.stopPropagation(); kickPlayer(kickBtn.dataset.playerId); return; }
     });
 }
 
-// ============================================================
-// 座位交换拖拽（固定槽位，拖到其他槽位时交换）
-// ============================================================
+// ---- 座位交换拖拽 ----
+let isDragging = false;
 function setupSeatSwap() {
-    let draggedSeat = null;
-    let startSlot = -1;
-    let startPlayerId = null;
-    let hasDragged = false;
-    let startX = 0, startY = 0;
-    let lastMouseX = 0, lastMouseY = 0;  // 记录最后鼠标位置，mouseup 时直接用
+    let draggedSeat = null, startSlot = -1, startPlayerId = null;
+    let hasDragged = false, startX = 0, startY = 0, lastMouseX = 0, lastMouseY = 0;
 
     document.addEventListener('mousedown', (e) => {
-        // 生死状态切换图标：点击切换状态，不触发选人/拖拽
         if (e.target.closest('.status-toggle')) {
             const seat = e.target.closest('.player-seat:not(.seat-empty)');
             if (seat && seat.dataset.playerId) {
-                e.preventDefault();
-                e.stopPropagation();
+                e.preventDefault(); e.stopPropagation();
                 togglePlayerStatus(seat.dataset.playerId);
             }
             return;
         }
-
-        // 只处理已占用的玩家座位
         const seat = e.target.closest('.player-seat:not(.seat-empty)');
         if (!seat) return;
-
-        isDragging = true;
-        draggedSeat = seat;
+        isDragging = true; draggedSeat = seat;
         startSlot = parseInt(seat.dataset.slot);
         startPlayerId = seat.dataset.playerId;
         hasDragged = false;
-        startX = e.clientX;
-        startY = e.clientY;
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
+        startX = e.clientX; startY = e.clientY;
+        lastMouseX = e.clientX; lastMouseY = e.clientY;
         e.preventDefault();
     });
 
     document.addEventListener('mousemove', (e) => {
-        // 始终更新最后鼠标位置
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-
+        lastMouseX = e.clientX; lastMouseY = e.clientY;
         if (!draggedSeat) return;
-
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-
-        // 移动超过 10px 才算拖拽（区分点击和拖拽）
+        const dx = e.clientX - startX, dy = e.clientY - startY;
         if (!hasDragged && Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-
         if (!hasDragged) {
             hasDragged = true;
-            // 拖拽开始：提升 z-index
             draggedSeat.style.zIndex = '10';
             draggedSeat.style.opacity = '0.85';
             draggedSeat.style.transition = 'none';
         }
-
-        // 视觉跟随鼠标（相对 table 定位）
-        const tableEl = $('#round-table');
-        const rect = tableEl.getBoundingClientRect();
+        const canvas = document.getElementById('table-canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
         draggedSeat.style.left = (e.clientX - rect.left) + 'px';
         draggedSeat.style.top = (e.clientY - rect.top) + 'px';
     });
 
-    document.addEventListener('mouseup', async () => {
-        if (!draggedSeat) return;
-        await finishDrag();
-    });
+    document.addEventListener('mouseup', async () => { if (draggedSeat) await _finishDrag(); });
 
-    // ----- 触摸事件（iPad / 移动端支持）-----
-
+    // 触摸事件
     document.addEventListener('touchstart', (e) => {
-        // 踢出按钮：不拦截，让原生 click 事件处理
         if (e.target.closest('.kick-btn')) return;
-
-        // 生死状态切换图标：点击切换状态，不触发选人/拖拽
         if (e.target.closest('.status-toggle')) {
             const seat = e.target.closest('.player-seat:not(.seat-empty)');
             if (seat && seat.dataset.playerId) {
-                e.preventDefault();
-                e.stopPropagation();
+                e.preventDefault(); e.stopPropagation();
                 togglePlayerStatus(seat.dataset.playerId);
             }
             return;
         }
-
         const seat = e.target.closest('.player-seat:not(.seat-empty)');
         if (!seat) return;
-
-        isDragging = true;
-        draggedSeat = seat;
+        isDragging = true; draggedSeat = seat;
         startSlot = parseInt(seat.dataset.slot);
         startPlayerId = seat.dataset.playerId;
         hasDragged = false;
-
         const touch = e.touches[0];
-        startX = touch.clientX;
-        startY = touch.clientY;
-        lastMouseX = touch.clientX;
-        lastMouseY = touch.clientY;
-        e.preventDefault(); // 阻止滚动
+        startX = touch.clientX; startY = touch.clientY;
+        lastMouseX = touch.clientX; lastMouseY = touch.clientY;
+        e.preventDefault();
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
         if (!draggedSeat) return;
-
         const touch = e.touches[0];
-        lastMouseX = touch.clientX;
-        lastMouseY = touch.clientY;
-
-        const dx = touch.clientX - startX;
-        const dy = touch.clientY - startY;
-
+        lastMouseX = touch.clientX; lastMouseY = touch.clientY;
+        const dx = touch.clientX - startX, dy = touch.clientY - startY;
         if (!hasDragged && Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-
         if (!hasDragged) {
             hasDragged = true;
             draggedSeat.style.zIndex = '10';
             draggedSeat.style.opacity = '0.85';
             draggedSeat.style.transition = 'none';
         }
-
-        const tableEl = $('#round-table');
-        const rect = tableEl.getBoundingClientRect();
+        const canvas = document.getElementById('table-canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
         draggedSeat.style.left = (touch.clientX - rect.left) + 'px';
         draggedSeat.style.top = (touch.clientY - rect.top) + 'px';
     }, { passive: false });
 
     document.addEventListener('touchend', async (e) => {
         if (!draggedSeat) return;
-        // 没有移动时，用 changedTouches 记录最后坐标
         if (!hasDragged && e.changedTouches.length > 0) {
             const touch = e.changedTouches[0];
-            lastMouseX = touch.clientX;
-            lastMouseY = touch.clientY;
+            lastMouseX = touch.clientX; lastMouseY = touch.clientY;
         }
-        await finishDrag();
+        await _finishDrag();
     });
 
-    document.addEventListener('touchcancel', async () => {
-        if (!draggedSeat) return;
-        await finishDrag();
-    });
+    document.addEventListener('touchcancel', async () => { if (draggedSeat) await _finishDrag(); });
 
-    // 拖拽结束的公共逻辑
-    async function finishDrag() {
+    async function _finishDrag() {
         if (!draggedSeat) return;
-
         if (hasDragged) {
-            draggedSeat.style.zIndex = '';
-            draggedSeat.style.opacity = '';
+            draggedSeat.style.zIndex = ''; draggedSeat.style.opacity = '';
             draggedSeat.style.transition = '';
-
             const closestSlot = findClosestSlot(lastMouseX, lastMouseY);
-
             if (closestSlot !== startSlot) {
-                try {
-                    await swapSeats(startSlot, closestSlot);
-                } catch (err) {
+                try { await swapSeats(startSlot, closestSlot); } catch (err) {
                     console.error('座位交换失败:', err);
                 }
             }
@@ -508,46 +580,27 @@ function setupSeatSwap() {
         } else {
             if (startPlayerId) selectPlayer(startPlayerId);
         }
-
-        isDragging = false;
-        draggedSeat = null;
-        startSlot = -1;
-        startPlayerId = null;
-        hasDragged = false;
+        isDragging = false; draggedSeat = null;
+        startSlot = -1; startPlayerId = null; hasDragged = false;
     }
 }
 
-// 交换两个槽位上的玩家座位（仅更新数据，不渲染 DOM）
+// ---- 交换座位 ----
 async function swapSeats(slotA, slotB) {
     if (slotA === slotB) return;
-
     const playerA = getPlayerAtSlot(slotA);
     const playerB = getPlayerAtSlot(slotB);
-
     const angleA = SLOT_ANGLES[slotA];
     const angleB = SLOT_ANGLES[slotB];
-
-    // 更新本地状态
     if (playerA) playerA.seat_angle = angleB;
     if (playerB) playerB.seat_angle = angleA;
-
-    // 保存到数据库（并行更新）
     const updates = [];
-    if (playerA) {
-        updates.push(
-            state.supabase
-                .from('players')
-                .update({ seat_angle: angleB })
-                .eq('id', playerA.id)
-        );
-    }
-    if (playerB) {
-        updates.push(
-            state.supabase
-                .from('players')
-                .update({ seat_angle: angleA })
-                .eq('id', playerB.id)
-        );
-    }
+    if (playerA) updates.push(state.supabase.from('players').update({ seat_angle: angleB }).eq('id', playerA.id));
+    if (playerB) updates.push(state.supabase.from('players').update({ seat_angle: angleA }).eq('id', playerB.id));
     await Promise.all(updates);
 }
+
+// 窗口 resize 时重绘 Canvas
+window.addEventListener('resize', () => {
+    if (state.players && state.players.length > 0) drawRoundTable();
+});
