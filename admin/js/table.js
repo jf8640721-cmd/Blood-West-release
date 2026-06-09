@@ -33,6 +33,11 @@ window._tablePhase = window._tablePhase || '首夜';
             drawRoundTable();
         });
     });
+
+    // 兜底：window.onload 时再画一次（确保所有资源加载完毕）
+    window.addEventListener('load', function() {
+        setTimeout(function() { drawRoundTable(); }, 100);
+    });
 })();
 
 // 辅助：在环形区域内叠加经卷纸纹理
@@ -66,11 +71,19 @@ function drawRoundTable() {
 
     const maxSize = Math.min(parent.clientWidth * 0.88, parent.clientHeight * 0.88, _tableSize);
 
-    // 容器尺寸尚未就绪（CSS 布局未完成），延迟重试
+    // 容器尺寸尚未就绪（CSS 布局未完成），延迟重试（最多10次）
     if (maxSize <= 0) {
-        requestAnimationFrame(function() { drawRoundTable(); });
+        if (!drawRoundTable._retryCount) drawRoundTable._retryCount = 0;
+        if (drawRoundTable._retryCount < 10) {
+            drawRoundTable._retryCount++;
+            requestAnimationFrame(function() { drawRoundTable(); });
+        } else {
+            console.warn('Canvas 容器尺寸始终为0，放弃绘制。parent.clientWidth=' + parent.clientWidth + ', parent.clientHeight=' + parent.clientHeight);
+            drawRoundTable._retryCount = 0;
+        }
         return;
     }
+    drawRoundTable._retryCount = 0;
 
     const scale = maxSize / _tableSize;
     const DPR = _tableDPR;
