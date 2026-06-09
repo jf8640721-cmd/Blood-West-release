@@ -496,7 +496,7 @@ function setupSeatClickHandler() {
 }
 
 // ---- 座位交换拖拽 ----
-let isDragging = false;
+// isDragging 已在 state.js 中声明，此处直接使用
 function setupSeatSwap() {
     let draggedSeat = null, startSlot = -1, startPlayerId = null;
     let hasDragged = false, startX = 0, startY = 0, lastMouseX = 0, lastMouseY = 0;

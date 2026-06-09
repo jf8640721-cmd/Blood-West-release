@@ -1,5 +1,20 @@
 # 版本日志
 
+## v3.0.1 (2026-06-09)
+
+### 🐛 紧急修复：Canvas 铜镜圆桌不加载 + 玩家加入不显示
+
+**根因：** `table.js` 中 `let isDragging` 与 `state.js` 重复声明，导致 `table.js` 整个文件 SyntaxError 解析失败，所有函数未定义。
+
+**修复内容：**
+- `admin/js/table.js` — 移除重复的 `let isDragging = false`（state.js 已声明）
+- `admin/js/table.js` — 纹理加载 IIFE 改为双 RAF 延迟绘制 + window.onload 兜底 + 重试上限
+- `admin/js/room.js` — `showRoomUI()` 中主动触发 Canvas 双 RAF 绘制
+- `admin/index.html` — 所有 JS/CSS 引用加 `?v=3.0.1` 缓存破坏参数
+- `admin/bg-frame.png` → `admin/bg-frame.jpg` — 压缩重编码（8.5MB→352KB, -96%）
+- `admin/msg-bg-parchment.jpg` — 重压缩（2.2MB→357KB, -84%）
+- `admin/style.css` — 更新所有 `bg-frame.png` 引用为 `bg-frame.jpg`
+
 ## v3.0.0 (2026-06-09)
 
 ### 🎨 UI 风格全面升级 — 敦煌岩彩主题
