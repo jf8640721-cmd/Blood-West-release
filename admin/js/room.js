@@ -107,6 +107,13 @@ function showRoomUI() {
     $('#btn-board-config').style.display = 'inline-block';
     $('#btn-debug-players').style.display = 'inline-block';
     $('#btn-exit-room').style.display = 'inline-block';
+
+    // 确保 Canvas 圆桌在布局完成后绘制
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            drawRoundTable();
+        });
+    });
 }
 
 // 隐藏房间 UI

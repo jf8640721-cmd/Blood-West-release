@@ -21,9 +21,18 @@ window._tablePhase = window._tablePhase || '首夜';
     _tableTexImg = new Image();
     _tableTexImg.onload = function() {
         _tableTexLoaded = true;
-        drawRoundTable();
+    };
+    _tableTexImg.onerror = function() {
+        console.warn('经卷纸纹理加载失败，将使用纯色渲染');
     };
     _tableTexImg.src = 'msg-bg-parchment.jpg';
+
+    // 等两帧确保 CSS 布局完成后再绘制（解决缓存图片同步 onload 时 clientHeight=0 的问题）
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            drawRoundTable();
+        });
+    });
 })();
 
 // 辅助：在环形区域内叠加经卷纸纹理
@@ -56,6 +65,13 @@ function drawRoundTable() {
     if (!parent) return;
 
     const maxSize = Math.min(parent.clientWidth * 0.88, parent.clientHeight * 0.88, _tableSize);
+
+    // 容器尺寸尚未就绪（CSS 布局未完成），延迟重试
+    if (maxSize <= 0) {
+        requestAnimationFrame(function() { drawRoundTable(); });
+        return;
+    }
+
     const scale = maxSize / _tableSize;
     const DPR = _tableDPR;
     canvas.width = _tableSize * DPR;
