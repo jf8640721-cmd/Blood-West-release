@@ -340,13 +340,15 @@ function getPlayerSlot(player) {
 
 // ---- 渲染圆桌 ----
 function renderRoundTable() {
+    try {
     const overlay = document.getElementById('seats-overlay');
     const emptyHint = document.getElementById('table-empty-hint');
 
     // 绘制 Canvas
     drawRoundTable();
 
-    if (!overlay) return;
+    if (!overlay) { console.warn('renderRoundTable: #seats-overlay 不存在'); renderPlayerList(); return; }
+    console.log('renderRoundTable: players=' + state.players.length + ', canvasW=' + (document.getElementById('table-canvas')?.style.width || '?'));
 
     if (state.players.length === 0) {
         overlay.innerHTML = '';
@@ -409,11 +411,17 @@ function renderRoundTable() {
         }
     }
     renderPlayerList();
+    } catch(e) {
+        console.error('renderRoundTable 出错:', e.message, e.stack);
+        // 即使圆桌渲染失败，也要更新左侧玩家列表
+        renderPlayerList();
+    }
 }
 
 // ---- 渲染左侧玩家列表 ----
 function renderPlayerList() {
     const list = document.getElementById('rt-player-list');
+    console.log('renderPlayerList: listEl=' + !!list + ', players=' + state.players.length);
     if (!list) return;
     if (state.players.length === 0) {
         list.innerHTML = '<li class="player-empty">暂无玩家</li>';

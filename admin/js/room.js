@@ -240,8 +240,10 @@ function subscribeToRoom(roomId) {
             table: 'players',
             filter: 'room_id=eq.' + roomId
         }, (payload) => {
+            console.log('Realtime INSERT player:', payload.new.player_number, payload.new.nickname);
             state.players.push(payload.new);
             state.players.sort((a, b) => a.player_number - b.player_number);
+            console.log('state.players now has', state.players.length, 'players, calling renderRoundTable');
             renderRoundTable();
             // 新玩家加入时刷新技能队列
             if (typeof initNightQueue === 'function') initNightQueue();
