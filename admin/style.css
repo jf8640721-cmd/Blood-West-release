@@ -4,74 +4,74 @@
 
 /* ----- CSS 设计系统变量 ----- */
 :root {
-    /* 五级灰阶背景 */
-    --bg-deepest:   #07060e;
-    --bg-deep:      #0a0a12;
-    --bg-surface:   #0f0f1c;
-    --bg-elevated:  #151528;
-    --bg-card:      #1a1a30;
+    /* 五级灰阶背景 — 中性暗灰棕，做"暗色画框"退后 */
+    --bg-deepest:   #08080a;
+    --bg-deep:      #0e0e12;
+    --bg-surface:   #14141a;
+    --bg-elevated:  #1b1b24;
+    --bg-card:      #22222e;
 
-    /* 强调色 */
-    --gold-primary: #c9a84c;
-    --gold-dim:     #b8963e;
-    --gold-dark:    #8b6914;
-    --gold-glow:    rgba(201, 168, 76, 0.4);
+    /* 金色强调 — 唯一的"前进色"，做视觉路标 */
+    --gold-primary: #b8860b;
+    --gold-dim:     #8b6914;
+    --gold-dark:    #5a3e0e;
+    --gold-glow:    rgba(184, 134, 11, 0.25);
 
-    --blood-red:    #8b2500;
-    --blood-bright: #a83220;
-    --blood-glow:   rgba(139, 37, 0, 0.4);
+    /* 血红 — 恶魔/处决/删除 */
+    --blood-red:    #8b2020;
+    --blood-bright: #a83232;
+    --blood-glow:   rgba(139, 32, 32, 0.3);
 
+    /* 暗紫 — 仅邪恶阵营/夜死，收窄使用 */
     --purple-deep:  #2a1040;
     --purple-mid:   #3a2060;
-    --purple-glow:  rgba(60, 30, 90, 0.4);
+    --purple-glow:  rgba(50, 25, 80, 0.3);
 
-    --copper:       #b87333;
+    /* 文字色 — 暖灰白，减少白色刺眼感 */
+    --text-primary:   #d4ccbc;
+    --text-secondary: #908878;
+    --text-muted:     #5e5648;
+    --text-gold:      #c9a848;
 
-    /* 文字色 */
-    --text-primary:   #e0d6c2;
-    --text-secondary: #a09080;
-    --text-muted:     #605050;
-    --text-gold:      #d4b860;
+    /* 边框色 — 低对比退后 */
+    --border-subtle: #18181e;
+    --border-mid:    #24242e;
+    --border-gold:   #3a3018;
 
-    /* 边框色 */
-    --border-subtle: #1e1e36;
-    --border-mid:    #2a2040;
-    --border-gold:   #5a3e1a;
-
-    /* 阴影 */
-    --shadow-gold:    0 0 12px var(--gold-glow);
-    --shadow-gold-lg: 0 0 24px var(--gold-glow), 0 0 48px rgba(139, 105, 20, 0.2);
-    --shadow-red:     0 0 10px var(--blood-glow);
-    --shadow-purple:  0 0 14px var(--purple-glow);
-    --shadow-card:    0 4px 24px rgba(0, 0, 0, 0.5), 0 0 1px rgba(201, 168, 76, 0.15);
-    --shadow-inset:   inset 0 2px 8px rgba(0, 0, 0, 0.5);
+    /* 阴影 — 克制辉光，重实体阴影 */
+    --shadow-gold:    0 0 8px var(--gold-glow);
+    --shadow-gold-lg: 0 0 16px var(--gold-glow), 0 0 32px rgba(139, 105, 20, 0.1);
+    --shadow-red:     0 0 8px var(--blood-glow);
+    --shadow-purple:  0 0 10px var(--purple-glow);
+    --shadow-card:    0 2px 16px rgba(0, 0, 0, 0.5);
+    --shadow-inset:   inset 0 1px 6px rgba(0, 0, 0, 0.5);
 
     /* 字体 */
-    --font-gothic: 'Georgia', 'STSong', 'SimSun', serif;
+    --font-gothic: 'STKaiti', 'KaiTi', 'STSong', 'SimSun', 'Georgia', serif;
     --font-body:   "Microsoft YaHei", "PingFang SC", sans-serif;
-    --font-mono:   "Courier New", "Consolas", monospace;
+    --font-mono:   "Courier New", "Consolas", "SF Mono", monospace;
 
     /* 圆角 */
     --radius-sm:  4px;
     --radius-md:  8px;
     --radius-lg:  12px;
-    --radius-xl:  20px;
+    --radius-xl:  16px;
     --radius-full: 50%;
 
     /* 过渡 */
     --transition-fast:   0.15s ease;
-    --transition-medium: 0.3s ease;
-    --transition-slow:   0.5s ease;
+    --transition-medium: 0.25s ease;
+    --transition-slow:   0.4s ease;
 
     /* 角色类别颜色 */
-    --role-town:      #e0d6c2;
-    --role-town-bg:   rgba(224, 214, 194, 0.12);
-    --role-outsider:  #4a9e5a;
-    --role-outsider-bg: rgba(74, 158, 90, 0.15);
+    --role-town:      #d8c8a0;
+    --role-town-bg:   rgba(216, 200, 160, 0.1);
+    --role-outsider:  #5a9e5a;
+    --role-outsider-bg: rgba(90, 158, 90, 0.12);
     --role-minion:    #c9a030;
-    --role-minion-bg: rgba(201, 160, 48, 0.15);
-    --role-demon:     #a83220;
-    --role-demon-bg:  rgba(168, 50, 32, 0.15);
+    --role-minion-bg: rgba(201, 160, 48, 0.12);
+    --role-demon:     #b84030;
+    --role-demon-bg:  rgba(184, 64, 48, 0.12);
 }
 
 /* ----- 基础重置 ----- */
@@ -98,7 +98,7 @@ body::after {
     top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none;
     z-index: 9999;
-    opacity: 0.025;
+    opacity: 0.012;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 200px 200px;
@@ -118,15 +118,15 @@ body::after {
 .btn:active { transform: scale(0.97); }
 
 .btn-gold {
-    background: linear-gradient(180deg, #6a4a1e 0%, #4a2e0e 50%, #3a2008 100%);
-    color: #f0d68a;
+    background: linear-gradient(180deg, #5a3e18 0%, #3a2810 50%, #2a1a08 100%);
+    color: #e8d090;
     border-color: var(--gold-dark);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .btn-gold:hover {
     box-shadow: var(--shadow-gold-lg), 0 2px 4px rgba(0,0,0,0.5);
-    color: #ffe8a0;
+    color: #f0d898;
     opacity: 1;
 }
 
@@ -178,10 +178,10 @@ body::after {
     text-align: center;
     border-radius: var(--radius-full);
     background: linear-gradient(180deg, #2a1040 0%, #1a0828 50%, #0f0418 100%);
-    border: 1.5px solid #5a2080;
+    border: 1.5px solid #4a2060;
     color: #e04060;
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(192, 60, 80, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 8px rgba(192, 60, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.02);
     transition: all var(--transition-medium);
     position: relative;
     animation: demon-pulse 2.5s ease-in-out infinite;
@@ -228,13 +228,13 @@ body::after {
     opacity: 0.6;
 }
 .btn-phase.night {
-    background: linear-gradient(135deg, #1a0a2e, #2d1545);
+    background: linear-gradient(135deg, #1a0a20, #251238);
     color: #b8a0d0;
     border-color: #4a2a7a;
     animation: phasePulseNight 3s infinite;
 }
 .btn-phase.day {
-    background: linear-gradient(135deg, #3e2a0a, #5a3e1a);
+    background: linear-gradient(135deg, #2e1e08, #4a3014);
     color: #f0d68a;
     border-color: var(--gold-dark);
     animation: phasePulseDay 3s infinite;
@@ -307,9 +307,9 @@ body::after {
 
 /* 铜色按钮 */
 .btn-copper {
-    background: linear-gradient(180deg, #5a3530 0%, #3a2018 50%, #2a1510 100%);
+    background: linear-gradient(180deg, #3a2820 0%, #2a1a12 50%, #1a0e0a 100%);
     color: #d4a090;
-    border-color: #6a3a2a;
+    border-color: #5a3020;
     box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
@@ -325,7 +325,7 @@ body::after {
     align-items: center;
     justify-content: space-between;
     padding: 12px 24px;
-    background: linear-gradient(180deg, #0d0c1a 0%, var(--bg-deep) 100%);
+    background: linear-gradient(180deg, #0e0e14 0%, var(--bg-deep) 100%);
     border-bottom: 1px solid var(--border-mid);
     flex-shrink: 0;
     position: relative;
@@ -355,23 +355,23 @@ body::after {
     color: var(--gold-primary);
     letter-spacing: 6px;
     text-shadow:
-        0 0 12px var(--gold-glow),
-        0 0 24px rgba(201, 168, 76, 0.25),
+        0 0 10px var(--gold-glow),
+        0 0 20px rgba(184, 134, 11, 0.15),
         0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .logo-sub {
     font-size: 11px;
     font-family: 'Georgia', 'Times New Roman', serif;
-    color: #8b7355;
+    color: #8b7858;
     letter-spacing: 3px;
     text-transform: uppercase;
-    text-shadow: 0 0 4px rgba(139, 115, 85, 0.3);
+    text-shadow: 0 0 4px rgba(139, 120, 88, 0.2);
 }
 
 .logo-version {
     font-size: 9px;
-    color: #4a3a2a;
+    color: #4a4030;
     letter-spacing: 1px;
     font-family: var(--font-mono);
 }
@@ -426,7 +426,7 @@ body::after {
     color: var(--gold-dark);
     letter-spacing: 6px;
     white-space: nowrap;
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 .panel-header h2 {
@@ -649,22 +649,22 @@ body::after {
     align-items: flex-end;
 }
 .msg-row.player-msg .msg-bubble {
-    background: linear-gradient(135deg, #1a0815 0%, #250d1e 100%);
-    border: 1px solid #3a1530;
-    color: #e0c0d0;
+    background: linear-gradient(135deg, #1a1018 0%, #220e18 100%);
+    border: 1px solid #301824;
+    color: #d8c0d0;
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 0 20px rgba(60, 15, 40, 0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .msg-row.host-msg {
     align-items: flex-start;
 }
 .msg-row.host-msg .msg-bubble {
-    background: linear-gradient(135deg, #141005 0%, #1e1808 100%);
-    border: 1px solid #3a2a10;
+    background: linear-gradient(135deg, #141008 0%, #1a1408 100%);
+    border: 1px solid #302410;
     color: #d0c8a0;
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 8px rgba(139, 105, 20, 0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .msg-time {
@@ -758,7 +758,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -775,7 +775,7 @@ body::after {
     text-align: center;
     position: relative;
     max-width: 90vw;
-    box-shadow: var(--shadow-gold-lg), 0 0 0 4px rgba(10,10,18,0.8), 0 0 0 6px rgba(90,62,26,0.25);
+    box-shadow: var(--shadow-gold-lg), 0 0 0 4px rgba(10,10,18,0.8), 0 0 0 6px rgba(60,45,18,0.2);
     animation: fadeInUp var(--transition-medium);
 }
 
@@ -895,9 +895,9 @@ body::after {
         0 0 60px rgba(139, 105, 20, 0.25),
         0 0 120px rgba(80, 40, 10, 0.15),
         inset 0 0 80px rgba(0, 0, 0, 0.6),
-        0 0 0 3px #5a3a1a,
-        0 0 0 6px #2a1508,
-        0 0 0 8px #1a0a03;
+        0 0 0 3px #4a3018,
+        0 0 0 6px #1a0e06,
+        0 0 0 8px #0e0602;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1155,11 +1155,11 @@ body::after {
 .btn-board {
     padding: 8px 16px;
     font-size: 14px;
-    background: linear-gradient(180deg, #3a3020 0%, #2a2015 50%, #1a1510 100%);
+    background: linear-gradient(180deg, #3a3020 0%, #2a2018 50%, #1a1510 100%);
     color: #d4c090;
-    border-color: #6a5a30;
+    border-color: #5a4a28;
     border-radius: var(--radius-md);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.02);
     cursor: pointer;
     transition: all var(--transition-fast);
 }
@@ -1629,8 +1629,8 @@ body::after {
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    background: #10081a;
-    border-bottom: 1px solid #2a1535;
+    background: #0e0818;
+    border-bottom: 1px solid #221230;
     overflow-x: auto;
     flex-shrink: 0;
     flex-wrap: wrap;
@@ -1741,22 +1741,22 @@ body::after {
 }
 
 .evil-bubble-player {
-    background: linear-gradient(135deg, #1a0825, #150520);
-    border: 1px solid #3a2060;
+    background: linear-gradient(135deg, #1a0820, #15051a);
+    border: 1px solid #302050;
     border-top-left-radius: 2px;
     color: #d0c0e0;
 }
 
 .evil-bubble-self {
-    background: linear-gradient(135deg, #1e1030, #180828);
-    border: 1px solid #4a2560;
+    background: linear-gradient(135deg, #1e0e28, #180820);
+    border: 1px solid #3a1850;
     border-top-right-radius: 2px;
     color: #d0c0e0;
 }
 
 .evil-bubble-host {
-    background: linear-gradient(135deg, #1a1810, #181408);
-    border: 1px solid #4a3a1a;
+    background: linear-gradient(135deg, #1a1810, #141008);
+    border: 1px solid #3a2a18;
     border-top-left-radius: 2px;
     color: #e0d6c2;
 }
@@ -1792,8 +1792,8 @@ body::after {
    ============================================================ */
 .night-queue-panel {
     margin: 0 0 4px;
-    background: linear-gradient(135deg, #0d0d1a, #111128);
-    border: 1px solid #2a2a50;
+    background: linear-gradient(135deg, #0d0d16, #101020);
+    border: 1px solid #222240;
     border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
@@ -1805,7 +1805,7 @@ body::after {
     align-items: center;
     gap: 12px;
     padding: 8px 16px;
-    background: linear-gradient(90deg, #1a1030, #0d0d1a);
+    background: linear-gradient(90deg, #1a1028, #0d0d16);
     cursor: pointer;
     user-select: none;
 }
@@ -1869,7 +1869,7 @@ body::after {
     gap: 8px;
     padding: 6px 16px;
     font-size: 13px;
-    border-bottom: 1px solid #12122a;
+    border-bottom: 1px solid #181830;
     transition: background 0.2s;
 }
 
@@ -1897,7 +1897,7 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #1a1a3a;
+    background: #141434;
     border-radius: 50%;
     font-size: 11px;
     color: #8a7aaa;
@@ -2082,15 +2082,15 @@ body::after {
    ============================================================ */
 .day-queue-panel {
     margin: 0 0 4px;
-    background: linear-gradient(135deg, #1a1200, #281e08);
-    border: 1px solid #4a3a1a;
+    background: linear-gradient(135deg, #1a1200, #221808);
+    border: 1px solid #3a2a14;
     border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
 }
 
 .day-queue-header {
-    background: linear-gradient(90deg, #2a1a08, #1a0e00) !important;
+    background: linear-gradient(90deg, #221408, #120a00) !important;
 }
 
 /* 白天队列行高亮色 */
