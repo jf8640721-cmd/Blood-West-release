@@ -12,7 +12,7 @@
         <h1 class="logo">
             <span class="logo-main">西游纪</span>
             <span class="logo-sub">Blood-West</span>
-            <span class="logo-version">v2.1.0</span>
+            <span class="logo-version">v2.0.2</span>
         </h1>
 
         <div class="toolbar-actions">
@@ -55,7 +55,7 @@
     <!-- ========== 圆桌主视图 ========== -->
     <main id="round-table-view">
         <!-- 左侧：紧凑玩家列表 -->
-        <aside id="rt-player-panel" class="ornate-panel">
+        <aside id="rt-player-panel">
             <div class="panel-header">
                 <h2>玩家</h2>
                 <span id="rt-player-count" class="count-badge">0</span>
@@ -82,7 +82,7 @@
         </section>
 
         <!-- 右侧：消息面板 -->
-        <section id="rt-message-panel" class="ornate-panel">
+        <section id="rt-message-panel">
             <!-- 夜间行动队列（嵌入消息面板顶部） -->
             <div id="night-queue-panel" class="night-queue-panel" style="display:none;">
                 <div class="queue-header" id="queue-header-bar" onclick="toggleQueuePanel()">
@@ -172,7 +172,7 @@
 
     <!-- ========== 二维码弹窗 ========== -->
     <div id="qr-modal" class="modal" style="display:none;">
-        <div class="modal-content ornate-modal">
+        <div class="modal-content">
             <span class="modal-close" id="btn-close-qr">&times;</span>
             <h3>扫描二维码加入房间</h3>
             <div id="qrcode-container"></div>
@@ -183,7 +183,7 @@
 
     <!-- ========== 版型配置弹窗 ========== -->
     <div id="board-modal" class="modal" style="display:none;">
-        <div class="modal-content board-panel ornate-modal">
+        <div class="modal-content board-panel">
             <span class="modal-close" id="btn-close-board">&times;</span>
             <h3>版型配置</h3>
 
@@ -216,7 +216,7 @@
 
     <!-- ========== 阶段切换确认弹窗 ========== -->
     <div id="phase-confirm-modal" class="modal" style="display:none;">
-        <div class="modal-content modal-confirm ornate-modal">
+        <div class="modal-content modal-confirm">
             <p id="phase-confirm-text" class="confirm-text"></p>
             <div class="confirm-actions">
                 <button id="btn-phase-confirm-cancel" class="btn btn-copper">取消</button>
