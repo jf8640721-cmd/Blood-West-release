@@ -365,9 +365,9 @@ body::before {
 .player-item.dragging { opacity: 0.4; }
 .player-item.drag-over { border-top: 2px solid var(--gold-primary); }
 
-.player-name { font-size: 14px; color: var(--cream-dim); cursor: pointer; transition: color 0.2s; }
+.player-name { font-size: 15px; color: var(--cream-dim); cursor: pointer; transition: color 0.2s; }
 .player-name:hover { color: var(--gold-primary); }
-.name-edit-icon { font-size: 11px; opacity: 0.35; transition: opacity 0.2s; }
+.name-edit-icon { font-size: 12px; opacity: 0.35; transition: opacity 0.2s; }
 .player-name:hover .name-edit-icon { opacity: 1; }
 
 /* 新消息提示小红点 */
@@ -601,7 +601,7 @@ body::before {
 
 /* 座位下方名字标签 */
 .seat-label {
-    font-size: 13px; font-weight: 600; color: #dcc8a0; text-align: center;
+    font-size: 14px; font-weight: 600; color: #dcc8a0; text-align: center;
     max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     text-shadow: 0 0 6px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.8);
     cursor: pointer; transition: color 0.2s;
@@ -822,7 +822,7 @@ body::before {
 
 /* ----- 角色徽章 ----- */
 .seat-role-badge {
-    font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 3px; margin-top: 2px;
+    font-size: 13px; font-weight: 600; padding: 2px 7px; border-radius: 3px; margin-top: 2px;
     white-space: nowrap; letter-spacing: 0.2px;
     text-shadow: 0 0 5px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.7);
 }
@@ -831,7 +831,7 @@ body::before {
 .seat-role-minion    { background: var(--role-minion-bg); color: #e8b85a; border: 1px solid rgba(219,168,81,0.4); }
 .seat-role-demon     { background: var(--role-demon-bg); color: #c07058; border: 1px solid rgba(171,105,84,0.4); }
 
-.player-role-name { font-size: 12px; margin-left: 8px; opacity: 0.85; }
+.player-role-name { font-size: 13px; margin-left: 8px; opacity: 0.85; }
 .player-role-townsfolk { color: var(--role-town); }
 .player-role-outsider  { color: var(--role-outsider); }
 .player-role-minion    { color: var(--role-minion); }
