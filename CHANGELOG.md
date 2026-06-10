@@ -1,5 +1,18 @@
 # 版本日志
 
+## v3.0.23 (2026-06-10)
+
+### ✨ 新增 — 扫码页楷体字体加载
+
+- **问题**：开发工具模拟器可显示 STKaiti 楷体，但真机 iOS/Android 均无此字体，回退为 PingFang SC 无衬线体，"西游纪"标题丧失书法风格
+- **方案**：通过微信小程序 `wx.loadFontFace()` API 动态加载开源楷体
+  - 字体：**LXGW WenKai（霞鹜文楷）** Regular，SIL Open Font License 开源可商用
+  - 存储：上传到 Supabase Storage `fonts` bucket（公开访问）
+  - 加载时机：扫码页 `onLoad` 调用，`global: true` 全局生效
+  - 降级策略：加载失败自动回退系统字体栈 `STKaiti → KaiTi → PingFang SC → serif`
+- **CSS 字体栈**：`--font-display` 首位新增 `'LXGW WenKai'`
+- **改动文件**：`scan.js`（+wx.loadFontFace）、`app.wxss`（字体栈）、`admin/index.html`（版本）、`scan.wxml`（版本）
+
 ## v3.0.22 (2026-06-10)
 
 ### 🐛 修复 — 真机背景图 404 + 屏幕顶部未覆盖
