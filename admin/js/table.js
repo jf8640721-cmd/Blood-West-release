@@ -476,7 +476,7 @@ function renderRoundTable() {
                   <div class="seat-dot">
                     <span class="status-toggle" title="点击切换状态 · 当前：${statusTitle}"></span>
                   </div>
-                  <div class="seat-label" onclick="editPlayerNickname('${occupied.id}');event.stopPropagation();" title="点击修改名牌">${escapeHtml(displayName)} <span class="name-edit-icon">✎</span></div>
+                  <div class="seat-label">${escapeHtml(displayName)}</div>
                   ${renderRoleBadgeHtml(occupied)}
                   <span class="kick-btn seat-kick-btn" data-player-id="${occupied.id}" title="踢出房间">⛔</span>
                 </div>`);
