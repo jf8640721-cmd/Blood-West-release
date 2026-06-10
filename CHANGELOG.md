@@ -1,5 +1,16 @@
 # 版本日志
 
+## v3.0.24 (2026-06-10)
+
+### 🎨 字体更换 — LXGW WenKai → Ma Shan Zheng（马山正）
+
+- **原因**：霞鹜文楷 24MB 加载偏慢，换用更小更飘逸的马山正毛笔楷体
+- **字体**：Ma Shan Zheng（马山正），Google Fonts 开源，SIL OFL
+  - 大小：5.6MB（比 LXGW WenKai 小 77%）
+  - 风格：毛笔手写楷体，笔画有力，更适合"西游纪"血染钟楼神秘主题
+  - 真机首次加载 1-2 秒，远快于之前的 5-8 秒
+- **降级链**：Ma Shan Zheng → LXGW WenKai → STKaiti → KaiTi → PingFang SC
+
 ## v3.0.23 (2026-06-10)
 
 ### ✨ 新增 — 扫码页楷体字体加载
