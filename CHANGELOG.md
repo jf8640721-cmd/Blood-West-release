@@ -1,5 +1,14 @@
 # 版本日志
 
+## v3.0.16 (2026-06-10)
+
+### 🔧 修复 — 背景图从 WXSS 改为 `<image>` 标签
+
+- 微信小程序 WXSS 不支持 `background-image` 引用本地图片，改为 `<image>` 标签承载
+- 4 页 WXML bg-layer 替换为 `<image class="bg-image" src="..." mode="aspectFill">`
+- app.wxss 新增 `.bg-image` 全局样式，4 页 WXSS 移除无效 `background-image`
+- 版本号 v3.0.15 → v3.0.16
+
 ## v3.0.15 (2026-06-10)
 
 ### 🗜️ 图片压缩 — WebP 格式，包体积大幅优化
