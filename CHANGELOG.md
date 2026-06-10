@@ -1,5 +1,17 @@
 # 版本日志
 
+## v3.0.19 (2026-06-10)
+
+### ✨ 新增 — 鎏金/木纹纹理叠加
+
+- 激活之前「预留」的 `texture-gold.webp` / `texture-wood.webp` 纹理图
+- 用 `<image>` 标签绝对定位叠加到鎏金按钮/徽章内部（z-index: -1 + opacity 0.18），增加材质感
+- 木纹纹理叠加到圆桌铜镜环 ring-1 / ring-4（opacity 0.25）
+- 涉及 4 页共 20+ 组件：scan 按钮、room-badge、player-badge、phase-badge、subscribe-banner、send-btn、nav-btn、nickname-btn.confirm、铜镜环
+- app.wxss 新增 `.btn-texture-gold` / `.ring-texture-wood` 全局纹理类
+- 各组件父容器统一加 `position: relative; z-index: 0;` 创建层叠上下文
+- 版本号 v3.0.18 → v3.0.19
+
 ## v3.0.18 (2026-06-10)
 
 ### 🐛 修复 — 背景图层级遮挡所有 UI 组件
