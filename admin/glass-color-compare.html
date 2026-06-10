@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>玻璃面板 — 朱砂底方案 · 西游纪</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background:
+                radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(30,10,8,0.45) 85%, rgba(30,10,8,0.7) 100%),
+                linear-gradient(180deg, #160808 0%, #200a08 50%, #0d0403 100%);
+            min-height: 100vh;
+            font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
+            color: #dcc8a0;
+            padding: 24px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            letter-spacing: 6px;
+            color: #dba851;
+            text-shadow: 0 0 12px rgba(219,168,81,0.4);
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #a09070;
+            font-size: 13px;
+            margin-bottom: 32px;
+        }
+
+        .compare-row {
+            display: flex;
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 340px;
+            max-width: 520px;
+        }
+        .col-label {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+        .col-label.old { color: #8b6a5a; }
+        .col-label.new { color: #c08070; }
+
+        .panel-section {
+            background: rgba(22,8,8,0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(139,105,20,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .panel-section h3 {
+            font-size: 13px;
+            color: #a09070;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139,105,20,0.3);
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+        .toolbar.old { background: rgba(26,14,6,0.5); }
+        .toolbar.new { background: rgba(30,10,8,0.35); }
+
+        .mock-logo { font-size: 18px; color: #dba851; letter-spacing: 4px; font-weight: 600; }
+        .mock-btn {
+            padding: 5px 12px;
+            border-radius: 4px;
+            border: 1px solid #dba851;
+            color: #dba851;
+            font-size: 12px;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        /* 深色面板 */
+        .deep-panel {
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(139,105,20,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 70px;
+        }
+        .deep-panel.old { background: rgba(18,9,4,0.55); }
+        .deep-panel.new { background: rgba(22,8,8,0.4); }
+
+        .mock-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .mock-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #dba851;
+            flex-shrink: 0;
+        }
+
+        /* 中等面板 */
+        .mid-panel {
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(139,105,20,0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .mid-panel.old { background: rgba(45,24,11,0.5); }
+        .mid-panel.new { background: rgba(42,16,14,0.35); }
+
+        /* 列表项 */
+        .list-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(139,105,20,0.1);
+            display: flex; align-items: center; gap: 8px;
+            backdrop-filter: blur(4px);
+            font-size: 13px;
+            border-radius: 4px;
+        }
+        .list-item.old { background: rgba(45,24,11,0.5); }
+        .list-item.new { background: rgba(42,16,14,0.35); }
+
+        .list-item.hover-old { background: rgba(62,34,18,0.55); backdrop-filter: blur(8px); }
+        .list-item.hover-new { background: rgba(55,24,20,0.4); backdrop-filter: blur(8px); }
+
+        /* 弹窗 */
+        .modal-box {
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(219,168,81,0.4);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .modal-box.old {
+            background: rgba(62,34,18,0.65);
+            box-shadow: 0 0 24px rgba(180,130,40,0.3), 0 0 0 4px rgba(26,14,6,0.8);
+        }
+        .modal-box.new {
+            background: rgba(55,24,20,0.5);
+            box-shadow: 0 0 24px rgba(180,130,40,0.3), 0 0 0 4px rgba(30,10,8,0.65);
+        }
+        .modal-box h3 { color: #dba851; font-size: 16px; letter-spacing: 3px; margin-bottom: 6px; }
+        .modal-box p { font-size: 12px; color: #c0a880; }
+
+        /* 回复输入区 */
+        .reply-area {
+            display: flex; gap: 8px;
+            padding: 10px;
+            border-top: 1px solid rgba(139,105,20,0.2);
+            backdrop-filter: blur(4px);
+            border-radius: 0 0 8px 8px;
+        }
+        .reply-area.old { background: rgba(45,24,11,0.5); }
+        .reply-area.new { background: rgba(42,16,14,0.35); }
+
+        .reply-input {
+            flex: 1; padding: 8px 12px;
+            border: 1px solid rgba(139,105,20,0.3);
+            border-radius: 6px;
+            color: #dcc8a0;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+        }
+        .reply-input.old { background: rgba(18,9,4,0.4); }
+        .reply-input.new { background: rgba(22,8,8,0.3); }
+        .reply-input::placeholder { color: #8b6a5a; }
+
+        /* 色值标签 */
+        .color-tag {
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+        .old .color-tag { background: rgba(0,0,0,0.4); color: #8b7a60; }
+        .new .color-tag { background: rgba(0,0,0,0.4); color: #b89880; }
+
+        .summary-box {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(22,8,8,0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(139,105,20,0.3);
+            border-radius: 12px;
+            padding: 20px 24px;
+        }
+        .summary-box h2 {
+            color: #dba851;
+            font-size: 16px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+        .summary-box table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .summary-box th {
+            padding: 8px 12px;
+            text-align: left;
+            color: #dba851;
+            border-bottom: 1px solid rgba(139,105,20,0.3);
+            font-weight: 500;
+        }
+        .summary-box td {
+            padding: 6px 12px;
+            border-bottom: 1px solid rgba(139,105,20,0.1);
+            color: #c0a080;
+        }
+        .summary-box td code {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        .arrow { color: #c08070; }
+
+        @media (max-width: 800px) {
+            .compare-row { flex-direction: column; align-items: center; }
+            .column { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔮 玻璃面板底色 — 朱砂底方案</h1>
+<p class="subtitle">敦煌岩彩 · 朱砂红底调 · 透明度加强</p>
+
+<div class="compare-row">
+
+    <!-- ====== 旧版 ====== -->
+    <div class="column">
+        <div class="col-label old">◆ 旧版 · 黑棕底</div>
+
+        <div class="panel-section old">
+            <h3>顶部工具栏</h3>
+            <div class="toolbar old">
+                <span class="mock-logo">西游纪</span>
+                <span style="font-size:11px;color:#a09070;">Blood-West</span>
+                <span class="mock-btn">创建房间</span>
+            </div>
+            <span class="color-tag">rgba(26,14,6,0.5)</span>
+        </div>
+
+        <div class="panel-section old">
+            <h3>深色面板（玩家列表 / 消息面板）</h3>
+            <div class="deep-panel old">
+                <div class="mock-item"><span class="mock-dot"></span> 1号 · 孙悟空</div>
+                <div class="mock-item"><span class="mock-dot"></span> 2号 · 唐僧</div>
+                <div class="mock-item"><span class="mock-dot"></span> 3号 · 猪八戒</div>
+            </div>
+            <span class="color-tag">rgba(18,9,4,0.55)</span>
+        </div>
+
+        <div class="panel-section old">
+            <h3>列表项 / 回复区</h3>
+            <div class="list-item old">孙悟空 · 齐天大圣</div>
+            <div class="list-item hover-old" style="margin-top:2px;">唐僧 · 金蝉子（悬停）</div>
+            <div style="margin-top:6px;">
+                <div class="reply-area old">
+                    <input class="reply-input old" placeholder="输入回复..." readonly>
+                    <span class="mock-btn">发送</span>
+                </div>
+            </div>
+            <span class="color-tag">rgba(45,24,11,0.5) / hover: rgba(62,34,18,0.55)</span>
+        </div>
+
+        <div class="panel-section old">
+            <h3>弹窗面板（版型配置）</h3>
+            <div class="modal-box old">
+                <h3>版型配置</h3>
+                <p>玩家人数 · 12 人局</p>
+            </div>
+            <span class="color-tag">rgba(62,34,18,0.65)</span>
+        </div>
+    </div>
+
+    <!-- ====== 新版 ====== -->
+    <div class="column">
+        <div class="col-label new">◆ 新版 · 朱砂底</div>
+
+        <div class="panel-section new">
+            <h3>顶部工具栏</h3>
+            <div class="toolbar new">
+                <span class="mock-logo">西游纪</span>
+                <span style="font-size:11px;color:#a09070;">Blood-West</span>
+                <span class="mock-btn">创建房间</span>
+            </div>
+            <span class="color-tag">rgba(30,10,8,0.35)</span>
+        </div>
+
+        <div class="panel-section new">
+            <h3>深色面板（玩家列表 / 消息面板）</h3>
+            <div class="deep-panel new">
+                <div class="mock-item"><span class="mock-dot"></span> 1号 · 孙悟空</div>
+                <div class="mock-item"><span class="mock-dot"></span> 2号 · 唐僧</div>
+                <div class="mock-item"><span class="mock-dot"></span> 3号 · 猪八戒</div>
+            </div>
+            <span class="color-tag">rgba(22,8,8,0.4)</span>
+        </div>
+
+        <div class="panel-section new">
+            <h3>列表项 / 回复区</h3>
+            <div class="list-item new">孙悟空 · 齐天大圣</div>
+            <div class="list-item hover-new" style="margin-top:2px;">唐僧 · 金蝉子（悬停）</div>
+            <div style="margin-top:6px;">
+                <div class="reply-area new">
+                    <input class="reply-input new" placeholder="输入回复..." readonly>
+                    <span class="mock-btn">发送</span>
+                </div>
+            </div>
+            <span class="color-tag">rgba(42,16,14,0.35) / hover: rgba(55,24,20,0.4)</span>
+        </div>
+
+        <div class="panel-section new">
+            <h3>弹窗面板（版型配置）</h3>
+            <div class="modal-box new">
+                <h3>版型配置</h3>
+                <p>玩家人数 · 12 人局</p>
+            </div>
+            <span class="color-tag">rgba(55,24,20,0.5)</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- ====== 改动汇总 ====== -->
+<div class="summary-box">
+    <h2>📋 改动汇总</h2>
+    <table>
+        <thead>
+            <tr><th>面板类型</th><th>旧值（黑棕底）</th><th></th><th>新值（朱砂底）</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>深色面板</td>
+                <td><code>rgba(18,9,4,0.55)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(22,8,8,0.4)</code></td>
+            </tr>
+            <tr>
+                <td>工具栏</td>
+                <td><code>rgba(26,14,6,0.5)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(30,10,8,0.35)</code></td>
+            </tr>
+            <tr>
+                <td>列表项 / 回复区</td>
+                <td><code>rgba(45,24,11,0.5)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(42,16,14,0.35)</code></td>
+            </tr>
+            <tr>
+                <td>悬停状态</td>
+                <td><code>rgba(62,34,18,0.55)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(55,24,20,0.4)</code></td>
+            </tr>
+            <tr>
+                <td>弹窗内容</td>
+                <td><code>rgba(62,34,18,0.65)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(55,24,20,0.5)</code></td>
+            </tr>
+            <tr>
+                <td>输入框</td>
+                <td><code>rgba(18,9,4,0.4)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(22,8,8,0.3)</code></td>
+            </tr>
+            <tr>
+                <td>邪恶群聊</td>
+                <td><code>rgba(42,14,14,0.4)</code></td>
+                <td class="arrow">→</td>
+                <td><code>rgba(42,8,8,0.3)</code></td>
+            </tr>
+            <tr style="border-top: 2px solid rgba(139,105,20,0.3);">
+                <td colspan="4" style="padding-top:10px; color:#c08070; font-size:12px;">
+                    ★ 变化方向：RGB 色相偏红（朱砂） + alpha 降低 <strong>0.15</strong>（透明度加强）
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
