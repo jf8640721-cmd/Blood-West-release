@@ -9,7 +9,7 @@ let _tableCtx = null;
 let _tableCanvas = null;
 let _tableTexImg = null;
 let _tableTexLoaded = false;
-let _tableSize = 500;
+let _tableSize = 420;
 let _tableDPR = Math.min(window.devicePixelRatio || 1, 2);
 let _tableCx = 0, _tableCy = 0, _tableR = 0;
 
