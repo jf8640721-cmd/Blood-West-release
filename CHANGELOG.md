@@ -1,5 +1,17 @@
 # 版本日志
 
+## v3.0.21 (2026-06-10)
+
+### 🎨 增强 — 纹理叠加逼近 blend-mode 效果
+
+- `.btn-texture-gold` 新增 `filter: contrast(1.35) brightness(0.82)`，用 CSS filter 模拟 overlay 加深效果
+- `.ring-texture-wood` 新增 `filter: contrast(1.25) brightness(0.88)`
+- 新增两个变体类：
+  - `.btn-texture-gold-sm`（小徽章：opacity 0.72）— room-badge/player-badge/phase-badge
+  - `.btn-texture-gold-lg`（大按钮：opacity 0.48）— scan-btn/scan-join-btn
+- 4 页 WXML 更新：小徽章→`-sm`，大按钮→`-lg`，其余保持默认 0.60
+- 版本号 v3.0.20 → v3.0.21
+
 ## v3.0.20 (2026-06-10)
 
 ### 🎨 调整 — 纹理叠加 opacity 大幅提升
