@@ -232,31 +232,31 @@ body::before {
 }
 .btn-debug:hover { color: #ba9078; border-color: #824924; background: rgba(62,34,18,0.4); }
 
-/* 邪恶群聊工具栏按钮 */
+/* 邪恶群聊工具栏按钮 — 朱砂暖红 + 鎏金光晕 */
 .btn-evil-toolbar {
     width: 36px; height: 36px; padding: 0;
     font-size: 18px; line-height: 36px; text-align: center;
     border-radius: var(--radius-full);
     background-image:
-        linear-gradient(180deg, rgba(127,58,40,0.7) 0%, rgba(80,30,20,0.85) 50%, rgba(50,15,10,0.95) 100%),
+        linear-gradient(180deg, rgba(200,62,62,0.55) 0%, rgba(150,35,30,0.75) 50%, rgba(80,15,12,0.9) 100%),
         url('bg-frame.jpg');
     background-position: 35% 50%; background-size: 400% 400%;
-    border: 1.5px solid #ab6954;
-    color: #f0c0b0; cursor: pointer;
-    box-shadow: 0 0 8px rgba(171,105,84,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+    border: 1.5px solid rgba(200,62,62,0.6);
+    color: #f5d0d0; cursor: pointer;
+    box-shadow: 0 0 8px rgba(219,168,81,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
     transition: all var(--transition-medium); position: relative;
     animation: demon-pulse 2.5s ease-in-out infinite;
 }
 .btn-evil-toolbar:hover {
-    border-color: #c88070;
-    box-shadow: 0 0 16px rgba(171,105,84,0.5), 0 0 32px rgba(127,58,40,0.25);
-    color: #ffe0d8; transform: scale(1.08); opacity: 1;
+    border-color: rgba(220,100,80,0.8);
+    box-shadow: 0 0 16px rgba(219,168,81,0.55), 0 0 32px rgba(200,62,62,0.3);
+    color: #ffe8e0; transform: scale(1.08); opacity: 1;
 }
 .btn-evil-toolbar:active { transform: scale(0.95); transition: all 0.1s ease; }
 
 @keyframes demon-pulse {
-    0%, 100% { box-shadow: 0 0 6px rgba(171,105,84,0.25); }
-    50% { box-shadow: 0 0 14px rgba(171,105,84,0.5), 0 0 28px rgba(127,58,40,0.2); }
+    0%, 100% { box-shadow: 0 0 6px rgba(219,168,81,0.3); }
+    50% { box-shadow: 0 0 14px rgba(219,168,81,0.55), 0 0 28px rgba(200,62,62,0.2); }
 }
 
 @keyframes demon-pulse-unread {
@@ -928,7 +928,7 @@ body::before {
 .evil-chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .evil-chip-dot.minion { background: #c09030; box-shadow: 0 0 3px rgba(192,144,48,0.5); }
 .evil-chip-dot.demon { background: #e04040; box-shadow: 0 0 3px rgba(224,64,64,0.5); }
-.evil-chip-name { color: #c0b0d0; font-size: 12px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+.evil-chip-name { color: #e0c0c0; font-size: 12px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
 .evil-chip-role { font-size: 11px; }
 .evil-chip-role.minion { color: #d4a020; }
 .evil-chip-role.demon { color: #f06060; }

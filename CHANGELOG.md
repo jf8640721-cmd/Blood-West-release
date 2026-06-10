@@ -1,5 +1,14 @@
 # 版本日志
 
+## v3.0.4 (2026-06-10)
+
+### 🎨 修复：邪恶群聊图标配色偏紫 → 敦煌朱砂暖红
+
+- `admin/style.css` — `.btn-evil-toolbar` 背景渐变从冷棕改为朱砂暖红 `rgba(200,62,62,...)`，发光从肉桂色改为鎏金 `rgba(219,168,81,...)`，彻底消除紫色泛光
+- `admin/style.css` — `.evil-chip-name` 从薰衣草紫 `#c0b0d0` 改为暖粉 `#e0c0c0`（与设计预览 [design-preview-dunhuang.html](admin/design-preview-dunhuang.html) 一致）
+- `admin/style.css` — `@keyframes demon-pulse` 脉动光晕同步改为鎏金+朱砂混合
+- 版本号 v3.0.3 → v3.0.4
+
 ## v3.0.3 (2026-06-09)
 
 ### 🐛 修复：Canvas 铜镜圆桌 arc() 负半径报错
