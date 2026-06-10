@@ -9,7 +9,7 @@ let _tableCtx = null;
 let _tableCanvas = null;
 let _tableTexImg = null;
 let _tableTexLoaded = false;
-let _tableSize = 620;
+let _tableSize = 500;
 let _tableDPR = Math.min(window.devicePixelRatio || 1, 2);
 let _tableCx = 0, _tableCy = 0, _tableR = 0;
 
@@ -107,33 +107,40 @@ function drawRoundTable() {
 
     ctx.clearRect(0, 0, _tableSize, _tableSize);
 
-    // ---- 第1层：鎏金外框 ----
-    const r1 = R, r1i = R - 10;
+    // ---- 辅助：绘制金属环边缘高光线 ----
+    function _edgeLine(r, alpha) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(220,180,130,' + alpha + ')';
+        ctx.lineWidth = 0.6; ctx.stroke();
+    }
+
+    // ---- 第1层：古铜外框（5px） ----
+    const r1 = R, r1i = R - 5;
     const grad1 = ctx.createRadialGradient(cx, cy, r1i, cx, cy, r1);
-    grad1.addColorStop(0, '#8b6914');
-    grad1.addColorStop(0.5, '#d49a3a');
-    grad1.addColorStop(0.85, '#edc379');
-    grad1.addColorStop(1, '#5a3e10');
+    grad1.addColorStop(0, '#7a5032');
+    grad1.addColorStop(0.2, '#9b6e46');
+    grad1.addColorStop(0.45, '#c89860');
+    grad1.addColorStop(0.7, '#9b6e46');
+    grad1.addColorStop(0.85, '#6b3e20');
+    grad1.addColorStop(1, '#3a1e0e');
     ctx.beginPath();
     ctx.arc(cx, cy, r1, 0, Math.PI * 2);
     ctx.arc(cx, cy, r1i, 0, Math.PI * 2, true);
     ctx.fillStyle = grad1; ctx.fill();
-    _texRing(r1, r1i, 300, 100, 900, 900, 0.10);
+    _texRing(r1, r1i, 300, 100, 900, 900, 0.08);
+    _edgeLine(r1, 0.4); _edgeLine(r1i, 0.25);
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, r1, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(237,195,121,0.6)';
-    ctx.lineWidth = 2; ctx.stroke();
-
-    // ---- 第2层：铆钉环（12颗） ----
-    const r2o = r1i - 2, r2i = r2o - 16;
+    // ---- 第2层：铆钉环（8px，12颗小铆钉） ----
+    const r2o = r1i - 2, r2i = r2o - 8;
     ctx.beginPath();
     ctx.arc(cx, cy, r2o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r2i, 0, Math.PI * 2, true);
     const grad2 = ctx.createRadialGradient(cx, cy, r2i, cx, cy, r2o);
-    grad2.addColorStop(0, '#4a3020'); grad2.addColorStop(1, '#2a1808');
+    grad2.addColorStop(0, '#3a1e0e'); grad2.addColorStop(0.5, '#2a1408'); grad2.addColorStop(1, '#1a0a03');
     ctx.fillStyle = grad2; ctx.fill();
-    _texRing(r2o, r2i, 350, 400, 800, 800, 0.10);
+    _texRing(r2o, r2i, 350, 400, 800, 800, 0.12);
+    _edgeLine(r2o, 0.15);
 
     const rivetCount = 12;
     const rivetR = (r2o + r2i) / 2;
@@ -142,160 +149,195 @@ function drawRoundTable() {
         const rx = cx + Math.cos(angle) * rivetR;
         const ry = cy + Math.sin(angle) * rivetR;
         ctx.beginPath();
-        ctx.arc(rx + 1, ry + 1, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fill();
-        const rivetGrad = ctx.createRadialGradient(rx - 1, ry - 1, 0.5, rx, ry, 3.5);
-        rivetGrad.addColorStop(0, '#edc379');
-        rivetGrad.addColorStop(0.6, '#d49a3a');
-        rivetGrad.addColorStop(1, '#8b6914');
+        ctx.arc(rx + 1, ry + 1, 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
+        const rivetGrad = ctx.createRadialGradient(rx - 0.6, ry - 0.6, 0.3, rx, ry, 2.2);
+        rivetGrad.addColorStop(0, '#e8c898');
+        rivetGrad.addColorStop(0.4, '#c89860');
+        rivetGrad.addColorStop(0.8, '#7a5032');
+        rivetGrad.addColorStop(1, '#3a1e0e');
         ctx.beginPath();
-        ctx.arc(rx, ry, 3.2, 0, Math.PI * 2);
+        ctx.arc(rx, ry, 2.2, 0, Math.PI * 2);
         ctx.fillStyle = rivetGrad; ctx.fill();
     }
 
-    // ---- 第3层：星宿刻度环 ----
-    const r3o = r2i - 2, r3i = r3o - 20;
+    // ---- 第3层：星宿刻度环（12px） ----
+    const r3o = r2i - 2, r3i = r3o - 12;
     ctx.beginPath();
     ctx.arc(cx, cy, r3o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r3i, 0, Math.PI * 2, true);
     const grad3 = ctx.createRadialGradient(cx, cy, r3i, cx, cy, r3o);
-    grad3.addColorStop(0, '#3a2818'); grad3.addColorStop(0.5, '#2a1808'); grad3.addColorStop(1, '#1a0a03');
+    grad3.addColorStop(0, '#2a1408'); grad3.addColorStop(0.4, '#1f0e04'); grad3.addColorStop(0.7, '#1a0a03'); grad3.addColorStop(1, '#0d0400');
     ctx.fillStyle = grad3; ctx.fill();
-    _texRing(r3o, r3i, 400, 700, 700, 700, 0.14);
+    _texRing(r3o, r3i, 400, 700, 700, 700, 0.15);
+    _edgeLine(r3o, 0.18); _edgeLine(r3i, 0.1);
 
     const tickCount = 24;
     for (let i = 0; i < tickCount; i++) {
         const angle = (i / tickCount) * Math.PI * 2 - Math.PI / 2;
         const isMajor = i % 3 === 0;
-        const len = isMajor ? 14 : 6;
-        const outerR = r3o - 3, innerR = outerR - len;
+        const len = isMajor ? 9 : 5;
+        const outerR = r3o - 2, innerR = outerR - len;
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(angle) * outerR, cy + Math.sin(angle) * outerR);
         ctx.lineTo(cx + Math.cos(angle) * innerR, cy + Math.sin(angle) * innerR);
-        ctx.strokeStyle = isMajor ? 'rgba(212,154,58,0.8)' : 'rgba(180,120,50,0.35)';
-        ctx.lineWidth = isMajor ? 1.5 : 0.7;
+        ctx.strokeStyle = isMajor ? 'rgba(200,152,96,0.7)' : 'rgba(155,110,70,0.3)';
+        ctx.lineWidth = isMajor ? 1.2 : 0.5;
         ctx.stroke();
     }
     for (let i = 0; i < 8; i++) {
         const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
-        const dotR = r3o - 19;
+        const dotR = r3o - 11;
         ctx.beginPath();
-        ctx.arc(cx + Math.cos(angle) * dotR, cy + Math.sin(angle) * dotR, 2, 0, Math.PI * 2);
-        ctx.fillStyle = '#edc379'; ctx.fill();
+        ctx.arc(cx + Math.cos(angle) * dotR, cy + Math.sin(angle) * dotR, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#d4a870'; ctx.fill();
     }
 
-    // ---- 第4层：鎏金铭文分隔环 ----
-    const r4o = r3i - 2, r4i = r4o - 6;
+    // ---- 第4层：古铜铭文分隔环（3px） ----
+    const r4o = r3i - 2, r4i = r4o - 3;
     ctx.beginPath();
     ctx.arc(cx, cy, r4o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r4i, 0, Math.PI * 2, true);
     const grad4 = ctx.createRadialGradient(cx, cy, r4i, cx, cy, r4o);
-    grad4.addColorStop(0, '#8b6914'); grad4.addColorStop(0.5, '#d49a3a'); grad4.addColorStop(1, '#5a3e10');
+    grad4.addColorStop(0, '#7a5032'); grad4.addColorStop(0.3, '#c89860'); grad4.addColorStop(0.6, '#9b6e46'); grad4.addColorStop(1, '#4a2a12');
     ctx.fillStyle = grad4; ctx.fill();
-    _texRing(r4o, r4i, 250, 200, 1000, 1000, 0.10);
+    _edgeLine(r4o, 0.3); _edgeLine(r4i, 0.2);
 
-    // ---- 第5层：木纹桌面 ----
-    const r5o = r4i - 1, r5i = r5o - 140;
+    // ---- 第5层：木纹桌面（120px） ----
+    const r5o = r4i - 1, r5i = r5o - 120;
     ctx.beginPath();
     ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
     const grad5 = ctx.createRadialGradient(cx, cy, r5i, cx, cy, r5o);
-    grad5.addColorStop(0, '#2a1808'); grad5.addColorStop(0.5, '#1a0c03'); grad5.addColorStop(1, '#0d0400');
+    grad5.addColorStop(0, '#1f0e04'); grad5.addColorStop(0.5, '#140803'); grad5.addColorStop(1, '#0a0300');
     ctx.fillStyle = grad5; ctx.fill();
-    _texRing(r5o, r5i, 200, 150, 1100, 1100, 0.22);
+    _texRing(r5o, r5i, 200, 150, 1100, 1100, 0.25);
 
-    // 木纹
+    // 木纹同心线
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
     ctx.clip();
-    for (let r = r5i + 4; r < r5o; r += 12 + Math.random() * 5) {
+    for (let r = r5i + 4; r < r5o; r += 8 + Math.random() * 6) {
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(180,140,100,' + (0.02 + Math.random() * 0.04) + ')';
-        ctx.lineWidth = 0.5 + Math.random() * 1;
+        ctx.strokeStyle = 'rgba(160,120,80,' + (0.015 + Math.random() * 0.035) + ')';
+        ctx.lineWidth = 0.4 + Math.random() * 0.7;
         ctx.stroke();
     }
-    for (let i = 0; i < 30; i++) {
-        const angle = (i / 30) * Math.PI * 2 + (Math.random() - 0.5) * 0.1;
-        const sr = r5i + Math.random() * (r5o - r5i) * 0.6;
-        const er = sr + 10 + Math.random() * 30;
+    // 放射状木纹
+    for (let i = 0; i < 24; i++) {
+        const angle = (i / 24) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+        const sr = r5i + Math.random() * (r5o - r5i) * 0.5;
+        const er = sr + 10 + Math.random() * 25;
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(angle) * sr, cy + Math.sin(angle) * sr);
         ctx.lineTo(cx + Math.cos(angle) * Math.min(er, r5o), cy + Math.sin(angle) * Math.min(er, r5o));
-        ctx.strokeStyle = 'rgba(160,120,80,' + (0.02 + Math.random() * 0.03) + ')';
-        ctx.lineWidth = 0.3 + Math.random() * 0.5;
+        ctx.strokeStyle = 'rgba(140,100,60,' + (0.015 + Math.random() * 0.025) + ')';
+        ctx.lineWidth = 0.2 + Math.random() * 0.4;
         ctx.stroke();
     }
     ctx.restore();
 
-    // ---- 第6层：鎏金内框 ----
-    const r6o = r5i, r6i = r6o - 8;
+    // ---- 第6层：古铜内框（4px） ----
+    const r6o = r5i, r6i = r6o - 4;
     ctx.beginPath();
     ctx.arc(cx, cy, r6o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r6i, 0, Math.PI * 2, true);
     const grad6 = ctx.createRadialGradient(cx, cy, r6i, cx, cy, r6o);
-    grad6.addColorStop(0, '#6a4a1a'); grad6.addColorStop(0.4, '#c49a3a');
-    grad6.addColorStop(0.7, '#d49a3a'); grad6.addColorStop(1, '#4a2a08');
+    grad6.addColorStop(0, '#6b3e20'); grad6.addColorStop(0.2, '#9b6e46');
+    grad6.addColorStop(0.5, '#c89860'); grad6.addColorStop(0.8, '#7a5032');
+    grad6.addColorStop(1, '#3a1e0e');
     ctx.fillStyle = grad6; ctx.fill();
-    _texRing(r6o, r6i, 300, 300, 900, 900, 0.10);
+    _edgeLine(r6o, 0.35); _edgeLine(r6i, 0.2);
 
-    // ---- 第7层：青铜罗盘 ----
-    const r7o = r6i - 1, r7i = r7o - 60;
+    // ---- 第7层：青铜罗盘（44px）+ 铜绿氧化斑 ----
+    const r7o = r6i - 1, r7i = r7o - 44;
     ctx.beginPath();
     ctx.arc(cx, cy, r7o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r7i, 0, Math.PI * 2, true);
     const grad7 = ctx.createRadialGradient(cx, cy, r7i, cx, cy, r7o);
-    grad7.addColorStop(0, '#5a4028'); grad7.addColorStop(0.6, '#3a2410'); grad7.addColorStop(1, '#1a0a03');
+    grad7.addColorStop(0, '#4a2a14'); grad7.addColorStop(0.3, '#3a1e0e');
+    grad7.addColorStop(0.6, '#2a1408'); grad7.addColorStop(0.85, '#1a0a03');
+    grad7.addColorStop(1, '#0d0300');
     ctx.fillStyle = grad7; ctx.fill();
-    _texRing(r7o, r7i, 450, 650, 600, 600, 0.16);
+    _texRing(r7o, r7i, 450, 650, 600, 600, 0.18);
+    _edgeLine(r7o, 0.22); _edgeLine(r7i, 0.12);
+
+    // 氧化铜绿斑驳
+    for (let i = 0; i < 18; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = r7i + Math.random() * (r7o - r7i);
+        const px = cx + Math.cos(angle) * dist;
+        const py = cy + Math.sin(angle) * dist;
+        const spotR = 1.5 + Math.random() * 4;
+        const spotGrad = ctx.createRadialGradient(px, py, 0, px, py, spotR);
+        spotGrad.addColorStop(0, 'rgba(70,105,82,' + (0.04 + Math.random() * 0.06) + ')');
+        spotGrad.addColorStop(1, 'rgba(70,105,82,0)');
+        ctx.beginPath();
+        ctx.arc(px, py, spotR, 0, Math.PI * 2);
+        ctx.fillStyle = spotGrad; ctx.fill();
+    }
 
     // 十字方位线
     for (let i = 0; i < 4; i++) {
         const angle = (i / 4) * Math.PI - Math.PI / 2;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(angle) * (r7i + 6), cy + Math.sin(angle) * (r7i + 6));
-        ctx.lineTo(cx + Math.cos(angle) * (r7o - 6), cy + Math.sin(angle) * (r7o - 6));
-        ctx.strokeStyle = 'rgba(212,154,58,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.moveTo(cx + Math.cos(angle) * (r7i + 4), cy + Math.sin(angle) * (r7i + 4));
+        ctx.lineTo(cx + Math.cos(angle) * (r7o - 4), cy + Math.sin(angle) * (r7o - 4));
+        ctx.strokeStyle = 'rgba(200,152,96,0.15)'; ctx.lineWidth = 0.7; ctx.stroke();
     }
 
     // ---- 第8层：魂芯 ----
     const r8 = r7i + 1;
-    const grad8 = ctx.createRadialGradient(cx, cy, r8 - 4, cx, cy, r8);
-    grad8.addColorStop(0, '#8b6914'); grad8.addColorStop(0.5, '#d49a3a'); grad8.addColorStop(1, '#4a2a08');
+    const grad8 = ctx.createRadialGradient(cx, cy, r8 - 3, cx, cy, r8);
+    grad8.addColorStop(0, '#7a5032'); grad8.addColorStop(0.3, '#c89860');
+    grad8.addColorStop(0.7, '#6b3e20'); grad8.addColorStop(1, '#2a1408');
     ctx.beginPath(); ctx.arc(cx, cy, r8, 0, Math.PI * 2);
     ctx.fillStyle = grad8; ctx.fill();
 
-    const rCore = r8 - 4;
-    const gradCore = ctx.createRadialGradient(cx - 2, cy - 2, rCore * 0.1, cx, cy, rCore);
-    gradCore.addColorStop(0, '#8b3a20'); gradCore.addColorStop(0.4, '#4a1810'); gradCore.addColorStop(1, '#1a0402');
+    const rCore = r8 - 3;
+    const gradCore = ctx.createRadialGradient(cx - 1.5, cy - 1.5, rCore * 0.08, cx, cy, rCore);
+    gradCore.addColorStop(0, '#6b2818'); gradCore.addColorStop(0.35, '#3a1210');
+    gradCore.addColorStop(0.7, '#1a0402'); gradCore.addColorStop(1, '#0a0100');
     ctx.beginPath(); ctx.arc(cx, cy, rCore, 0, Math.PI * 2);
     ctx.fillStyle = gradCore; ctx.fill();
-    _texRing(rCore, 0, 500, 1200, 500, 500, 0.14);
+    _texRing(rCore, 0, 500, 1200, 500, 500, 0.16);
 
     // 十字准线
     ctx.beginPath();
-    ctx.moveTo(cx - rCore * 0.7, cy); ctx.lineTo(cx + rCore * 0.7, cy);
-    ctx.moveTo(cx, cy - rCore * 0.7); ctx.lineTo(cx, cy + rCore * 0.7);
-    ctx.strokeStyle = 'rgba(237,195,121,0.45)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.moveTo(cx - rCore * 0.65, cy); ctx.lineTo(cx + rCore * 0.65, cy);
+    ctx.moveTo(cx, cy - rCore * 0.65); ctx.lineTo(cx, cy + rCore * 0.65);
+    ctx.strokeStyle = 'rgba(220,180,130,0.4)'; ctx.lineWidth = 0.7; ctx.stroke();
 
-    // 中心亮点 + 阶段文字
-    const gradCenter = ctx.createRadialGradient(cx, cy, 0, cx, cy, 6);
-    gradCenter.addColorStop(0, '#fff8e0'); gradCenter.addColorStop(0.3, '#edc379');
-    gradCenter.addColorStop(0.6, '#d49a3a'); gradCenter.addColorStop(1, 'transparent');
-    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    // 中心亮点
+    const gradCenter = ctx.createRadialGradient(cx, cy, 0, cx, cy, 5);
+    gradCenter.addColorStop(0, '#fff8e0'); gradCenter.addColorStop(0.25, '#e8d0a0');
+    gradCenter.addColorStop(0.5, '#c89860'); gradCenter.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2);
     ctx.fillStyle = gradCenter; ctx.fill();
+
+    // ---- 全局微噪点：打破CG塑料感 ----
+    for (let i = 0; i < 200; i++) {
+        const nx = Math.random() * _tableSize;
+        const ny = Math.random() * _tableSize;
+        const nd = Math.hypot(nx - cx, ny - cy);
+        if (nd < R) {
+            ctx.fillStyle = 'rgba(0,0,0,' + (0.008 + Math.random() * 0.02) + ')';
+            ctx.fillRect(nx, ny, 1.2, 1.2);
+        }
+    }
 
     // 阶段文字
     const phase = window._tablePhase || '首夜';
     ctx.fillStyle = '#d4b87a';
-    ctx.font = 'bold 16px "Noto Serif SC", "STKaiti", "KaiTi", serif';
+    ctx.font = 'bold 14px "Noto Serif SC", "STKaiti", "KaiTi", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(219,168,81,0.6)';
-    ctx.shadowBlur = 12;
-    ctx.fillText(phase, cx, cy - rCore - 18);
+    ctx.shadowColor = 'rgba(180,140,100,0.5)';
+    ctx.shadowBlur = 10;
+    ctx.fillText(phase, cx, cy - rCore - 16);
     ctx.shadowBlur = 0;
 }
 
@@ -306,7 +348,7 @@ function computeSeatPosition(angle) {
     const canvasDisplaySize = parseFloat(canvas.style.width);
     const cx = canvasDisplaySize / 2;
     const cy = canvasDisplaySize / 2;
-    const seatR = canvasDisplaySize * 0.46 + 28; // 桌面半径 + 座位偏移
+    const seatR = canvasDisplaySize * 0.46 + 22; // 桌面半径 + 座位偏移
     return {
         x: cx + Math.cos(angle) * seatR,
         y: cy + Math.sin(angle) * seatR
