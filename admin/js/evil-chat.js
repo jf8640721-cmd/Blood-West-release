@@ -44,10 +44,10 @@ function switchMsgTab(tabName, silent) {
 function updateEvilTabBadge() {
     const tab = $('#tab-evil');
     if (state.evilUnread && state.msgTab !== 'evil') {
-        tab.textContent = '😈 邪恶群聊 ●';
-        tab.style.color = '#e080f0';
+        tab.textContent = '魔 邪恶群聊 ●';
+        tab.style.color = '#e06050';
     } else {
-        tab.textContent = '😈 邪恶群聊';
+        tab.textContent = '魔 邪恶群聊';
         tab.style.color = '';
     }
 }
@@ -114,7 +114,7 @@ function renderEvilMembers() {
         return;
     }
 
-    bar.innerHTML = '<span class="evil-members-label">😈 邪恶阵营 (' + evilPlayers.length + '人)：</span>' +
+    bar.innerHTML = '<span class="evil-members-label">魔 邪恶阵营 (' + evilPlayers.length + '人)：</span>' +
         evilPlayers.map(p => {
             const displayName = p.nickname || p.player_number + '号';
             const roleObj = getPlayerRoleObj(p);
