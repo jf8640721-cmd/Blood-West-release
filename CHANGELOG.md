@@ -1,5 +1,41 @@
 # 版本日志
 
+## v3.0.22 (2026-06-10)
+
+### 🐛 修复 — 真机背景图 404 + 屏幕顶部未覆盖
+
+- **根因定位**：真机 vConsole 日志显示 `GET images/texture-gold.webp 404 (Not Found)`
+  - 微信小程序真机环境对 WebP 格式图片返回 404，模拟器正常
+  - 全部 3 个 `.webp` 图片转为 `.jpg`（texture-gold、bg-chat、texture-wood）
+  - 4 个 WXML 文件（scan/chat/table/evil-chat）全部 `.webp` → `.jpg` 引用替换
+- **全局 z-index 真机修复**：`.bg-image` / `.bg-overlay` 的 `z-index: -1` 在真机 WebView 中落到 `page` 根元素背景色 `#1a0e06` 后面
+  - 改 `z-index: -1` → `z-index: 0`
+  - 4 页内容组件（top-bar / msg-list / bottom-nav / input-area / table-area 等）全部加 `position: relative; z-index: 1` 确保不被背景遮挡
+- **导航栏隐藏**：扫码页 `navigationStyle: "custom"` 隐藏原生导航栏
+  - `scan.js` 通过 `wx.getMenuButtonBoundingClientRect()` 动态计算安全区顶部距离
+  - 背景图覆盖到状态栏下方，彻底解决顶部未覆盖问题
+
+### 🎨 优化 — 扫码页 UI 重构
+
+- **扫码按钮**：方案C 几何符号风格
+  - 高度 74px → 48px，单行布局
+  - 图标「扫码」→ `◎` Unicode 几何符号
+  - 文字「扫描二维码加入房间 + 提示小字」→ 精简为「扫描二维码」
+  - 去掉金色描边（`border: none`）和外发光（`box-shadow` 仅保留暗色投影）
+  - 背景改为半透古铜 `rgba(180,120,40,0.48) → rgba(130,80,18,0.58)`，鎏金纹理透出
+  - 纹理叠加改用大按钮专用 `.btn-texture-gold-lg`（opacity 0.48）
+  - 加 `overflow: hidden` 确保纹理图被圆角裁切
+- **卡片去黑框**：`.scan-card` 背景→透明，边框→none，阴影→none，让按钮直接浮在鎏金背景上
+- **进入房间按钮**：同步半透古铜风格，去掉金色外发光
+- **输入框**：背景从死黑 `rgba(0,0,0,0.3)` → 暖棕半透 `rgba(20,12,4,0.55)`，加内阴影 + 外辉光
+- **分割线**：提亮，`rgba(180,130,60,0.3)` → `rgba(200,150,70,0.45)`，去掉中间「或 手动输入房间码」文字
+
+### 📝 规范 — CLAUDE.md 新增图片识别规则
+
+- 收到 `[Unsupported Image]` 标记时，必须立即告知用户无法查看图片，请用户用文字描述，禁止猜测后继续操作
+
+---
+
 ## v3.0.21 (2026-06-10)
 
 ### 🎨 增强 — 纹理叠加逼近 blend-mode 效果
