@@ -1,5 +1,27 @@
 # 版本日志
 
+## v3.0.9 (2026-06-10)
+
+### 🐛 修复 Canvas 负半径崩溃 + 🎨 工具栏透明度统一
+
+**Canvas 圆桌 — 环宽等比缩放：**
+- `_tableSize=420` 时硬编码环宽总和（204px）超过桌面半径（193px），导致 `r7i=-10.8` → `arc()` 崩溃
+- 新增 `_ringScale = _tableSize / 620` 缩放系数，所有 7 层环宽 + 间距等比缩放
+- 原始设计基于 `_tableSize=620`，缩小画布时环宽自动适配，确保内环半径始终 > 0
+- 座位偏移 `22px` 同步缩放：`22 * _ringScale`
+- 刻度、星位点、魂芯尺寸随环缩放
+- 添加注释标注环宽与圆桌尺寸的关联关系
+
+**🎨 玻璃面板底色统一：**
+- 工具栏区域透明度底色统一为 `rgba(30,10,8,...)` 基准（此前多个元素混用不同 RGB 底色）
+- 修复元素：`.room-info`、`.player-item`、`.player-item:hover/active`、`.queue-header`、`.queue-row`
+- 版型配置面板统一：`.board-cat-header`、`.board-role-tag`、`.board-empty-slot`
+- 消息面板统一：`.reply-area`、`.btn-quick-reply`、`.msg-tab`、`.btn-count-stepper`
+- 历史面板统一：`.history-phase-group`、`.history-phase-header`、`.history-action-row`
+- 弹窗、队列、角色选择器等 20+ 玻璃元素统一底色
+
+- 版本号 v3.0.8 → v3.0.9
+
 ## v3.0.8 (2026-06-10)
 
 ### 🎨 圆桌进一步缩小 + 玻璃面板透明度再加强

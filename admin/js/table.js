@@ -9,7 +9,13 @@ let _tableCtx = null;
 let _tableCanvas = null;
 let _tableTexImg = null;
 let _tableTexLoaded = false;
+// 圆桌逻辑画布尺寸（CSS像素）
+// ⚠️ 缩小此值时环宽会自动等比缩放（原始设计基于620）
+//  座位位置 computeSeatPosition() 通过 canvasDisplaySize*0.46 与圆桌半径关联
 let _tableSize = 420;
+// 环宽缩放系数 — 基于原始设计尺寸 620
+// 所有7层环的宽度和间距乘以此系数，确保缩小画布时内环半径不为负
+let _ringScale = _tableSize / 620;
 let _tableDPR = Math.min(window.devicePixelRatio || 1, 2);
 let _tableCx = 0, _tableCy = 0, _tableR = 0;
 
@@ -105,6 +111,33 @@ function drawRoundTable() {
     const R = _tableSize * 0.46;
     _tableCx = cx; _tableCy = cy; _tableR = R;
 
+    // ---- 环宽缩放：原始设计基于 _tableSize=620，等比缩放确保内环半径 > 0 ----
+    // 重新计算 _ringScale（支持运行时动态调整 _tableSize）
+    _ringScale = _tableSize / 620;
+    const s = _ringScale;
+    // 各环宽度 + 间距（缩放到当前画布尺寸，至少保留1px避免消失）
+    const w1 = Math.max(2, Math.round(5 * s));   // 古铜外框
+    const g1 = Math.max(1, Math.round(2 * s));    // 环1→环2间距
+    const w2 = Math.max(3, Math.round(8 * s));   // 铆钉环
+    const g2 = Math.max(1, Math.round(2 * s));    // 环2→环3间距
+    const w3 = Math.max(4, Math.round(12 * s));  // 星宿刻度环
+    const g3 = Math.max(1, Math.round(2 * s));    // 环3→环4间距
+    const w4 = Math.max(1, Math.round(3 * s));   // 铭文分隔环
+    const g4 = Math.max(1, Math.round(1 * s));    // 环4→环5间距
+    const w5 = Math.max(30, Math.round(120 * s)); // 木纹桌面
+    const w6 = Math.max(1, Math.round(4 * s));   // 古铜内框
+    const g6 = Math.max(1, Math.round(1 * s));    // 环6→环7间距
+    const w7 = Math.max(12, Math.round(44 * s)); // 青铜罗盘
+
+    // 环边界半径（由外向内逐层计算）
+    const r1 = R,          r1i = r1 - w1;
+    const r2o = r1i - g1,  r2i = r2o - w2;
+    const r3o = r2i - g2,  r3i = r3o - w3;
+    const r4o = r3i - g3,  r4i = r4o - w4;
+    const r5o = r4i - g4,  r5i = r5o - w5;
+    const r6o = r5i,       r6i = r6o - w6;
+    const r7o = r6i - g6,  r7i = r7o - w7;
+
     ctx.clearRect(0, 0, _tableSize, _tableSize);
 
     // ---- 辅助：绘制金属环边缘高光线 ----
@@ -115,8 +148,7 @@ function drawRoundTable() {
         ctx.lineWidth = 0.6; ctx.stroke();
     }
 
-    // ---- 第1层：古铜外框（5px） ----
-    const r1 = R, r1i = R - 5;
+    // ---- 第1层：古铜外框（环宽缩放后约 w1 px） ----
     const grad1 = ctx.createRadialGradient(cx, cy, r1i, cx, cy, r1);
     grad1.addColorStop(0, '#7a5032');
     grad1.addColorStop(0.2, '#9b6e46');
@@ -131,8 +163,8 @@ function drawRoundTable() {
     _texRing(r1, r1i, 300, 100, 900, 900, 0.08);
     _edgeLine(r1, 0.4); _edgeLine(r1i, 0.25);
 
-    // ---- 第2层：铆钉环（8px，12颗小铆钉） ----
-    const r2o = r1i - 2, r2i = r2o - 8;
+    // ---- 第2层：铆钉环（12颗小铆钉） ----
+    // 环半径 r2o/r2i 已在预计算块中定义
     ctx.beginPath();
     ctx.arc(cx, cy, r2o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r2i, 0, Math.PI * 2, true);
@@ -161,8 +193,8 @@ function drawRoundTable() {
         ctx.fillStyle = rivetGrad; ctx.fill();
     }
 
-    // ---- 第3层：星宿刻度环（12px） ----
-    const r3o = r2i - 2, r3i = r3o - 12;
+    // ---- 第3层：星宿刻度环 ----
+    // 环半径 r3o/r3i 已在预计算块中定义
     ctx.beginPath();
     ctx.arc(cx, cy, r3o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r3i, 0, Math.PI * 2, true);
@@ -173,11 +205,12 @@ function drawRoundTable() {
     _edgeLine(r3o, 0.18); _edgeLine(r3i, 0.1);
 
     const tickCount = 24;
+    const tickOff = Math.round(2 * s);  // 刻度距环外缘偏移
     for (let i = 0; i < tickCount; i++) {
         const angle = (i / tickCount) * Math.PI * 2 - Math.PI / 2;
         const isMajor = i % 3 === 0;
-        const len = isMajor ? 9 : 5;
-        const outerR = r3o - 2, innerR = outerR - len;
+        const len = Math.round((isMajor ? 9 : 5) * s);
+        const outerR = r3o - tickOff, innerR = outerR - len;
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(angle) * outerR, cy + Math.sin(angle) * outerR);
         ctx.lineTo(cx + Math.cos(angle) * innerR, cy + Math.sin(angle) * innerR);
@@ -187,14 +220,14 @@ function drawRoundTable() {
     }
     for (let i = 0; i < 8; i++) {
         const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
-        const dotR = r3o - 11;
+        const dotR = r3o - Math.round(11 * s);
         ctx.beginPath();
         ctx.arc(cx + Math.cos(angle) * dotR, cy + Math.sin(angle) * dotR, 1.5, 0, Math.PI * 2);
         ctx.fillStyle = '#d4a870'; ctx.fill();
     }
 
-    // ---- 第4层：古铜铭文分隔环（3px） ----
-    const r4o = r3i - 2, r4i = r4o - 3;
+    // ---- 第4层：古铜铭文分隔环 ----
+    // 环半径 r4o/r4i 已在预计算块中定义
     ctx.beginPath();
     ctx.arc(cx, cy, r4o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r4i, 0, Math.PI * 2, true);
@@ -203,8 +236,8 @@ function drawRoundTable() {
     ctx.fillStyle = grad4; ctx.fill();
     _edgeLine(r4o, 0.3); _edgeLine(r4i, 0.2);
 
-    // ---- 第5层：木纹桌面（120px） ----
-    const r5o = r4i - 1, r5i = r5o - 120;
+    // ---- 第5层：木纹桌面 ----
+    // 环半径 r5o/r5i 已在预计算块中定义
     ctx.beginPath();
     ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
@@ -219,7 +252,7 @@ function drawRoundTable() {
     ctx.arc(cx, cy, r5o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r5i, 0, Math.PI * 2, true);
     ctx.clip();
-    for (let r = r5i + 4; r < r5o; r += 8 + Math.random() * 6) {
+    for (let r = r5i + Math.round(4 * s); r < r5o; r += Math.round(8 * s) + Math.random() * Math.round(6 * s)) {
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(160,120,80,' + (0.015 + Math.random() * 0.035) + ')';
@@ -240,8 +273,8 @@ function drawRoundTable() {
     }
     ctx.restore();
 
-    // ---- 第6层：古铜内框（4px） ----
-    const r6o = r5i, r6i = r6o - 4;
+    // ---- 第6层：古铜内框 ----
+    // 环半径 r6o/r6i 已在预计算块中定义
     ctx.beginPath();
     ctx.arc(cx, cy, r6o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r6i, 0, Math.PI * 2, true);
@@ -252,8 +285,8 @@ function drawRoundTable() {
     ctx.fillStyle = grad6; ctx.fill();
     _edgeLine(r6o, 0.35); _edgeLine(r6i, 0.2);
 
-    // ---- 第7层：青铜罗盘（44px）+ 铜绿氧化斑 ----
-    const r7o = r6i - 1, r7i = r7o - 44;
+    // ---- 第7层：青铜罗盘 + 铜绿氧化斑 ----
+    // 环半径 r7o/r7i 已在预计算块中定义
     ctx.beginPath();
     ctx.arc(cx, cy, r7o, 0, Math.PI * 2);
     ctx.arc(cx, cy, r7i, 0, Math.PI * 2, true);
@@ -280,24 +313,24 @@ function drawRoundTable() {
         ctx.fillStyle = spotGrad; ctx.fill();
     }
 
-    // 十字方位线
+    // 十字方位线（偏移量缩放）
+    const crossOff = Math.round(4 * s);
     for (let i = 0; i < 4; i++) {
         const angle = (i / 4) * Math.PI - Math.PI / 2;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(angle) * (r7i + 4), cy + Math.sin(angle) * (r7i + 4));
-        ctx.lineTo(cx + Math.cos(angle) * (r7o - 4), cy + Math.sin(angle) * (r7o - 4));
+        ctx.moveTo(cx + Math.cos(angle) * (r7i + crossOff), cy + Math.sin(angle) * (r7i + crossOff));
+        ctx.lineTo(cx + Math.cos(angle) * (r7o - crossOff), cy + Math.sin(angle) * (r7o - crossOff));
         ctx.strokeStyle = 'rgba(200,152,96,0.15)'; ctx.lineWidth = 0.7; ctx.stroke();
     }
 
-    // ---- 第8层：魂芯 ----
-    const r8 = r7i + 1;
-    const grad8 = ctx.createRadialGradient(cx, cy, r8 - 3, cx, cy, r8);
+    // ---- 第8层：魂芯（尺寸随环缩放） ----
+    const r8 = r7i + Math.max(1, Math.round(1 * s));
+    const rCore = r8 - Math.round(3 * s);  // 魂芯内圆半径
+    const grad8 = ctx.createRadialGradient(cx, cy, rCore, cx, cy, r8);
     grad8.addColorStop(0, '#7a5032'); grad8.addColorStop(0.3, '#c89860');
     grad8.addColorStop(0.7, '#6b3e20'); grad8.addColorStop(1, '#2a1408');
     ctx.beginPath(); ctx.arc(cx, cy, r8, 0, Math.PI * 2);
     ctx.fillStyle = grad8; ctx.fill();
-
-    const rCore = r8 - 3;
     const gradCore = ctx.createRadialGradient(cx - 1.5, cy - 1.5, rCore * 0.08, cx, cy, rCore);
     gradCore.addColorStop(0, '#6b2818'); gradCore.addColorStop(0.35, '#3a1210');
     gradCore.addColorStop(0.7, '#1a0402'); gradCore.addColorStop(1, '#0a0100');
@@ -311,11 +344,12 @@ function drawRoundTable() {
     ctx.moveTo(cx, cy - rCore * 0.65); ctx.lineTo(cx, cy + rCore * 0.65);
     ctx.strokeStyle = 'rgba(220,180,130,0.4)'; ctx.lineWidth = 0.7; ctx.stroke();
 
-    // 中心亮点
-    const gradCenter = ctx.createRadialGradient(cx, cy, 0, cx, cy, 5);
+    // 中心亮点（半径随环缩放）
+    const dotR = Math.max(2, Math.round(5 * s));
+    const gradCenter = ctx.createRadialGradient(cx, cy, 0, cx, cy, dotR);
     gradCenter.addColorStop(0, '#fff8e0'); gradCenter.addColorStop(0.25, '#e8d0a0');
     gradCenter.addColorStop(0.5, '#c89860'); gradCenter.addColorStop(1, 'transparent');
-    ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
     ctx.fillStyle = gradCenter; ctx.fill();
 
     // ---- 全局微噪点：打破CG塑料感 ----
@@ -348,7 +382,9 @@ function computeSeatPosition(angle) {
     const canvasDisplaySize = parseFloat(canvas.style.width);
     const cx = canvasDisplaySize / 2;
     const cy = canvasDisplaySize / 2;
-    const seatR = canvasDisplaySize * 0.46 + 22; // 桌面半径 + 座位偏移
+    // 座位半径 = 桌面半径(0.46) + 环外偏移(22*缩放系数)
+    // 偏移量随 _tableSize 等比缩放，确保座位始终在环外合适位置
+    const seatR = canvasDisplaySize * 0.46 + 22 * _ringScale;
     return {
         x: cx + Math.cos(angle) * seatR,
         y: cy + Math.sin(angle) * seatR
