@@ -10,12 +10,12 @@ let _tableCanvas = null;
 let _tableTexImg = null;
 let _tableTexLoaded = false;
 // 圆桌逻辑画布尺寸（CSS像素）
-// ⚠️ 缩小此值时环宽会自动等比缩放（原始设计基于620）
+// ⚠️ 缩小此值时环宽会自动等比缩放（参考基准 _tableSize=500，即 v3.0.6 视觉比例）
 //  座位位置 computeSeatPosition() 通过 canvasDisplaySize*0.46 与圆桌半径关联
 let _tableSize = 420;
-// 环宽缩放系数 — 基于原始设计尺寸 620
-// 所有7层环的宽度和间距乘以此系数，确保缩小画布时内环半径不为负
-let _ringScale = _tableSize / 620;
+// 环宽缩放系数 — 基于 v3.0.6 视觉基准 500（500时 s=1.0，环宽不变）
+// 所有7层环的宽度和间距乘以此系数，确保缩小画布时内环半径不为负且比例一致
+let _ringScale = _tableSize / 500;
 let _tableDPR = Math.min(window.devicePixelRatio || 1, 2);
 let _tableCx = 0, _tableCy = 0, _tableR = 0;
 
@@ -111,9 +111,9 @@ function drawRoundTable() {
     const R = _tableSize * 0.46;
     _tableCx = cx; _tableCy = cy; _tableR = R;
 
-    // ---- 环宽缩放：原始设计基于 _tableSize=620，等比缩放确保内环半径 > 0 ----
+    // ---- 环宽缩放：基于 v3.0.6 视觉基准 500，等比缩放保持内部比例一致 ----
     // 重新计算 _ringScale（支持运行时动态调整 _tableSize）
-    _ringScale = _tableSize / 620;
+    _ringScale = _tableSize / 500;
     const s = _ringScale;
     // 各环宽度 + 间距（缩放到当前画布尺寸，至少保留1px避免消失）
     const w1 = Math.max(2, Math.round(5 * s));   // 古铜外框
@@ -371,7 +371,7 @@ function drawRoundTable() {
     ctx.textBaseline = 'middle';
     ctx.shadowColor = 'rgba(180,140,100,0.5)';
     ctx.shadowBlur = 10;
-    ctx.fillText(phase, cx, cy - rCore - 16);
+    ctx.fillText(phase, cx, cy - rCore - Math.round(16 * s));
     ctx.shadowBlur = 0;
 }
 
