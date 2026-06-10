@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>纹理叠加预览 — 多方案对比</title>
+<style>
+  :root {
+    --bg-deepest:    #1a0e06;
+    --gold-primary:  #d49a3a;
+    --border-gold:   #8b6914;
+    --border-gilt:   #d49a3a;
+    --radius-md:     8px;
+    --font-display:  'STKaiti', 'KaiTi', 'Noto Serif SC', serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #0d0d0d;
+    color: #ccc;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    padding: 20px 24px;
+  }
+
+  h1 {
+    text-align: center;
+    color: var(--gold-primary);
+    font-family: var(--font-display);
+    letter-spacing: 6px;
+    font-size: 26px;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8a7a65;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* ── 全局控制条 ── */
+  .control-bar {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+    background: #1a1a1a; border: 1px solid #333; border-radius: 10px;
+    padding: 12px 20px; margin-bottom: 24px; max-width: 800px; margin-left: auto; margin-right: auto;
+    flex-wrap: wrap;
+  }
+  .control-bar label { font-size: 13px; color: #aaa; }
+  .control-bar input[type="range"] { width: 120px; accent-color: var(--gold-primary); }
+  .control-bar .val { color: var(--gold-primary); font-weight: bold; min-width: 32px; display: inline-block; }
+
+  /* ── 对比网格 ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    max-width: 1300px;
+    margin: 0 auto 30px;
+  }
+
+  .col-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .col-card h2 {
+    text-align: center; font-size: 12px; color: #888; letter-spacing: 1px;
+    padding: 10px; background: #111; border-bottom: 1px solid #222;
+  }
+  .col-card h2 span { color: var(--gold-primary); }
+
+  .preview-bg {
+    background: var(--bg-deepest);
+    padding: 16px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+    min-height: 500px;
+  }
+
+  /* ── 组件样式 ── */
+  .gold-btn {
+    position: relative; z-index: 0;
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+    color: #fff5e0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+
+  /* 小程序方案 — img 标签叠加 */
+  .tx-img {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; pointer-events: none; border-radius: inherit; object-fit: cover;
+  }
+
+  /* 浏览器方案 — CSS background-image + blend-mode */
+  .tx-css {
+    /* 渐变底色 + 纹理图叠加，用 background-blend-mode */
+  }
+  .tx-css.overlay  { background-blend-mode: overlay; }
+  .tx-css.multiply { background-blend-mode: multiply; }
+  .tx-css.soft     { background-blend-mode: soft-light; }
+
+  /* ── 各组件 ── */
+  .phase-badge {
+    position: relative; z-index: 0;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 14px;
+    font-size: 12px; font-weight: bold;
+  }
+  .phase-badge.day {
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    border: 1px solid #d4a020; color: #fff5e0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .phase-badge.night {
+    background: linear-gradient(180deg, #8b2a2a, #5a1010);
+    border: 1px solid #8b1a1a; color: #f0c0c0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .room-badge {
+    position: relative; z-index: 0;
+    padding: 4px 10px; display: inline-flex;
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .room-code-text { font-size: 12px; color: #fff5e0; font-family: 'Courier New', monospace; letter-spacing: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+  .player-badge {
+    position: relative; z-index: 0;
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 4px 10px;
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .player-num-text { font-size: 12px; color: #fff5e0; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.7); }
+
+  .nav-btn {
+    position: relative; z-index: 0;
+    padding: 5px 18px; display: inline-flex;
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .nav-btn span { font-size: 12px; color: #fff5e0; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+  .send-btn {
+    position: relative; z-index: 0;
+    width: 56px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    color: #fff5e0; border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+    font-size: 13px; font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .scan-btn {
+    position: relative; z-index: 0;
+    width: 100%; height: 64px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: linear-gradient(180deg, #b8781e, #8a5810);
+    border: 1px solid var(--border-gold); border-radius: var(--radius-md);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .mirror-ring {
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 0; flex-shrink: 0;
+  }
+  .ring-1 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle at 40% 40%, #f0d080, #d4a040 25%, #b87828 50%, #8b5a1a 70%, #5a3010 100%);
+    box-shadow: 0 0 30px rgba(240,200,100,0.45), 0 0 60px rgba(220,160,60,0.3);
+  }
+  .ring-4 {
+    width: 140px; height: 140px;
+    background: rgba(42,24,8,0.45);
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.45), 0 0 0 2px rgba(180,120,60,0.55);
+  }
+
+  .comp-label {
+    font-size: 10px; color: #555; letter-spacing: 1px; margin-bottom: 2px;
+  }
+  hr { border: none; border-top: 1px solid #222; margin: 4px 0; }
+
+  /* 方案4 - CSS blend 版 */
+  .blend-overlay {
+    background-image: url('../miniprogram/images/texture-gold.webp');
+    background-size: cover;
+    background-blend-mode: overlay;
+  }
+  .blend-soft {
+    background-image: url('../miniprogram/images/texture-gold.webp');
+    background-size: cover;
+    background-blend-mode: soft-light;
+  }
+
+  /* ── Z-Index 层级参考 ── */
+  .zscale {
+    background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
+    padding: 16px; max-width: 800px; margin: 0 auto 24px;
+    font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.8;
+  }
+  .zscale h3 { color: var(--gold-primary); font-family: var(--font-display); letter-spacing: 3px; margin-bottom: 8px; font-size: 14px; }
+  .zscale .lv { color: #888; }
+  .zscale .lv1 { color: #b8781e; }
+  .zscale .lv2 { color: #d49a3a; }
+  .zscale .lv3 { color: #edc379; }
+  .zscale .lv4 { color: #fff5e0; }
+
+  /* 快速跳转 */
+  .quick-nav {
+    text-align: center; margin-bottom: 16px;
+  }
+  .quick-nav a { color: var(--gold-primary); margin: 0 10px; font-size: 12px; text-decoration: none; }
+  .quick-nav a:hover { text-decoration: underline; }
+
+  /* 提示 */
+  .note {
+    background: #1a1a0a; border-left: 3px solid var(--gold-primary); border-radius: 4px;
+    padding: 10px 14px; margin: 16px auto; max-width: 800px; font-size: 12px; color: #aaa; line-height: 1.6;
+  }
+  .note strong { color: var(--gold-primary); }
+</style>
+</head>
+<body>
+
+<h1>纹理叠加 · 四方案对比</h1>
+<p class="subtitle">血染钟楼·西游纪 — 小程序鎏金按钮纹理预览 &nbsp;|&nbsp; v3.0.19</p>
+
+<!-- Z-Index 层级体系 -->
+<div class="zscale">
+  <h3>📐 小程序 Z-Index 层级体系（建议）</h3>
+  <span class="lv">-1</span>  <span class="lv1">背景图层 bg-image / 纹理叠加层 texture</span><br>
+  <span class="lv">0</span>   <span class="lv2">页面容器 page / 组件父级（创建层叠上下文）</span><br>
+  <span class="lv">1-5</span> <span class="lv3">圆桌环层 ring-1~5 / 座位 seats-container</span><br>
+  <span class="lv">10</span>  <span class="lv4">遮罩层 loading-mask</span><br>
+  <span class="lv">20</span>  <span class="lv4">弹窗层 nickname-mask / 弹窗 dialog</span>
+</div>
+
+<!-- 全局控制 -->
+<div class="control-bar">
+  <label>纹理透明度：<span class="val" id="opVal">0.60</span></label>
+  <input type="range" id="opSlider" min="0.10" max="0.80" step="0.01" value="0.60" oninput="updateOpacity(this.value)">
+  <span style="color:#555;">|</span>
+  <label>方案2（小程序当前）opacity=<span class="val" id="col2Val">0.60</span></label>
+</div>
+
+<!-- 四列对比 -->
+<div class="compare-grid">
+
+  <!-- ═══ 方案1：纯渐变 ═══ -->
+  <div class="col-card">
+    <h2>① 纯渐变（无纹理）— 基准</h2>
+    <div class="preview-bg">
+
+      <div class="comp-label">phase-badge (day/night)</div>
+      <div><span class="phase-badge day">☀️ 白天</span>&nbsp;<span class="phase-badge night">🌙 黑夜</span></div>
+      <hr>
+
+      <div class="comp-label">room-badge</div>
+      <div class="room-badge"><span class="room-code-text">A3F9K2</span></div>
+      <hr>
+
+      <div class="comp-label">player-badge</div>
+      <div class="player-badge"><span class="player-num-text">1 Lester</span><span style="font-size:9px;color:rgba(255,245,224,0.7);margin-left:4px;">✎</span></div>
+      <hr>
+
+      <div class="comp-label">nav-btn</div>
+      <div class="nav-btn"><span>桌 圆桌</span></div>
+      <hr>
+
+      <div class="comp-label">send-btn</div>
+      <div class="send-btn">发送</div>
+      <hr>
+
+      <div class="comp-label">scan-btn</div>
+      <div class="scan-btn"><span style="font-size:24px;">扫码</span><span style="font-size:12px;color:#fff5e0;font-weight:bold;">扫描二维码加入房间</span></div>
+      <hr>
+
+      <div class="comp-label">铜镜环 (ring-1 + ring-4)</div>
+      <div style="display:flex;justify-content:center;">
+        <div class="mirror-ring ring-1"><div class="mirror-ring ring-4"><span style="font-size:13px;color:#f0d890;font-weight:bold;">白天</span></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 方案2：小程序当前（img overlay, opacity 0.18） ═══ -->
+  <div class="col-card" id="col2">
+    <h2>② <span>小程序方案</span> — img叠加 opacity:<span class="val" id="col2Live">0.18</span></h2>
+    <div class="preview-bg">
+
+      <div class="comp-label">phase-badge (day/night)</div>
+      <div><span class="phase-badge day"><img class="tx-img col2-op" src="../miniprogram/images/texture-gold.webp">☀️ 白天</span>&nbsp;<span class="phase-badge night">🌙 黑夜</span></div>
+      <hr>
+
+      <div class="comp-label">room-badge</div>
+      <div class="room-badge"><img class="tx-img col2-op" src="../miniprogram/images/texture-gold.webp"><span class="room-code-text">A3F9K2</span></div>
+      <hr>
+
+      <div class="comp-label">player-badge</div>
+      <div class="player-badge"><img class="tx-img col2-op" src="../miniprogram/images/texture-gold.webp"><span class="player-num-text">1 Lester</span><span style="font-size:9px;color:rgba(255,245,224,0.7);margin-left:4px;">✎</span></div>
+      <hr>
+
+      <div class="comp-label">nav-btn</div>
+      <div class="nav-btn"><img class="tx-img col2-op" src="../miniprogram/images/texture-gold.webp"><span>桌 圆桌</span></div>
+      <hr>
+
+      <div class="comp-label">send-btn</div>
+      <div class="send-btn"><img class="tx-img col2-op" src="../miniprogram/images/texture-gold.webp">发送</div>
+      <hr>
+
+      <div class="comp-label">scan-btn</div>
+      <div class="scan-btn"><img class="tx-img col2-op" src="../miniprogram/images/texture-gold.webp"><span style="font-size:24px;">扫码</span><span style="font-size:12px;color:#fff5e0;font-weight:bold;">扫描二维码加入房间</span></div>
+      <hr>
+
+      <div class="comp-label">铜镜环 (wood texture)</div>
+      <div style="display:flex;justify-content:center;">
+        <div class="mirror-ring ring-1"><img class="tx-img" style="opacity:0.25;" src="../miniprogram/images/texture-wood.webp"><div class="mirror-ring ring-4"><img class="tx-img" style="opacity:0.25;" src="../miniprogram/images/texture-wood.webp"><span style="font-size:13px;color:#f0d890;font-weight:bold;">白天</span></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 方案3：增强版（img overlay, opacity 0.35） ═══ -->
+  <div class="col-card">
+    <h2>③ 增强叠加 — img叠加 <span>opacity:0.35</span></h2>
+    <div class="preview-bg">
+
+      <div class="comp-label">phase-badge (day/night)</div>
+      <div><span class="phase-badge day"><img class="tx-img" style="opacity:0.35;" src="../miniprogram/images/texture-gold.webp">☀️ 白天</span>&nbsp;<span class="phase-badge night">🌙 黑夜</span></div>
+      <hr>
+
+      <div class="comp-label">room-badge</div>
+      <div class="room-badge"><img class="tx-img" style="opacity:0.35;" src="../miniprogram/images/texture-gold.webp"><span class="room-code-text">A3F9K2</span></div>
+      <hr>
+
+      <div class="comp-label">player-badge</div>
+      <div class="player-badge"><img class="tx-img" style="opacity:0.35;" src="../miniprogram/images/texture-gold.webp"><span class="player-num-text">1 Lester</span><span style="font-size:9px;color:rgba(255,245,224,0.7);margin-left:4px;">✎</span></div>
+      <hr>
+
+      <div class="comp-label">nav-btn</div>
+      <div class="nav-btn"><img class="tx-img" style="opacity:0.35;" src="../miniprogram/images/texture-gold.webp"><span>桌 圆桌</span></div>
+      <hr>
+
+      <div class="comp-label">send-btn</div>
+      <div class="send-btn"><img class="tx-img" style="opacity:0.35;" src="../miniprogram/images/texture-gold.webp">发送</div>
+      <hr>
+
+      <div class="comp-label">scan-btn</div>
+      <div class="scan-btn"><img class="tx-img" style="opacity:0.35;" src="../miniprogram/images/texture-gold.webp"><span style="font-size:24px;">扫码</span><span style="font-size:12px;color:#fff5e0;font-weight:bold;">扫描二维码加入房间</span></div>
+      <hr>
+
+      <div class="comp-label">铜镜环 (wood texture, op:0.40)</div>
+      <div style="display:flex;justify-content:center;">
+        <div class="mirror-ring ring-1"><img class="tx-img" style="opacity:0.40;" src="../miniprogram/images/texture-wood.webp"><div class="mirror-ring ring-4"><img class="tx-img" style="opacity:0.40;" src="../miniprogram/images/texture-wood.webp"><span style="font-size:13px;color:#f0d890;font-weight:bold;">白天</span></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 方案4：CSS blend-mode（浏览器理想态） ═══ -->
+  <div class="col-card">
+    <h2>④ <span>CSS blend-mode</span> — 浏览器理想态</h2>
+    <div class="preview-bg">
+
+      <div class="comp-label">phase-badge (overlay blend)</div>
+      <div><span class="phase-badge day blend-overlay">☀️ 白天</span>&nbsp;<span class="phase-badge night">🌙 黑夜</span></div>
+      <hr>
+
+      <div class="comp-label">room-badge (overlay blend)</div>
+      <div class="room-badge blend-overlay"><span class="room-code-text">A3F9K2</span></div>
+      <hr>
+
+      <div class="comp-label">player-badge (soft-light blend)</div>
+      <div class="player-badge blend-soft"><span class="player-num-text">1 Lester</span><span style="font-size:9px;color:rgba(255,245,224,0.7);margin-left:4px;">✎</span></div>
+      <hr>
+
+      <div class="comp-label">nav-btn (overlay blend)</div>
+      <div class="nav-btn blend-overlay"><span>桌 圆桌</span></div>
+      <hr>
+
+      <div class="comp-label">send-btn (overlay blend)</div>
+      <div class="send-btn blend-overlay">发送</div>
+      <hr>
+
+      <div class="comp-label">scan-btn (overlay blend)</div>
+      <div class="scan-btn blend-overlay"><span style="font-size:24px;">扫码</span><span style="font-size:12px;color:#fff5e0;font-weight:bold;">扫描二维码加入房间</span></div>
+      <hr>
+
+      <div class="comp-label">铜镜环 (CSS bg blend)</div>
+      <div style="display:flex;justify-content:center;">
+        <div class="mirror-ring ring-1" style="background-image:url('../miniprogram/images/texture-wood.webp');background-size:cover;background-blend-mode:overlay;"><div class="mirror-ring ring-4" style="background-image:url('../miniprogram/images/texture-wood.webp');background-size:cover;background-blend-mode:overlay;"><span style="font-size:13px;color:#f0d890;font-weight:bold;">白天</span></div></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- 结论提示 -->
+<div class="note">
+  <strong>💡 当前状态（v3.0.20）：</strong><br>
+  ② <strong>小程序方案 opacity 0.60</strong>：纹理清晰可见，金色基调保持 — <strong>✅ 已应用</strong><br>
+  ③ <strong>增强叠加 opacity 0.35</strong>：保留作为 v3.0.19 的旧值对比参照<br>
+  ④ <strong>CSS blend-mode (overlay/soft-light)</strong>：最佳视觉效果 — 小程序不支持 background-blend-mode<br><br>
+  <strong>向理想态逼近路线：</strong><br>
+  ✅ Phase 1 — opacity 0.18→0.60（已完成）<br>
+  ⬜ Phase 2 — 对不同组件尝试差异化 opacity（大按钮 0.50、小徽章 0.70）<br>
+  ⬜ Phase 3 — 用图片处理工具给 texture-gold.webp 加对比度/暗角，模拟 multiply 效果<br>
+</div>
+
+<script>
+  function updateOpacity(v) {
+    document.getElementById('opVal').textContent = parseFloat(v).toFixed(2);
+    document.getElementById('col2Val').textContent = parseFloat(v).toFixed(2);
+    document.getElementById('col2Live').textContent = parseFloat(v).toFixed(2);
+    document.querySelectorAll('.col2-op').forEach(el => { el.style.opacity = v; });
+  }
+</script>
+
+</body>
+</html>
