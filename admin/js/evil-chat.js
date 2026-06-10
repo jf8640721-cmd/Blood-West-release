@@ -44,10 +44,10 @@ function switchMsgTab(tabName, silent) {
 function updateEvilTabBadge() {
     const tab = $('#tab-evil');
     if (state.evilUnread && state.msgTab !== 'evil') {
-        tab.textContent = '魔 邪恶群聊 ●';
+        tab.textContent = '邪恶群聊 ●';
         tab.style.color = '#e06050';
     } else {
-        tab.textContent = '魔 邪恶群聊';
+        tab.textContent = '邪恶群聊';
         tab.style.color = '';
     }
 }
@@ -61,38 +61,8 @@ function switchToEvilTab() {
     updateEvilToolbarButton();
 }
 
-// 根据邪恶玩家数量更新工具栏恶魔按钮的显示/隐藏和样式
-function updateEvilToolbarButton() {
-    const btn = $('#btn-evil-toolbar');
-    if (!state.room) {
-        btn.style.display = 'none';
-        return;
-    }
-    const evilCount = getEvilPlayers().length;
-    if (evilCount > 0) {
-        btn.style.display = 'inline-block';
-        // 当前在邪恶 Tab 时按钮高亮
-        if (state.msgTab === 'evil') {
-            btn.style.borderColor = '#ff5070';
-            btn.style.boxShadow = '0 0 18px rgba(240, 60, 80, 0.6), 0 0 36px rgba(160, 30, 60, 0.3)';
-            btn.style.color = '#ff5060';
-            btn.style.animation = 'none';
-        } else if (state.evilUnread) {
-            // 有未读消息：更强烈的闪烁
-            btn.style.borderColor = '#ff4060';
-            btn.style.boxShadow = '0 0 16px rgba(255, 60, 80, 0.7), 0 0 32px rgba(192, 40, 60, 0.4)';
-            btn.style.color = '#ff4060';
-            btn.style.animation = 'demon-pulse-unread 1.2s ease-in-out infinite';
-        } else {
-            btn.style.borderColor = '#5a2080';
-            btn.style.boxShadow = '';
-            btn.style.color = '#e04060';
-            btn.style.animation = 'demon-pulse 2.5s ease-in-out infinite';
-        }
-    } else {
-        btn.style.display = 'none';
-    }
-}
+// 工具栏恶魔按钮已移除，保留空函数防止调用报错
+function updateEvilToolbarButton() {}
 
 // 获取当前邪恶阵营玩家列表
 function getEvilPlayers() {
@@ -114,7 +84,7 @@ function renderEvilMembers() {
         return;
     }
 
-    bar.innerHTML = '<span class="evil-members-label">魔 邪恶阵营 (' + evilPlayers.length + '人)：</span>' +
+    bar.innerHTML = '<span class="evil-members-label">邪恶阵营 (' + evilPlayers.length + '人)：</span>' +
         evilPlayers.map(p => {
             const displayName = p.nickname || p.player_number + '号';
             const roleObj = getPlayerRoleObj(p);

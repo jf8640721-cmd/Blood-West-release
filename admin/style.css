@@ -232,39 +232,6 @@ body::before {
 }
 .btn-debug:hover { color: #ba9078; border-color: #824924; background: rgba(62,34,18,0.4); }
 
-/* 邪恶群聊工具栏按钮 — 朱砂暖红 + 鎏金光晕 */
-.btn-evil-toolbar {
-    width: 36px; height: 36px; padding: 0;
-    font-family: var(--font-display);
-    font-size: 22px; font-weight: 700; line-height: 36px; text-align: center;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-    border-radius: var(--radius-full);
-    background-image:
-        linear-gradient(180deg, rgba(200,62,62,0.55) 0%, rgba(150,35,30,0.75) 50%, rgba(80,15,12,0.9) 100%),
-        url('bg-frame.jpg');
-    background-position: 35% 50%; background-size: 400% 400%;
-    border: 1.5px solid rgba(200,62,62,0.6);
-    color: #f5d0d0; cursor: pointer;
-    box-shadow: 0 0 8px rgba(219,168,81,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
-    transition: all var(--transition-medium); position: relative;
-    animation: demon-pulse 2.5s ease-in-out infinite;
-}
-.btn-evil-toolbar:hover {
-    border-color: rgba(220,100,80,0.8);
-    box-shadow: 0 0 16px rgba(219,168,81,0.55), 0 0 32px rgba(200,62,62,0.3);
-    color: #ffe8e0; transform: scale(1.08); opacity: 1;
-}
-.btn-evil-toolbar:active { transform: scale(0.95); transition: all 0.1s ease; }
-
-@keyframes demon-pulse {
-    0%, 100% { box-shadow: 0 0 6px rgba(219,168,81,0.3); }
-    50% { box-shadow: 0 0 14px rgba(219,168,81,0.55), 0 0 28px rgba(200,62,62,0.2); }
-}
-
-@keyframes demon-pulse-unread {
-    0%, 100% { box-shadow: 0 0 8px rgba(200,80,60,0.4), 0 0 18px rgba(160,50,30,0.2); }
-    50% { box-shadow: 0 0 20px rgba(200,80,60,0.8), 0 0 40px rgba(160,50,30,0.5); }
-}
 
 /* 阶段切换按钮 */
 .btn-phase {

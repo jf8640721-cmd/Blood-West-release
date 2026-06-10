@@ -102,7 +102,6 @@ async function restoreRoom() {
 function showRoomUI() {
     $('#btn-create-room').style.display = 'none';
     $('#room-info').style.display = 'flex';
-    $('#btn-evil-toolbar').style.display = 'none'; // 初始隐藏，等邪恶玩家出现再显示
     $('#phase-controls').style.display = 'flex';
     $('#btn-board-config').style.display = 'inline-block';
     $('#btn-debug-players').style.display = 'inline-block';
@@ -120,7 +119,6 @@ function showRoomUI() {
 function hideRoomUI() {
     $('#btn-create-room').style.display = 'inline-block';
     $('#room-info').style.display = 'none';
-    $('#btn-evil-toolbar').style.display = 'none';
     $('#phase-controls').style.display = 'none';
     $('#btn-board-config').style.display = 'none';
     $('#btn-debug-players').style.display = 'none';
