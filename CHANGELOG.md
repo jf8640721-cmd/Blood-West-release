@@ -1,5 +1,15 @@
 # 版本日志
 
+## v3.0.33 (2026-06-11)
+
+### 🔧 优化 — 小程序代码清理
+
+- **删除废弃 CSS**：`scan.wxss` 移除 `.scan-divider` `.scan-manual` 等已注释弃用样式
+- **删除死代码**：`api.js` 移除未被任何页面调用的 `exchangeOpenid()` 函数（~22行）
+- **删除死配置**：`config.js` 移除仅被上述函数引用的 `WORKER_URL`
+- **清理冗余 toast**：`scan.js` `exchangeRealOpenid()` 移除「OpenID已获取」成功 toast，补上 `wx.cloud` 可用性检查
+- **清理冗余日志**：`chat.js` + `scan.js` 移除 7 处 verbose debug log（`JSON.stringify(result)` 等）
+
 ## v3.0.32 (2026-06-11)
 
 ### 🎨 增强 — 全局角色文字提亮+对比度优化
