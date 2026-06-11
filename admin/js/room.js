@@ -426,6 +426,9 @@ async function executePhaseSwitch() {
     updateRoundTablePhase(newPhase);
     hidePhaseConfirm();
 
+    // 推送阶段切换通知给所有玩家
+    notifyPhaseChange(newPhase);
+
     // 首夜结束时初始化技能状态
     if (newPhase === '第1天' && typeof initSkillStates === 'function') {
         initSkillStates();
@@ -452,6 +455,48 @@ async function togglePhaseBackward() {
 
     pendingPhaseDirection = 'backward';
     showPhaseConfirm(prevPhase);
+}
+
+// ============================================================
+// 阶段切换全员推送通知（v3.0.34+）
+// ============================================================
+function notifyPhaseChange(newPhase) {
+    if (!state.room || !state.room.id) return;
+    if (!SUBSCRIBE_TEMPLATE_ID || SUBSCRIBE_TEMPLATE_ID === 'SUBSCRIBE_TEMPLATE_ID') return;
+
+    var isDay = newPhase.indexOf('天') !== -1;
+    var tip = isDay ? '白天技能玩家可发动' : '夜晚技能玩家可发动';
+
+    // 查询房间内所有有真实 OpenID 的玩家
+    state.supabase
+        .from('players')
+        .select('wechat_openid, player_number')
+        .eq('room_id', state.room.id)
+        .not('wechat_openid', 'is', null)
+        .then(function(res) {
+            if (res.error || !res.data || !res.data.length) return;
+
+            var now = new Date();
+            var timeStr = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+
+            res.data.forEach(function(player) {
+                fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'send-notify',
+                        openid: player.wechat_openid,
+                        template_id: SUBSCRIBE_TEMPLATE_ID,
+                        page: '/pages/chat/chat',
+                        data: {
+                            thing3: { value: newPhase + ' ' + tip },
+                            thing9: { value: '说书人' },
+                            time2: { value: timeStr }
+                        }
+                    })
+                }).catch(function() { /* 静默 */ });
+            });
+        }).catch(function() { /* 静默 */ });
 }
 
 // 更新圆桌中央阶段显示（Canvas 重绘）
