@@ -574,9 +574,9 @@ body::before {
 }
 .player-seat:hover { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.2); }
 .player-seat.selected .seat-dot {
-    box-shadow: 0 0 22px 6px rgba(212,154,58,0.9);
-    border-color: var(--gold-pale);
-    background: radial-gradient(circle at 40% 40%, #c89848, #7a4020);
+    box-shadow: 0 0 22px 6px rgba(200,160,70,0.7);
+    border-color: #d4b860;
+    background: radial-gradient(circle at 35% 35%, #d8b870, #b08838 40%, #7a5020 100%);
     animation: seatSelPulse 2s ease-in-out infinite;
 }
 .player-seat.has-new .seat-dot { animation: seatNewMsgPulse 2s infinite; }
@@ -589,21 +589,23 @@ body::before {
     box-shadow: none;
 }
 
-/* 座位标记点 */
+/* 座位标记点 — 鎏金暖金 */
 .seat-dot {
-    width: 22px; height: 22px; border-radius: var(--radius-full);
-    background: radial-gradient(circle at 40% 40%, #8a6840, #3a2010);
-    border: 2.5px solid #8b6914;
-    box-shadow: 0 0 12px rgba(180,130,40,0.5), 0 0 4px rgba(0,0,0,0.6);
+    width: 24px; height: 24px; border-radius: var(--radius-full);
+    background: radial-gradient(circle at 35% 35%, #c8a860, #a07830 40%, #6a4018 100%);
+    border: 2.5px solid #b89040;
+    box-shadow: 0 0 14px rgba(180,140,50,0.5), 0 0 3px rgba(0,0,0,0.5);
     transition: all var(--transition-medium);
     position: relative; display: flex; align-items: center; justify-content: center;
 }
 
 /* 座位下方名字标签 */
 .seat-label {
-    font-size: 14px; font-weight: 600; color: #dcc8a0; text-align: center;
+    font-size: 14px; font-weight: 600; color: #f0e0c0; text-align: center;
     max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    text-shadow: 0 0 6px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.8);
+    background: rgba(12,6,2,0.6); padding: 3px 9px; border-radius: 4px;
+    border: 1px solid rgba(180,130,60,0.35);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
     cursor: pointer; transition: color 0.2s;
     letter-spacing: 0.3px;
 }
@@ -632,32 +634,32 @@ body::before {
 }
 .player-seat.status-executed .status-toggle::after { content: '✕'; }
 
-/* 夜死：暗紫 + 月 */
+/* 夜死：石青冷灰 + 月 */
 .player-seat.status-killed_at_night .status-toggle {
-    background: #2a1040; border-color: #3a2060;
-    color: #c0a0e0; font-size: 9px;
-    box-shadow: 0 0 6px rgba(60,30,90,0.4);
+    background: #384858; border-color: #506070;
+    color: #b0c0d0; font-size: 9px;
+    box-shadow: 0 0 6px rgba(80,100,120,0.4);
 }
 .player-seat.status-killed_at_night .status-toggle::after { content: '☽'; }
 
-/* 处决座标：朱砂渐变 */
+/* 处决座标：朱砂深红 */
 .player-seat.status-executed .seat-dot {
-    background: radial-gradient(circle at 40% 40%, #c06040, #7a2010);
-    border-color: var(--cinnabar);
-    box-shadow: 0 0 14px var(--cinnabar-glow), 0 0 6px rgba(171,105,84,0.4);
+    background: radial-gradient(circle at 35% 35%, #c86858, #983830 40%, #601818 100%);
+    border-color: #b04038;
+    box-shadow: 0 0 16px rgba(180,50,40,0.5), 0 0 3px rgba(0,0,0,0.5);
 }
 .player-seat.status-executed.selected .seat-dot {
-    box-shadow: 0 0 18px 4px rgba(171,105,84,0.85); border-color: var(--cinnabar);
+    box-shadow: 0 0 20px 4px rgba(200,60,50,0.65); border-color: #c84840;
 }
 
-/* 夜死座标：暗紫渐变 */
+/* 夜死座标：石青冷灰 */
 .player-seat.status-killed_at_night .seat-dot {
-    background: radial-gradient(circle at 40% 40%, #4a3080, #1a0840);
-    border-color: #3a2060;
-    box-shadow: 0 0 14px rgba(60,30,90,0.4), 0 0 6px rgba(80,40,120,0.4);
+    background: radial-gradient(circle at 35% 35%, #788898, #506070 40%, #283848 100%);
+    border-color: #607080;
+    box-shadow: 0 0 14px rgba(80,100,120,0.45), 0 0 3px rgba(0,0,0,0.5);
 }
 .player-seat.status-killed_at_night.selected .seat-dot {
-    box-shadow: 0 0 18px 4px rgba(120,60,180,0.7); border-color: #3a2060;
+    box-shadow: 0 0 18px 4px rgba(100,120,150,0.6); border-color: #7888a0;
 }
 
 /* 右侧消息面板 */
