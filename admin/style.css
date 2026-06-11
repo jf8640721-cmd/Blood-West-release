@@ -29,9 +29,9 @@
     --stone-green:   #3e9e7b;
 
     /* 文字 */
-    --cream:         #d4b87a;
-    --cream-dim:     #b87848;
-    --cream-muted:   #8b5a38;
+    --cream:         #e8cc90;
+    --cream-dim:     #d09860;
+    --cream-muted:   #a07048;
 
     /* 边框 */
     --border-subtle: #2e1210;
@@ -62,15 +62,15 @@
     --transition-medium: 0.3s ease;
     --transition-slow:   0.5s ease;
 
-    /* 角色阵营 */
-    --role-town:       #efcf98;
-    --role-town-bg:    rgba(239, 207, 152, 0.12);
-    --role-outsider:   #3e9e7b;
-    --role-outsider-bg:rgba(62, 158, 123, 0.15);
-    --role-minion:     #dba851;
-    --role-minion-bg:  rgba(219, 168, 81, 0.15);
-    --role-demon:      #ab6954;
-    --role-demon-bg:   rgba(171, 105, 84, 0.15);
+    /* 角色阵营 — 高饱和提亮，深底可辨 */
+    --role-town:       #f8e8b0;
+    --role-town-bg:    rgba(248, 232, 176, 0.20);
+    --role-outsider:   #5ce0a8;
+    --role-outsider-bg:rgba(92, 224, 168, 0.20);
+    --role-minion:     #f5c842;
+    --role-minion-bg:  rgba(245, 200, 66, 0.20);
+    --role-demon:      #f05848;
+    --role-demon-bg:   rgba(240, 88, 72, 0.20);
 }
 
 /* ----- 基础重置 ----- */
@@ -417,7 +417,7 @@ body::before {
 .msg-row { margin-bottom: 12px; display: flex; flex-direction: column; }
 .msg-meta { font-size: 11px; color: var(--cream-muted); margin-bottom: 3px; }
 .msg-row.player-msg .msg-meta { text-align: right; color: #b89078; }
-.msg-row.host-msg .msg-meta { text-align: left; color: #9a8a6a; }
+.msg-row.host-msg .msg-meta { text-align: left; color: #c0a870; }
 
 .msg-bubble {
     max-width: 75%; padding: 10px 14px; border-radius: var(--radius-lg);
@@ -569,10 +569,11 @@ body::before {
     position: absolute; transform: translate(-50%, -50%);
     display: flex; flex-direction: column; align-items: center; gap: 3px;
     cursor: pointer; pointer-events: auto;
-    transition: transform var(--transition-medium), filter var(--transition-fast);
+    transition: transform var(--transition-medium), filter var(--transition-fast), z-index 0.1s;
     z-index: 3;
 }
-.player-seat:hover { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.2); }
+.player-seat:hover { transform: translate(-50%, -50%) scale(1.12); filter: brightness(1.2); z-index: 10; }
+.player-seat.selected { z-index: 8; }
 .player-seat.selected .seat-dot {
     box-shadow: 0 0 22px 6px rgba(200,160,70,0.7);
     border-color: #d4b860;
@@ -828,12 +829,12 @@ body::before {
     white-space: nowrap; letter-spacing: 0.2px;
     text-shadow: 0 0 5px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.7);
 }
-.seat-role-townsfolk { background: var(--role-town-bg); color: #f2d8a8; border: 1px solid rgba(239,207,152,0.35); }
-.seat-role-outsider  { background: var(--role-outsider-bg); color: #4fc08d; border: 1px solid rgba(62,158,123,0.4); }
-.seat-role-minion    { background: var(--role-minion-bg); color: #e8b85a; border: 1px solid rgba(219,168,81,0.4); }
-.seat-role-demon     { background: var(--role-demon-bg); color: #c07058; border: 1px solid rgba(171,105,84,0.4); }
+.seat-role-townsfolk { background: var(--role-town-bg); color: #f8e8b0; border: 1px solid rgba(248,232,176,0.45); }
+.seat-role-outsider  { background: var(--role-outsider-bg); color: #5ce0a8; border: 1px solid rgba(92,224,168,0.45); }
+.seat-role-minion    { background: var(--role-minion-bg); color: #f5c842; border: 1px solid rgba(245,200,66,0.45); }
+.seat-role-demon     { background: var(--role-demon-bg); color: #f05848; border: 1px solid rgba(240,88,72,0.45); }
 
-.player-role-name { font-size: 13px; margin-left: 8px; opacity: 0.85; }
+.player-role-name { font-size: 13px; margin-left: 8px; font-weight: 600; }
 .player-role-townsfolk { color: var(--role-town); }
 .player-role-outsider  { color: var(--role-outsider); }
 .player-role-minion    { color: var(--role-minion); }

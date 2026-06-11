@@ -382,9 +382,9 @@ function computeSeatPosition(angle) {
     const canvasDisplaySize = parseFloat(canvas.style.width);
     const cx = canvasDisplaySize / 2;
     const cy = canvasDisplaySize / 2;
-    // 座位半径 = 桌面半径(0.46) + 环外偏移(22*缩放系数)
-    // 偏移量随 _tableSize 等比缩放，确保座位始终在环外合适位置
-    const seatR = canvasDisplaySize * 0.46 + 22 * _ringScale;
+    // 座位半径 = 桌面半径(0.46) + 环外偏移(42*缩放系数)
+    // 偏移量随 _tableSize 等比缩放，给名牌留足空间
+    const seatR = canvasDisplaySize * 0.46 + 42 * _ringScale;
     return {
         x: cx + Math.cos(angle) * seatR,
         y: cy + Math.sin(angle) * seatR
