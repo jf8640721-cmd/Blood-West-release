@@ -793,6 +793,21 @@ body::before {
 }
 .board-outsider-warning:empty { display: none; }
 
+/* 平衡校验状态条 */
+.board-balance-status {
+    margin: 4px 0 4px; padding: 8px 14px; font-size: 13px;
+    border-radius: var(--radius-sm); text-align: center;
+}
+.board-balance-status:empty { display: none; }
+.board-balance-status--pass {
+    color: #5ab870; background: rgba(62,158,123,0.08);
+    border: 1px solid rgba(62,158,123,0.2);
+}
+.board-balance-status--warn {
+    color: #e8c840; background: rgba(200,150,40,0.08);
+    border: 1px solid rgba(200,150,40,0.2);
+}
+
 /* 复原按钮 */
 .btn-restore {
     background: transparent; color: var(--cream-muted);

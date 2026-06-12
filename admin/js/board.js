@@ -29,14 +29,16 @@ function openBoardPanel() {
         var fresh = recommendBoard(boardPlayerCount);
         boardPanelState = {
             playerCount: fresh.playerCount,
-            roles: fresh.roles.slice()
+            roles: fresh.roles.slice(),
+            _balanceWarnings: fresh._balanceWarnings || null
         };
     } else {
         // 无激活版型 → 全新随机生成
         var fresh = recommendBoard(boardPlayerCount);
         boardPanelState = {
             playerCount: fresh.playerCount,
-            roles: fresh.roles.slice()
+            roles: fresh.roles.slice(),
+            _balanceWarnings: fresh._balanceWarnings || null
         };
     }
 
@@ -58,7 +60,8 @@ function adjustBoardCount(delta) {
     var fresh = recommendBoard(boardPlayerCount);
     boardPanelState = {
         playerCount: fresh.playerCount,
-        roles: fresh.roles.slice()
+        roles: fresh.roles.slice(),
+        _balanceWarnings: fresh._balanceWarnings || null
     };
     renderBoardPanel();
 }
@@ -102,6 +105,9 @@ function renderBoardPanel() {
     // 检查外来者修正是否异常，显示警告
     var warning = getOutsiderWarning();
     $('#board-outsider-warning').innerHTML = warning || '';
+
+    // 显示平衡校验状态
+    renderBalanceStatus();
 
     // 按类别分组渲染角色列表（标签可点击交换）
     var listHtml = '';
@@ -372,6 +378,31 @@ function getOutsiderWarning() {
     return '⚠️ 外来者数量异常：外来者过多（当前' + actual + '个 / 建议' + expected + '个），请减少外来者';
 }
 
+// 渲染平衡校验状态（利用 boardPanelState._balanceWarnings 或实时校验）
+function renderBalanceStatus() {
+    var el = $('#board-balance-status');
+    if (!el) return;
+
+    // 检查是否有兜底警告
+    var warnings = boardPanelState._balanceWarnings || [];
+
+    // 如果没有预存警告，实时校验
+    if (warnings.length === 0 && typeof validateBoard === 'function') {
+        var validation = validateBoard(boardPanelState.roles, boardPanelState.playerCount);
+        if (!validation.valid) {
+            warnings = validation.errors;
+        }
+    }
+
+    if (warnings.length === 0) {
+        el.className = 'board-balance-status board-balance-status--pass';
+        el.innerHTML = '✅ 版型平衡';
+    } else {
+        el.className = 'board-balance-status board-balance-status--warn';
+        el.innerHTML = '⚠️ 平衡警告：' + warnings.map(function(w) { return escapeHtml(w); }).join('；');
+    }
+}
+
 // 复原到上次确认的版型
 function restoreBoardPanel() {
     if (!state.activeBoard) return;
@@ -390,7 +421,8 @@ function refreshBoard() {
     var fresh = recommendBoard(boardPlayerCount);
     boardPanelState = {
         playerCount: fresh.playerCount,
-        roles: fresh.roles.slice()
+        roles: fresh.roles.slice(),
+        _balanceWarnings: fresh._balanceWarnings || null
     };
     renderBoardPanel();
 }
