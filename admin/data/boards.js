@@ -49,7 +49,7 @@ const BALANCE_RULES = {
 
   // 规则 #5: 首夜信息量下限
   firstNightInfo: {
-    minTownsfolk: 2,       // 村民中至少2个有首夜行动
+    minTownsfolk: 1,       // 村民中至少1个有首夜行动
     ratio: 4               // 或每4个村民至少1人
   }
 };
