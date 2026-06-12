@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+          content="
+            default-src 'self';
+            script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+            style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+            font-src 'self' https://fonts.gstatic.com;
+            img-src 'self' data: blob: https://uwshulmdtrdirskdkjdr.supabase.co;
+            connect-src 'self' https://uwshulmdtrdirskdkjdr.supabase.co wss://uwshulmdtrdirskdkjdr.supabase.co https://cloudbase-d4g9rcvtd370cce65.service.tcloudbase.com;
+            frame-src 'none';
+            base-uri 'self';
+            form-action 'self';
+          ">
     <title>西游纪 Blood-West · 主持后台</title>
     <link rel="stylesheet" href="style.css?v=3.0.2">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
@@ -218,8 +230,12 @@
     </div>
 
     <!-- ========== CDN 依赖 ========== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1"
+            integrity="sha384-UQ9Ztz63gzT2JZCuDRkNXV8RP/gXxdPUuM9LKlz2BzqGx9xFYNAK8yAEgbfZHs7P"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
+            integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU"
+            crossorigin="anonymous"></script>
 
     <!-- ========== 角色数据层 ========== -->
     <script src="data/teams.js"></script>

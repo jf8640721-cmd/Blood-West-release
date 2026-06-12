@@ -78,6 +78,24 @@ function bindEvents() {
 }
 
 // ============================================================
+// 调试工具：仅 localhost/本地环境可见
+// ============================================================
+(function() {
+    var host = window.location.hostname;
+    var isLocal = (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local'));
+    if (!isLocal) {
+        // 生产环境：隐藏调试按钮并覆盖调试函数
+        var style = document.createElement('style');
+        style.textContent = '#btn-debug-players { display: none !important; }';
+        document.head.appendChild(style);
+        var blocked = function() { console.warn('调试功能在生产环境已禁用'); };
+        window.debugAddPlayers = blocked;
+        window.debugAddTestPlayers = blocked;
+        window.debugClearTestPlayers = blocked;
+    }
+})();
+
+// ============================================================
 // 调试工具：模拟玩家加入（浏览器控制台调用）
 // 用法：debugAddTestPlayers(15) — 添加15名测试玩家
 // ============================================================
@@ -124,7 +142,7 @@ async function debugAddPlayers() {
     try {
         await debugAddTestPlayers(count);
     } catch (e) {
-        alert('添加失败：' + e.message);
+        showError('添加测试玩家', e);
     }
 }
 
@@ -161,7 +179,8 @@ async function debugAddTestPlayers(count) {
     return data;
 }
 
-// 调试工具：清除所有测试玩家
+// 调试工具：清除所有测试玩家（软删除：标记为 kicked）
+// RLS 策略禁止 anon key 执行 DELETE，故使用 UPDATE 替代
 async function debugClearTestPlayers() {
     if (!state.room) {
         console.error('❌ 请先创建房间');
@@ -170,7 +189,7 @@ async function debugClearTestPlayers() {
 
     const { error } = await state.supabase
         .from('players')
-        .delete()
+        .update({ kicked: true })
         .eq('room_id', state.room.id)
         .like('openid', 'test_%');
 
@@ -179,7 +198,7 @@ async function debugClearTestPlayers() {
         return;
     }
 
-    console.log('✅ 已清除所有测试玩家');
+    console.log('✅ 已标记清除所有测试玩家（kicked=true）');
 }
 
 // ============================================================

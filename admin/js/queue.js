@@ -551,7 +551,8 @@ async function confirmPassiveItem(item) {
 }
 
 // ============================================================
-// 撤销队列项
+// 撤销队列项（软删除：标记为 cancelled）
+// RLS 策略禁止 anon key 执行 DELETE，使用 UPDATE status 替代
 // ============================================================
 async function undoQueueItem(item) {
     if (item.status === 'completed' || item.status === 'skipped') {
@@ -560,9 +561,10 @@ async function undoQueueItem(item) {
     }
     if (item.actionId && state.queueActions[item.actionId]) {
         try {
+            // 软删除：标记为 cancelled，保留审计记录
             await state.supabase
                 .from('skill_actions')
-                .delete()
+                .update({ status: 'cancelled', resolution: '主持人撤销' })
                 .eq('id', item.actionId);
             delete state.queueActions[item.actionId];
             item.actionId = null;
@@ -1213,7 +1215,7 @@ async function triggerDayItem(item) {
     await processDayQueueItem(item);
 }
 
-// 撤销白天队列项
+// 撤销白天队列项（软删除：标记为 cancelled）
 async function undoDayQueueItem(item) {
     if (item.status === 'completed' || item.status === 'skipped') {
         if (item.status === 'completed') state.dayQueueProcessed = Math.max(0, state.dayQueueProcessed - 1);
@@ -1221,9 +1223,10 @@ async function undoDayQueueItem(item) {
     }
     if (item.actionId && state.dayQueueActions[item.actionId]) {
         try {
+            // 软删除：标记为 cancelled，保留审计记录
             await state.supabase
                 .from('skill_actions')
-                .delete()
+                .update({ status: 'cancelled', resolution: '主持人撤销' })
                 .eq('id', item.actionId);
             delete state.dayQueueActions[item.actionId];
             item.actionId = null;

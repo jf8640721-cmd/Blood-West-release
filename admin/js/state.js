@@ -72,3 +72,18 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// 显示用户友好的错误提示（详细信息仅打印到控制台，不暴露给用户）
+function showError(context, err) {
+    console.error('[' + context + ']', err);
+    var userMsg = '操作失败，请稍后重试';
+    if (err && err.message) {
+        // 只对已知的、安全的错误信息透传
+        var safeMsg = String(err.message);
+        // 屏蔽可能包含数据库细节的错误
+        if (safeMsg.length < 80 && !/[<>{}]/.test(safeMsg) && safeMsg.indexOf('PGRST') === -1) {
+            userMsg = safeMsg;
+        }
+    }
+    alert(userMsg);
+}

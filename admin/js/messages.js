@@ -145,7 +145,7 @@ async function replyToPlayer() {
         }]);
 
     if (error) {
-        alert('发送失败：' + error.message);
+        showError('发送回复', error);
         return;
     }
 
@@ -216,7 +216,7 @@ async function sendQuickReply(content) {
         }]);
 
     if (error) {
-        alert('发送失败：' + error.message);
+        showError('快捷回复', error);
         return;
     }
 
@@ -250,7 +250,7 @@ async function kickPlayer(playerId) {
         }]);
 
     if (msgError) {
-        alert('发送踢出通知失败：' + msgError.message);
+        showError('发送踢出通知', msgError);
         return;
     }
 
@@ -261,7 +261,7 @@ async function kickPlayer(playerId) {
         .eq('id', playerId);
 
     if (kickError) {
-        alert('踢出失败：' + kickError.message);
+        showError('踢出玩家', kickError);
         return;
     }
 

@@ -1,12 +1,32 @@
 # 版本日志
 
-## v3.0.35 (2026-06-11)
+## v3.0.35 (2026-06-12)
 
 ### ✨ 新增 — 角色图册搜索功能
 
 - 图册页新增搜索栏，输入角色名或技能关键词即时筛选
 - 搜索与阵营筛选联动，可在当前阵营内精搜
 - 带一键清除按钮
+
+### 🔒 安全 — 全项目安全审查与修复
+
+**严重修复**：
+- **移除硬编码密钥**：云函数 `notify/index.js` 中 WECHAT_APPID/WECHAT_APPSECRET 改为仅从环境变量读取，不再有默认硬编码值；`config.json` 中同步移除敏感值
+- **RLS 加固**：所有表禁止 anon key 执行 DELETE，仅允许 service_role；SELECT/INSERT/UPDATE 保持兼容现有功能
+- **软删除适配**：队列撤销操作（`undoQueueItem`/`undoDayQueueItem`）改用 UPDATE status='cancelled' 替代 DELETE；调试清除函数改用 UPDATE kicked=true
+
+**高危修复**：
+- **CDN SRI 校验**：`index.html` 中 supabase-js 和 qrcodejs 添加 `integrity` hash + 固定版本号，防供应链攻击
+- **CORS 白名单**：云函数 `Access-Control-Allow-Origin` 从 `*` 改为仅允许 GitHub Pages 和云开发控制台，添加 `X-Content-Type-Options`/`X-Frame-Options` 安全头
+
+**中危修复**：
+- **安全随机数**：房间码生成 `Math.random()` → `crypto.getRandomValues()`，防房间码预测
+- **调试功能保护**：生产环境（非 localhost）自动隐藏调试按钮 + 覆盖调试函数为空操作
+- **真实 OpenID**：小程序扫码页 `getOpenid()` 优先通过云函数换取真实微信 OpenID，失败时降级为临时标识
+- **错误提示脱敏**：新增 `showError()` 工具函数，用户面仅显示安全错误信息，数据库细节仅 console 输出
+
+**低危改善**：
+- **CSP 头**：`index.html` 添加 Content-Security-Policy meta 标签，限制脚本/样式/连接来源
 
 ## v3.0.34 (2026-06-11)
 

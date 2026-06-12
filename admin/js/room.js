@@ -17,7 +17,7 @@ async function createRoom() {
         .single();
 
     if (error) {
-        alert('创建房间失败：' + error.message);
+        showError('创建房间', error);
         return;
     }
 
@@ -35,12 +35,14 @@ async function createRoom() {
     if (typeof subscribeDaySkillActions === 'function') subscribeDaySkillActions(data.id);
 }
 
-// 生成 6 位房间码（大写字母 + 数字，排除易混淆字符）
+// 生成 6 位房间码（大写字母 + 数字，排除易混淆字符，密码学安全随机）
 function generateRoomCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const randomValues = new Uint32Array(6);
+    crypto.getRandomValues(randomValues);
     let code = '';
     for (let i = 0; i < 6; i++) {
-        code += chars[Math.floor(Math.random() * chars.length)];
+        code += chars[randomValues[i] % chars.length];
     }
     return code;
 }
@@ -417,7 +419,7 @@ async function executePhaseSwitch() {
         .eq('id', state.room.id);
 
     if (error) {
-        alert('切换失败：' + error.message);
+        showError('切换阶段', error);
         return;
     }
 
@@ -534,7 +536,7 @@ async function editPlayerNickname(playerId) {
         .eq('id', playerId);
 
     if (error) {
-        alert('修改失败：' + error.message);
+        showError('修改名牌', error);
         return;
     }
 

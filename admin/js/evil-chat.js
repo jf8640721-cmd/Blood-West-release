@@ -179,7 +179,7 @@ async function sendEvilMessage() {
         }]);
 
     if (error) {
-        alert('发送失败：' + error.message);
+        showError('发送邪恶群聊消息', error);
         return;
     }
 
