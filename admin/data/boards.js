@@ -271,3 +271,28 @@ function recommendBoard(playerCount) {
   }
   return fallback;
 }
+
+/**
+ * 根据当前版型和坏人数生成衣服推荐（不在场村民角色）
+ * @param {Array} boardRoles - 当前版型中的角色列表
+ * @returns {Array} 推荐的衣服角色列表
+ */
+function generateClothes(boardRoles) {
+  // 统计坏人数（爪牙 + 恶魔）
+  var evilCount = 0;
+  boardRoles.forEach(function(r) {
+    if (r.category === 'minion' || r.category === 'demon') evilCount++;
+  });
+  var clothesCount = evilCount + 1;
+
+  // 收集已在版型中的角色 ID
+  var usedIds = boardRoles.map(function(r) { return r.id; });
+
+  // 从不在场的村民中随机挑选
+  var pool = ROLES.filter(function(r) {
+    return r.category === 'townsfolk' && usedIds.indexOf(r.id) === -1;
+  });
+
+  var shuffled = shuffle(pool);
+  return shuffled.slice(0, Math.min(clothesCount, shuffled.length));
+}

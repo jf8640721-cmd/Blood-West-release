@@ -808,6 +808,29 @@ body::before {
     border: 1px solid rgba(200,150,40,0.2);
 }
 
+/* 衣服推荐区域 */
+.clothes-section {
+    margin-top: 12px; padding: 10px 12px;
+    background: rgba(180,160,120,0.08);
+    border: 1px solid rgba(180,160,120,0.2);
+    border-radius: var(--radius-sm);
+}
+.clothes-header {
+    font-size: 13px; color: var(--text-primary); margin-bottom: 8px; font-weight: 500;
+}
+.clothes-hint {
+    font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 6px;
+}
+.clothes-list {
+    display: flex; flex-wrap: wrap; gap: 6px;
+}
+.clothes-tag {
+    display: inline-block; padding: 3px 10px;
+    background: rgba(180,160,120,0.15);
+    border: 1px solid rgba(180,160,120,0.3);
+    border-radius: 4px; font-size: 12px; color: #d4c8a0;
+}
+
 /* 复原按钮 */
 .btn-restore {
     background: transparent; color: var(--cream-muted);

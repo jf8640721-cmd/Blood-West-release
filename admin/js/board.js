@@ -159,6 +159,9 @@ function renderBoardPanel() {
     if (restoreBtn) {
         restoreBtn.disabled = !state.activeBoard;
     }
+
+    // 渲染衣服推荐
+    renderClothesSection();
 }
 
 // 折叠/展开版型分类
@@ -376,6 +379,34 @@ function getOutsiderWarning() {
         return '⚠️ 外来者修正异常：当前有 ' + (mod > 0 ? '+' + mod : mod) + ' 修正但外来者过多（当前' + actual + '个 / 建议' + expected + '个），请减少外来者';
     }
     return '⚠️ 外来者数量异常：外来者过多（当前' + actual + '个 / 建议' + expected + '个），请减少外来者';
+}
+
+// 渲染衣服推荐区域
+function renderClothesSection() {
+  var el = $('#board-clothes-section');
+  if (!el) return;
+
+  var clothes = boardPanelState._clothes || [];
+  if (clothes.length === 0) {
+    clothes = generateClothes(boardPanelState.roles);
+    boardPanelState._clothes = clothes;
+  }
+
+  var evilCount = 0;
+  boardPanelState.roles.forEach(function(r) {
+    if (r.category === 'minion' || r.category === 'demon') evilCount++;
+  });
+
+  var html = '<div class="clothes-section">';
+  html += '<div class="clothes-header">👔 衣服推荐';
+  html += '<span class="clothes-hint">（不在场村民，供坏人伪装，共' + clothes.length + '件 / 坏人' + evilCount + '人+1）</span>';
+  html += '</div>';
+  html += '<div class="clothes-list">';
+  clothes.forEach(function(r) {
+    html += '<span class="clothes-tag">' + r.name + '</span>';
+  });
+  html += '</div></div>';
+  el.innerHTML = html;
 }
 
 // 渲染平衡校验状态（利用 boardPanelState._balanceWarnings 或实时校验）
