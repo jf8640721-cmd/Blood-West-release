@@ -130,6 +130,8 @@ async function loadQueueActions(phase) {
         var actions = res.data || [];
         state.queueActions = {};
         actions.forEach(function(a) {
+            // 跳过已撤销（cancelled）的记录，不恢复历史状态
+            if (a.status === 'cancelled') return;
             state.queueActions[a.id] = a;
             // 更新队列中对应项的状态
             var item = state.nightQueue.find(function(q) {
@@ -144,6 +146,8 @@ async function loadQueueActions(phase) {
                     item.status = 'completed';
                 } else if (a.status === 'awaiting_response') {
                     item.status = 'awaiting';
+                } else if (a.status === 'skipped') {
+                    item.status = 'skipped';
                 }
             }
         });
@@ -377,7 +381,7 @@ async function processQueueItem(item) {
     try {
         // 更新或创建 skill_actions 记录
         if (item.actionId) {
-            await state.supabase
+            var updateRes = await state.supabase
                 .from('skill_actions')
                 .update({
                     status: 'completed',
@@ -385,6 +389,13 @@ async function processQueueItem(item) {
                     processed_at: new Date().toISOString()
                 })
                 .eq('id', item.actionId);
+
+            if (updateRes.error) {
+                console.error('更新技能行动失败:', updateRes.error);
+                item.status = 'submitted'; // 恢复以便重试
+                renderQueuePanel();
+                return;
+            }
         } else {
             // 玩家口头告知，主持人手动记录
             var resolutionParts = ['主持人手动处理'];
@@ -413,6 +424,14 @@ async function processQueueItem(item) {
                 .from('skill_actions')
                 .insert(insertData)
                 .select();
+
+            if (res.error) {
+                console.error('插入技能行动失败:', res.error);
+                item.status = 'submitted'; // 恢复以便重试
+                renderQueuePanel();
+                return;
+            }
+
             if (res.data && res.data.length > 0) {
                 item.actionId = res.data[0].id;
                 state.queueActions[item.actionId] = res.data[0];
@@ -456,11 +475,23 @@ async function skipQueueItem(item) {
                 .from('skill_actions')
                 .insert(insertData)
                 .select();
+
+            if (res.error) {
+                console.error('记录跳过失败:', res.error);
+                item.status = 'pending'; // 回滚状态以便重试
+                renderQueuePanel();
+                return;
+            }
+
             if (res.data && res.data.length > 0) {
                 item.actionId = res.data[0].id;
+                state.queueActions[item.actionId] = res.data[0];
             }
         } catch (e) {
-            console.error('记录跳过失败:', e);
+            console.error('记录跳过异常:', e);
+            item.status = 'pending';
+            renderQueuePanel();
+            return;
         }
     }
 
@@ -513,6 +544,12 @@ async function sendHostPrompt(item) {
             .from('skill_actions')
             .insert(insertData)
             .select();
+
+        if (res.error) {
+            console.error('创建技能询问记录失败:', res.error);
+            return;
+        }
+
         if (res.data && res.data.length > 0) {
             item.actionId = res.data[0].id;
             state.queueActions[item.actionId] = res.data[0];
@@ -921,6 +958,8 @@ async function loadDayQueueActions(phase) {
         var actions = res.data || [];
         state.dayQueueActions = {};
         actions.forEach(function(a) {
+            // 跳过已撤销（cancelled）的记录，不恢复历史状态
+            if (a.status === 'cancelled') return;
             state.dayQueueActions[a.id] = a;
             var item = state.dayQueue.find(function(q) {
                 return q.player.id === a.player_id;
@@ -934,6 +973,8 @@ async function loadDayQueueActions(phase) {
                     item.status = 'completed';
                 } else if (a.status === 'awaiting_response') {
                     item.status = 'awaiting';
+                } else if (a.status === 'skipped') {
+                    item.status = 'skipped';
                 }
             }
         });
@@ -1157,6 +1198,14 @@ async function processDayQueueItem(item) {
             .from('skill_actions')
             .insert(insertData)
             .select();
+
+        if (res.error) {
+            console.error('插入白天技能行动失败:', res.error);
+            item.status = 'pending'; // 回滚状态以便重试
+            renderDayQueuePanel();
+            return;
+        }
+
         if (res.data && res.data.length > 0) {
             item.actionId = res.data[0].id;
             state.dayQueueActions[item.actionId] = res.data[0];
@@ -1167,6 +1216,9 @@ async function processDayQueueItem(item) {
 
     } catch (e) {
         console.error('处理白天队列项失败:', e);
+        item.status = 'pending';
+        renderDayQueuePanel();
+        return;
     }
 }
 
@@ -1189,12 +1241,23 @@ async function skipDayQueueItem(item) {
             .from('skill_actions')
             .insert(insertData)
             .select();
+
+        if (res.error) {
+            console.error('跳过白天队列项失败:', res.error);
+            item.status = 'pending'; // 回滚状态以便重试
+            renderDayQueuePanel();
+            return;
+        }
+
         if (res.data && res.data.length > 0) {
             item.actionId = res.data[0].id;
             state.dayQueueActions[item.actionId] = res.data[0];
         }
     } catch (e) {
-        console.error('跳过白天队列项失败:', e);
+        console.error('跳过白天队列项异常:', e);
+        item.status = 'pending';
+        renderDayQueuePanel();
+        return;
     }
 
     item.status = 'skipped';

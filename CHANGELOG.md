@@ -1,5 +1,13 @@
 # 版本日志
 
+## v3.0.36 (2026-06-12)
+
+### 🐛 修复 — 行动记录第2天起无法显示
+
+- **队列处理补全 Supabase 错误检查**：`processQueueItem`/`skipQueueItem`/`sendHostPrompt`/`processDayQueueItem`/`skipDayQueueItem` 共5处 insert/update 添加 `res.error` 检查，失败时回滚本地状态并停止后续操作，防止"本地标记完成但数据库无记录"的静默丢失
+- **队列加载过滤 cancelled 记录**：`loadQueueActions`/`loadDayQueueActions` 跳过 status='cancelled' 的已撤销记录，避免 Realtime 重新初始化队列时恢复已撤销的历史状态
+- **补全 skipped 状态映射**：队列加载时新增 `skipped` 状态处理，确保跳过项正确还原
+
 ## v3.0.35 (2026-06-12)
 
 ### ✨ 新增 — 角色图册搜索功能
