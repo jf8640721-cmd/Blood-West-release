@@ -1,5 +1,17 @@
 # 版本日志
 
+## v3.0.42 (2026-06-16)
+
+### 🐛 修复 — 技能栏选择目标后被轮询清空
+
+- **问题**：玩家在技能栏号码网格选择目标后，1-2秒内选择自动消失
+- **根因**：`evaluateSkillBar()` 每1.5秒轮询执行时，`setData()` 无条件将 `skillBarSelectedTarget` 重置为 `0`
+- **修复**：新增 `_skillBarPhase` 追踪当前阶段，同模式同阶段轮询时保留已选目标（`prevMode === 'active' && !phaseChanged`），仅在模式切换或阶段变更时才清空选择
+
+### 变更文件
+
+- `miniprogram/pages/chat/chat.js` — evaluateSkillBar() 增加目标保留逻辑
+
 ## v3.0.41 (2026-06-16)
 
 ### 🐛 修复 — 创建房间按钮点击无反应
