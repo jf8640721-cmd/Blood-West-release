@@ -82,7 +82,7 @@ function bindEvents() {
 // ============================================================
 (function() {
     var host = window.location.hostname;
-    var isLocal = (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local'));
+    var isLocal = (window.location.protocol === 'file:' || host === '' || host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.endsWith('.local'));
     if (!isLocal) {
         // 生产环境：隐藏调试按钮并覆盖调试函数
         var style = document.createElement('style');
