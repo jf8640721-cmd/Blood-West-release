@@ -8,6 +8,12 @@
 // 1. 创建房间
 // ============================================================
 async function createRoom() {
+    // v3.0.41: 防御 — Supabase 未初始化时给出明确提示
+    if (!state.supabase) {
+        alert('系统初始化未完成（Supabase 不可用）。\n\n请刷新页面重试，如问题持续请检查网络连接。');
+        return;
+    }
+
     const code = generateRoomCode();
 
     const { data, error } = await state.supabase

@@ -1,5 +1,23 @@
 # 版本日志
 
+## v3.0.41 (2026-06-16)
+
+### 🐛 修复 — 创建房间按钮点击无反应
+
+- **问题**：点击「创建房间」按钮完全无反应，控制台无明显报错
+- **根因**：Supabase CDN（jsdelivr）加载失败时 `window.supabase` 为 `undefined`，`init()` 第1行 `createClient()` 直接抛异常，后续 `bindEvents()` 永远不执行，所有按钮事件未绑定
+- **修复**（`admin/app.js`）：
+  - `init()` 中 Supabase 客户端创建包裹 try/catch，检测 `window.supabase` 存在性再调用
+  - CDN 加载失败时弹出明确提示"Supabase 库加载失败，请检查网络连接"
+  - `bindEvents()` 移到 try/catch 之后，确保按钮事件始终绑定
+  - `restoreRoom()` 仅 Supabase 可用时才执行
+- **额外防护**（`admin/js/room.js`）：`createRoom()` 开头检测 `state.supabase` 是否为空，给明确提示而非静默失败
+
+### 变更文件
+
+- `admin/app.js` — +11行（init 防御性重构）
+- `admin/js/room.js` — +5行（createRoom 前置检测）
+
 ## v3.0.40 (2026-06-16)
 
 ### 🐛 修复 — 技能每夜重复提交

@@ -5,12 +5,30 @@
 
 // ----- 初始化 -----
 function init() {
-    state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // v3.0.41: 防御 Supabase CDN 加载失败导致整个系统不可用
+    try {
+        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+            state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase 客户端初始化成功');
+        } else {
+            console.error('❌ Supabase CDN 未加载（window.supabase 不存在），请检查网络连接');
+            alert('系统初始化失败：Supabase 库加载失败。\n\n请检查网络连接后刷新页面。\n如果使用 file:// 协议打开，请确认能访问外网。');
+        }
+    } catch(e) {
+        console.error('❌ Supabase 客户端创建失败:', e);
+        state.supabase = null;
+    }
+
+    // 无论 Supabase 是否成功，都绑定事件（确保按钮可点击）
     bindEvents();
     setupRtDragAndDrop();
     setupSeatSwap();
     setupSeatClickHandler();
-    restoreRoom();
+
+    // 仅当 Supabase 可用时才尝试恢复房间
+    if (state.supabase) {
+        restoreRoom();
+    }
 }
 
 // ----- 事件绑定 -----
