@@ -1,5 +1,22 @@
 # 版本日志
 
+## v3.0.40 (2026-06-16)
+
+### 🐛 修复 — 技能每夜重复提交
+
+- **问题**：玩家夜晚提交技能后主持人处理完成，下次轮询技能栏重新出现，玩家可再次提交产生空记录
+- **根因**：`evaluateSkillBar()` 仅检查 `skill_states`（一次性已用、待回应标记），未查询 `skill_actions` 表确认当前阶段是否已有提交
+- **修复**（三层防护）：
+  1. 新增 `getPlayerPhaseActions()` API，查询玩家在当前阶段的已有技能行动
+  2. `evaluateSkillBar()` 判定时检测本阶段已有 `player_initiated` 记录 → 直接显示"已提交"状态，不再展示发动按钮
+  3. `onSkillBarSubmitUse/Pass()` 提交前加 DB 级二次校验，已有记录则拒绝并提示"本阶段已提交，请等待主持人处理"
+- **效果**：每个夜晚/白天阶段每名玩家仅能提交一次技能行动，主持人处理后轮询自动显示已完成状态
+
+### 变更文件
+
+- `miniprogram/utils/api.js` — +10行（新增 `getPlayerPhaseActions` 函数）
+- `miniprogram/pages/chat/chat.js` — +45行（初始加载+轮询各增加第6项并行查询、evaluateSkillBar 签名及判定逻辑扩展、提交前 DB 校验守卫）
+
 ## v3.0.39 (2026-06-16)
 
 ### ✨ 新增 — 小程序技能发动界面
