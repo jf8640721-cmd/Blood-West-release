@@ -140,6 +140,24 @@ async function loadQueueActions(phase) {
             if (item) {
                 item.actionId = a.id;
                 item.targetPlayerId = a.target_player_id;
+
+                // v3.0.45: 解析 action_data 提取目标和文本用于队列显示
+                var actionData = {};
+                try { actionData = JSON.parse(a.action_data || '{}'); } catch(e) {}
+                var displayParts = [];
+                if (actionData.targetNumber) {
+                    displayParts.push(actionData.targetNumber + '号');
+                }
+                if (actionData.targetNumbers && actionData.targetNumbers.length > 0) {
+                    displayParts.push(actionData.targetNumbers.map(function(n) { return n + '号'; }).join('、'));
+                }
+                if (actionData.text) {
+                    displayParts.push(actionData.text);
+                }
+                if (displayParts.length > 0) {
+                    item.targetRaw = displayParts.join(' ');
+                }
+
                 if (a.status === 'submitted' || a.status === 'responded') {
                     item.status = 'submitted';
                 } else if (a.status === 'completed') {
@@ -967,6 +985,24 @@ async function loadDayQueueActions(phase) {
             if (item) {
                 item.actionId = a.id;
                 item.targetPlayerId = a.target_player_id;
+
+                // v3.0.45: 解析 action_data 提取目标和文本用于队列显示
+                var dayActionData = {};
+                try { dayActionData = JSON.parse(a.action_data || '{}'); } catch(e) {}
+                var dayDisplayParts = [];
+                if (dayActionData.targetNumber) {
+                    dayDisplayParts.push(dayActionData.targetNumber + '号');
+                }
+                if (dayActionData.targetNumbers && dayActionData.targetNumbers.length > 0) {
+                    dayDisplayParts.push(dayActionData.targetNumbers.map(function(n) { return n + '号'; }).join('、'));
+                }
+                if (dayActionData.text) {
+                    dayDisplayParts.push(dayActionData.text);
+                }
+                if (dayDisplayParts.length > 0) {
+                    item.targetRaw = dayDisplayParts.join(' ');
+                }
+
                 if (a.status === 'submitted' || a.status === 'responded') {
                     item.status = 'submitted';
                 } else if (a.status === 'completed') {
