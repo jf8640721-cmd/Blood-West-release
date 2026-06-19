@@ -1,5 +1,22 @@
 # 版本日志
 
+## v3.0.43 (2026-06-16)
+
+### 🐛 修复 — 首夜信息角色技能栏不显示
+
+- **问题**：主持人首夜派发身份后，小程序端有技能的角色不弹出技能栏，无法发动提交
+- **根因**（两个）：
+  1. `evaluateSkillBar()` 仅检查 `nightOrder` 决定是否显示技能栏，但有6个纯首夜信息角色（女儿国王、玉皇大帝、黎山圣母、巨灵神、金顶大仙、许仙）的 `nightOrder` 为 `null`，仅设置了 `firstNightOrder`，导致永远不显示
+  2. `firstNightBlocked` 检查过于粗暴：毗蓝婆等同时有 `firstNightOrder` 和 `nightOrder` 的角色，首夜信息能力也被整块屏蔽
+- **修复**：
+  - `firstNightBlocked` 检查增加 `&& firstNightOrder == null` 条件，有首夜信息能力的角色不被屏蔽
+  - `hasNightOrder` 判定增加首夜 `firstNightOrder` 检测，信息位角色也能显示技能栏
+- **影响角色**：女儿国王、玉皇大帝、黎山圣母、巨灵神、金顶大仙、许仙、毗蓝婆（共7个角色首夜恢复可用）
+
+### 变更文件
+
+- `miniprogram/pages/chat/chat.js` — evaluateSkillBar() 两处条件修正
+
 ## v3.0.42 (2026-06-16)
 
 ### 🐛 修复 — 技能栏选择目标后被轮询清空
