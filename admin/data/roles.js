@@ -44,7 +44,7 @@ var ROLES = [
     ability: "流沙：每个白天选择两名玩家，得知昨夜醒来人数",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: null, firstNightOrder: null,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, targetCount: 2, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: "师徒四人",
     description: "沙僧通过流沙感知昨夜有多少玩家被唤醒（被技能选中或发动技能），从而推断夜晚行动规模。",
     tips: "注意告知的是'醒来人数'，不是死亡人数"
@@ -126,7 +126,7 @@ var ROLES = [
     ability: "天眼：每晚睁开第三只眼，可选择两名玩家，得知其中是否有恶魔，一名善良玩家是你的宿敌，会被误判为恶魔",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: 23, firstNightOrder: null, firstNightBlocked: true,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, targetCount: 2, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "二郎神的天眼可查验两名玩家中是否包含恶魔，但有一名善良宿敌会干扰结果被误判为恶魔。",
     tips: "宿敌由主持在开局时秘密指定一名善良玩家；告知二郎神'其中有/无恶魔'即可"
@@ -168,7 +168,7 @@ var ROLES = [
     ability: "天帝：首夜化身任意村民。如该角色在场，他晕眩至你死亡",
     balanceTags: ["disruption"],
     abilityType: "active", nightOrder: null, firstNightOrder: 1,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "玉皇大帝在首夜选择化身成任意村民角色获得其能力，若该村民真实在场则被眩晕直至玉帝死亡。",
     tips: "主持需秘密告知玉帝其化身角色的能力；若目标在场则通知其晕眩"
@@ -178,7 +178,7 @@ var ROLES = [
     ability: "天后：每晚传唤两名善良角色，得知传唤成功的人数",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: 21, firstNightOrder: null, firstNightBlocked: true,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, targetCount: 2, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "王母娘娘每夜选择两名玩家传唤，得知其中有多少善良角色响应了传唤。",
     tips: "主持只告知传唤成功的善良角色数量（0/1/2）"
@@ -250,7 +250,7 @@ var ROLES = [
     ability: "神佑：首夜选择三个角色，排序靠前的在场角色死亡时由你承担",
     balanceTags: ["protection"],
     abilityType: "active", nightOrder: null, firstNightOrder: 2,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "巨灵神首夜守护三个角色，若其中在场者死亡，由巨灵神代为承受。",
     tips: "主持需记录三个守护角色及其排序；按顺序代人承受死亡"
@@ -260,7 +260,7 @@ var ROLES = [
     ability: "洞察：首夜得知全场异常人数，每晚选择两名玩家进行查验",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: 25, firstNightOrder: 7, firstNightBlocked: true,
-    needsChoice: true, firstNightNeedsChoice: false, isDizzyable: true, deathImmune: false,
+    needsChoice: true, firstNightNeedsChoice: false, targetCount: 2, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "毗蓝婆首夜获知全场异常（邪恶+外来者+独立）人数，之后每晚可查验两名玩家。",
     tips: "首夜告知异常人数；每晚告知查验结果"
@@ -290,7 +290,7 @@ var ROLES = [
     ability: "云霄锦衣：首夜，你将获得一名不在场爪牙的能力",
     balanceTags: [],
     abilityType: "active", nightOrder: null, firstNightOrder: 5,
-    needsChoice: false, isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "金顶大仙在首夜随机获得一个不在场的爪牙角色的能力。",
     tips: "主持随机选择一个不在场爪牙，告知其能力并允许金顶大仙使用"
@@ -470,7 +470,7 @@ var ROLES = [
     ability: "笔墨：全局一次，在白天选择两名玩家，当夜他们的号码将被交换；丹青：全局一次，在夜晚选择两名玩家，白天他们的号码将被交换",
     balanceTags: ["support"],
     abilityType: "once_per_game", nightOrder: 28, firstNightOrder: null, firstNightBlocked: true,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, targetCount: 2, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "宁采臣以笔墨丹青之术交换玩家号码——笔墨白天选人当夜交换，丹青夜晚选人白天交换。两项独立使用。",
     tips: "笔墨：白天选择两名玩家→当夜号码互换；丹青：夜晚选择→白天号码互换；各自独立使用"
@@ -662,7 +662,7 @@ var ROLES = [
     ability: "魅惑：首夜魅惑一名玩家，会被认作邪恶阵营；诱惑：每晚诱惑说书人透露一名角色的身份",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: 5, firstNightOrder: 4, firstNightBlocked: true,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "狐狸精首夜栽赃一名善良玩家使其被查验时显示邪恶，之后每晚可诱惑说书人泄露角色信息。",
     tips: "被魅惑玩家查验结果显示邪恶；每晚获知一名角色身份"
@@ -733,7 +733,7 @@ var ROLES = [
     ability: "结亲：首夜选择一名玩家结亲。该玩家必须全程扮演玉兔精指定的角色，如果表现不够坚定，处决入夜；冥婚：玉兔精若被处决，可强行处决一名玩家陪葬",
     balanceTags: ["killing"],
     abilityType: "active", nightOrder: null, firstNightOrder: 4,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "玉兔精强迫一名玩家扮演指定角色，不坚定则被处决。若玉兔精被处决可拉人陪葬。",
     tips: "首夜指定结亲目标和扮演角色；主持监督扮演质量；冥婚：被处决时选择陪葬者"
@@ -743,7 +743,7 @@ var ROLES = [
     ability: "莲台泡影：当你获得说书人给予的衣服时，确认选择一件，可幻化做该角色并获得对应技能",
     balanceTags: [],
     abilityType: "active", nightOrder: null, firstNightOrder: 4,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "鲤鱼精可变身为其他角色并获得其技能，是最灵活的爪牙。",
     tips: "从说书人提供的角色中选择一件'衣服'（幻化目标），获得该角色技能"
@@ -774,7 +774,7 @@ var ROLES = [
     outsiderModifier: -1,
     balanceTags: ["killing"],
     abilityType: "active", nightOrder: null, firstNightOrder: 4,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "千年树妖首夜标记三名玩家——一旦有标记玩家死亡，另一存活标记者被秘密转为恶魔并与树妖结识。若被转者为邪恶则树妖入群转爪牙。",
     tips: "首夜标记三名玩家；任一标记死亡→存活标记之一秘密转恶魔；被转者若原为邪恶→树妖入群转爪牙；树妖初始不在邪恶群"
@@ -864,7 +864,7 @@ var ROLES = [
     outsiderModifier: 1,
     balanceTags: ["disruption","killing"],
     abilityType: "active", nightOrder: 11, firstNightOrder: 6, firstNightBlocked: true,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: "牛魔父子",
     description: "红孩儿每晚杀人，首夜获知三个在场角色并可焚烧一人使其全程晕眩。第三夜最远善良玩家感知灼热。",
     tips: "首夜告知三个在场角色；被焚烧者全程晕眩；灼热位置=离红孩儿座位最远的善良玩家"
@@ -915,7 +915,7 @@ var ROLES = [
     outsiderModifier: -1,
     balanceTags: ["killing"],
     abilityType: "active", nightOrder: 11, firstNightOrder: 6,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "黑山老妖每晚向递增数量的玩家发元素标记，选错即拖入噩梦死亡。累计死亡>2后次夜休息并重置计数。",
     tips: "每晚目标数=夜晚数+1（第1夜2人/第2夜3人...）；选错者死亡；累计死亡>2→次夜休息→计数器重置"

@@ -1,5 +1,36 @@
 # 版本日志
 
+## v3.0.45 (2026-06-19)
+
+### ✨ 技能栏缺口修复 — 双选网格 + 文本统一化
+
+基于[角色技能分类分析](docs/角色技能分类与代码处理分析.md)，将多目标和角色选择器缺口统一处理：
+
+**双选号码网格**（5个角色新增 `targetCount: 2`）：
+- **二郎神、沙僧、王母娘娘、毗蓝婆（常规夜）、宁采臣** 支持在号码网格中同时选择2个目标
+- 网格标题动态显示"选择2个目标"，选中 cell 显示 ①② 序号标记
+- 点击已选 cell 取消选择，选满后 Toast 提示上限
+- 提交时 `action_data` 使用 `targetNumbers: [N1, N2]` 数组，自动排序
+
+**角色选择器 → 文本输入**（6个角色改 `choiceType: "text"`）：
+- **玉皇大帝**（化身村民）、**金顶大仙**（获取爪牙能力）、**鲤鱼精**（幻化衣服角色）、**狐狸精**（查询角色身份）→ 改为纯文本输入，无号码网格
+- **红孩儿**（选目标+角色名）、**玉兔精**（选结亲对象+角色名）→ 保留号码网格+文本输入框
+
+**三选+目标 → 文本输入**（3个角色加 `choiceType: "text"`）：
+- **巨灵神**（守护3角色）、**千年树妖**（发标记给3玩家）、**黑山老妖**（N+1目标）→ 网格选主要目标 + 文本输入其余目标
+
+**UI 优化**：
+- 网格 cell 增加 `position: relative` + 选中序号角标样式（金色发光）
+- 文本输入框 placeholder 改为通用提示"输入技能相关信息"
+
+### 变更文件
+
+- `miniprogram/utils/roles.js` — 14角色数据变更（5个＋targetCount, 9个＋choiceType, 4个改needsChoice）
+- `admin/data/roles.js` — 同上同步
+- `miniprogram/pages/chat/chat.js` — +30行（skillBarSelectedTargets数组、skillBarMaxTargets字段、多选toggle逻辑、双选targetNumbers提交）
+- `miniprogram/pages/chat/chat.wxml` — 网格标题动态化 + cell序号标记 + placeholder改通用
+- `miniprogram/pages/chat/chat.wxss` — +8行（skill-grid-order 角标样式 + cell relative定位）
+
 ## v3.0.44 (2026-06-16)
 
 ### 🐛 修复 — 角色数据勘误 + 文本型技能支持
