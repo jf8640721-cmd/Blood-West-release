@@ -250,7 +250,7 @@ var ROLES = [
     ability: "神佑：首夜选择三个角色，排序靠前的在场角色死亡时由你承担",
     balanceTags: ["protection"],
     abilityType: "active", nightOrder: null, firstNightOrder: 2,
-    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "巨灵神首夜守护三个角色，若其中在场者死亡，由巨灵神代为承受。",
     tips: "主持需记录三个守护角色及其排序；按顺序代人承受死亡"
@@ -774,7 +774,7 @@ var ROLES = [
     outsiderModifier: -1,
     balanceTags: ["killing"],
     abilityType: "active", nightOrder: null, firstNightOrder: 4,
-    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: true, teamSynergy: null,
     description: "千年树妖首夜标记三名玩家——一旦有标记玩家死亡，另一存活标记者被秘密转为恶魔并与树妖结识。若被转者为邪恶则树妖入群转爪牙。",
     tips: "首夜标记三名玩家；任一标记死亡→存活标记之一秘密转恶魔；被转者若原为邪恶→树妖入群转爪牙；树妖初始不在邪恶群"
@@ -915,7 +915,7 @@ var ROLES = [
     outsiderModifier: -1,
     balanceTags: ["killing"],
     abilityType: "active", nightOrder: 11, firstNightOrder: 6,
-    needsChoice: true, choiceType: "text", isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "黑山老妖每晚向递增数量的玩家发元素标记，选错即拖入噩梦死亡。累计死亡>2后次夜休息并重置计数。",
     tips: "每晚目标数=夜晚数+1（第1夜2人/第2夜3人...）；选错者死亡；累计死亡>2→次夜休息→计数器重置"
