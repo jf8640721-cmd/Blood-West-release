@@ -92,13 +92,13 @@ var ROLES = [
   },
   {
     id: "nver_guowang", name: "女儿国王", category: "townsfolk",
-    ability: "威仪：首夜你会知道邪恶阵营的女性角色数；集权：每个女性玩家死亡时，你在夜晚得知其所属阵营",
+    ability: "威仪：首夜你会知道邪恶阵营的女性角色数；集权：每晚主动查验一名玩家所属阵营",
     balanceTags: ["info"],
-    abilityType: "active", nightOrder: null, firstNightOrder: 7,
-    needsChoice: false, isDizzyable: true, deathImmune: false,
+    abilityType: "active", nightOrder: 35, firstNightOrder: 7,
+    needsChoice: true, firstNightNeedsChoice: false, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
-    description: "女儿国王在首夜获得邪恶女性数量，并在每个女性玩家死亡时于夜晚得知其阵营。若与唐僧邻座，两人全程晕眩。",
-    tips: "注意唐僧-女儿国王邻座眩晕规则；集权触发需主持主动告知"
+    description: "女儿国王首夜获知邪恶女性数量，之后每晚可主动查验一名玩家所属阵营。若与唐僧邻座，两人全程晕眩。",
+    tips: "注意唐僧-女儿国王邻座眩晕规则；首夜无需选择目标（自动获知信息）"
   },
   {
     id: "donghai_longwang", name: "东海龙王", category: "townsfolk",
@@ -260,7 +260,7 @@ var ROLES = [
     ability: "洞察：首夜得知全场异常人数，每晚选择两名玩家进行查验",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: 25, firstNightOrder: 7, firstNightBlocked: true,
-    needsChoice: true, isDizzyable: true, deathImmune: false,
+    needsChoice: true, firstNightNeedsChoice: false, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "毗蓝婆首夜获知全场异常（邪恶+外来者+独立）人数，之后每晚可查验两名玩家。",
     tips: "首夜告知异常人数；每晚告知查验结果"
@@ -270,7 +270,7 @@ var ROLES = [
     ability: "降世：每晚猜测一名邪恶角色得知是否在场，如果猜出全部在场邪恶角色且未发生错误，玄女翻牌",
     balanceTags: ["info"],
     abilityType: "active", nightOrder: 19, firstNightOrder: null,
-    needsChoice: false, isDizzyable: true, deathImmune: false,
+    needsChoice: false, choiceType: "text", isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "九天玄女每晚猜测一名邪恶角色是否在场，若全部猜对且无误，则公开翻牌确认。",
     tips: "主持每次告知是否在场；全部猜对时公开翻牌"

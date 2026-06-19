@@ -1,5 +1,33 @@
 # 版本日志
 
+## v3.0.44 (2026-06-16)
+
+### 🐛 修复 — 角色数据勘误 + 文本型技能支持
+
+基于[角色技能分类分析](docs/角色技能分类与代码处理分析.md)查漏补缺：
+
+**角色数据修正**（`miniprogram/utils/roles.js` + `admin/data/roles.js`）：
+- **毗蓝婆**：新增 `firstNightNeedsChoice: false`，首夜纯接收异常人数信息不再强制选目标
+- **女儿国王**：`nightOrder` 从 `null` 改为 `35`，`needsChoice` 改为 `true`，`firstNightNeedsChoice: false`，修正为每夜主动选号码查验阵营
+- **九天玄女**：新增 `choiceType: "text"`，标记为文本消息型技能
+
+**技能栏文本输入**（`chat.js/wxml/wxss`）：
+- `choiceType="text"` 的角色在技能栏显示文本输入框，可输入猜测角色名等内容
+- 文本内容写入 `action_data.text` 字段，随技能提交到 `skill_actions` 表
+- 提交时校验文本非空，保留轮询不刷新
+
+**evaluateSkillBar 增强**：
+- 模式A/模式B 均支持 `firstNightNeedsChoice` 字段覆盖首夜选择需求
+- 新增 `skillBarShowTextInput` / `skillBarTextInput` 状态变量
+
+### 变更文件
+
+- `miniprogram/utils/roles.js` — 3行数据修正（毗蓝婆/女儿国王/九天玄女）
+- `admin/data/roles.js` — 3行数据修正 + 女儿国王描述更新
+- `miniprogram/pages/chat/chat.js` — +35行（firstNightNeedsChoice判定、文本输入状态、提交校验）
+- `miniprogram/pages/chat/chat.wxml` — +6行（文本输入框）
+- `miniprogram/pages/chat/chat.wxss` — +18行（文本输入框样式）
+
 ## v3.0.43 (2026-06-16)
 
 ### 🐛 修复 — 首夜信息角色技能栏不显示
