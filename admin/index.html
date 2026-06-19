@@ -239,6 +239,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1"
             integrity="sha384-UQ9Ztz63gzT2JZCuDRkNXV8RP/gXxdPUuM9LKlz2BzqGx9xFYNAK8yAEgbfZHs7P"
             crossorigin="anonymous"></script>
+    <!-- CDN 备用：jsdelivr 境内不稳定时切 unpkg -->
+    <script>
+    if (typeof window.supabase === 'undefined') {
+        document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.108.1/dist/umd/supabase.min.js"><\/script>');
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
             integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU"
             crossorigin="anonymous"></script>
