@@ -509,6 +509,33 @@ body::before {
     font-family: var(--font-display); letter-spacing: 2px;
 }
 
+/* ----- 处理回复弹窗（v3.0.46）----- */
+.modal-process-reply { max-width: 480px; padding: 28px 32px 24px; }
+.process-reply-summary {
+    color: var(--cream-dim); font-size: 14px; margin-bottom: 16px;
+    padding: 10px 14px; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);
+    line-height: 1.6; text-align: left;
+}
+.process-reply-summary strong { color: var(--gold-primary); }
+.process-reply-summary .target-highlight {
+    color: var(--cinnabar); font-weight: 500;
+}
+.process-reply-input-row { margin-bottom: 12px; }
+.process-reply-input {
+    width: 100%; padding: 10px 14px;
+    background: rgba(20,8,4,0.8); border: 1px solid var(--border-mid);
+    border-radius: var(--radius-md); color: var(--cream-pale);
+    font-size: 15px; outline: none; box-sizing: border-box;
+}
+.process-reply-input:focus { border-color: var(--border-gold); }
+.process-reply-quick {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.process-reply-quick .quick-reply-label {
+    font-size: 12px; color: var(--text-secondary);
+}
+
 #qrcode-container {
     display: inline-block; padding: 16px; background: #fff;
     border-radius: var(--radius-md); margin-bottom: 16px;

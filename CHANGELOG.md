@@ -1,5 +1,35 @@
 # 版本日志
 
+## v3.0.46 (2026-06-19)
+
+### ✨ 主持人处理回复 + 玩家技能记忆本
+
+**Web 端 — 处理技能时回复玩家**：
+- 新增处理回复弹窗（`process-reply-modal`）：主持人点「处理」后弹出对话框
+- 显示玩家提交摘要（角色名·技能名 → 目标/文本）
+- 支持输入回复内容 + 4个快捷模板（已处理/已标记/请说明/已知晓）
+- 确认后：更新 `skill_actions` 状态 + 插入 `messages` 消息 → 玩家即时收到回复
+- Enter 键快捷提交，点击遮罩关闭
+
+**小程序端 — 技能发动记忆本**：
+- 新增「技能记录」页面（`pages/skill-log/`）：按夜晚阶段分组展示全部技能发动历史
+- 每条记录显示：技能图标、角色名、行动类型（发动/不发动/回应）、目标、状态、主持人回复
+- 已处理记录绿色边框，不发动记录半透明
+- 聊天页底部导航新增「录 记录」按钮
+- API 新增 `getPlayerSkillHistory(playerId, roomId)` 跨阶段查询
+
+### 变更文件
+
+- `admin/index.html` — 新增 `process-reply-modal` 弹窗 DOM（+18行）
+- `admin/style.css` — 新增弹窗样式（+25行）
+- `admin/js/queue.js` — `processQueueItem` 改为弹窗流程 + `showProcessReplyModal`/`executeProcessWithReply`/`closeProcessReplyModal`（+100行）
+- `admin/app.js` — 弹窗事件绑定（+20行）
+- `miniprogram/pages/skill-log/` — 新增4个文件（~180行）
+- `miniprogram/utils/api.js` — 新增 `getPlayerSkillHistory`（+8行）
+- `miniprogram/pages/chat/chat.wxml` — 底部导航 +1「录 记录」
+- `miniprogram/pages/chat/chat.js` — +`onGoSkillLog()` 跳转
+- `miniprogram/app.json` — 注册新页面路径
+
 ## v3.0.45 (2026-06-19)
 
 ### ✨ 技能栏缺口修复 — 双选网格 + 文本统一化

@@ -51,6 +51,26 @@ function bindEvents() {
         }
     });
 
+    // v3.0.46: 处理技能回复弹窗事件
+    $('#btn-process-reply-cancel').addEventListener('click', closeProcessReplyModal);
+    $('#btn-close-process-reply').addEventListener('click', closeProcessReplyModal);
+    $('#btn-process-reply-confirm').addEventListener('click', executeProcessWithReply);
+    $('#process-reply-modal').addEventListener('click', (e) => {
+        if (e.target === $('#process-reply-modal')) {
+            closeProcessReplyModal();
+        }
+    });
+    $('#process-reply-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') executeProcessWithReply();
+    });
+    // 快捷模板按钮：点击填充输入框
+    document.querySelectorAll('#process-reply-modal .btn-process-quick').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            $('#process-reply-input').value = this.getAttribute('data-reply');
+            $('#process-reply-input').focus();
+        });
+    });
+
     // 点击弹窗外部关闭
     $('#qr-modal').addEventListener('click', (e) => {
         if (e.target === $('#qr-modal')) {

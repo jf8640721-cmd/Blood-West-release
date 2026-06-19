@@ -393,36 +393,80 @@ async function handleQueueAction(action, orderIndex) {
 // ============================================================
 async function processQueueItem(item) {
     if (!state.room) return;
+    // v3.0.46: 弹出回复弹窗，主持人输入回复后再处理
+    showProcessReplyModal(item);
+}
+
+// v3.0.46: 处理回复弹窗 — 当前正在处理中的队列项
+var _processingItem = null;
+
+function showProcessReplyModal(item) {
+    _processingItem = item;
+    var modal = $('#process-reply-modal');
+    var summaryEl = $('#process-reply-summary');
+    var inputEl = $('#process-reply-input');
+
+    // 构建提交摘要
+    var r = item.roleObj;
+    var skillName = getSkillShortName(r);
+    var targetText = item.targetRaw || '';
+    if (!targetText && item.targetPlayerId) {
+        var tp = state.players.find(function(p) { return p.id === item.targetPlayerId; });
+        if (tp) targetText = tp.player_number + '号';
+    }
+
+    var summaryHtml = '<strong>' + escapeHtml(r.name) + '</strong> · ' + escapeHtml(skillName);
+    if (targetText) {
+        summaryHtml += ' <span class="target-highlight">→ ' + escapeHtml(targetText) + '</span>';
+    }
+    summaryEl.innerHTML = summaryHtml;
+
+    // 清空输入框
+    inputEl.value = '';
+    modal.style.display = 'flex';
+    setTimeout(function() { inputEl.focus(); }, 100);
+}
+
+function closeProcessReplyModal() {
+    $('#process-reply-modal').style.display = 'none';
+    _processingItem = null;
+}
+
+async function executeProcessWithReply() {
+    var item = _processingItem;
+    if (!item || !state.room) return;
+
+    var replyContent = $('#process-reply-input').value.trim();
+    closeProcessReplyModal();
+
     item.status = 'processing';
     renderQueuePanel();
 
     try {
+        var resolutionText = replyContent || '主持人已处理';
+
         // 更新或创建 skill_actions 记录
         if (item.actionId) {
             var updateRes = await state.supabase
                 .from('skill_actions')
                 .update({
                     status: 'completed',
-                    resolution: '主持人已处理',
+                    resolution: resolutionText,
                     processed_at: new Date().toISOString()
                 })
                 .eq('id', item.actionId);
 
             if (updateRes.error) {
                 console.error('更新技能行动失败:', updateRes.error);
-                item.status = 'submitted'; // 恢复以便重试
+                item.status = 'submitted';
                 renderQueuePanel();
                 return;
             }
         } else {
             // 玩家口头告知，主持人手动记录
             var resolutionParts = ['主持人手动处理'];
-            if (item.targetRaw) {
-                resolutionParts.push('→ ' + item.targetRaw);
-            }
-            if (item.resolution) {
-                resolutionParts.push('[' + item.resolution + ']');
-            }
+            if (item.targetRaw) resolutionParts.push('→ ' + item.targetRaw);
+            if (item.resolution) resolutionParts.push('[' + item.resolution + ']');
             var insertData = {
                 room_id: state.room.id,
                 phase: state.queuePhase,
@@ -435,9 +479,7 @@ async function processQueueItem(item) {
                 resolution: resolutionParts.join(' '),
                 processed_at: new Date().toISOString()
             };
-            if (item.targetPlayerId) {
-                insertData.target_player_id = item.targetPlayerId;
-            }
+            if (item.targetPlayerId) insertData.target_player_id = item.targetPlayerId;
             var res = await state.supabase
                 .from('skill_actions')
                 .insert(insertData)
@@ -445,15 +487,27 @@ async function processQueueItem(item) {
 
             if (res.error) {
                 console.error('插入技能行动失败:', res.error);
-                item.status = 'submitted'; // 恢复以便重试
+                item.status = 'submitted';
                 renderQueuePanel();
                 return;
             }
-
             if (res.data && res.data.length > 0) {
                 item.actionId = res.data[0].id;
                 state.queueActions[item.actionId] = res.data[0];
             }
+        }
+
+        // v3.0.46: 向玩家发送回复消息
+        if (replyContent) {
+            await state.supabase
+                .from('messages')
+                .insert({
+                    room_id: state.room.id,
+                    player_id: item.player.id,
+                    direction: 'host_to_player',
+                    content: replyContent,
+                    phase: state.queuePhase
+                });
         }
 
         item.status = 'completed';
@@ -464,7 +518,7 @@ async function processQueueItem(item) {
 
     } catch (e) {
         console.error('处理队列项失败:', e);
-        item.status = 'submitted'; // 恢复以便重试
+        item.status = 'submitted';
     }
 }
 

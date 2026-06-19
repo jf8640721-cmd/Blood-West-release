@@ -25,7 +25,7 @@
         <h1 class="logo">
             <span class="logo-main">西游纪</span>
             <span class="logo-sub">Blood-West</span>
-            <span class="logo-version">v3.0.45</span>
+            <span class="logo-version">v3.0.46</span>
         </h1>
 
         <div class="toolbar-actions">
@@ -231,6 +231,31 @@
             <div class="confirm-actions">
                 <button id="btn-phase-confirm-cancel" class="btn btn-copper">取消</button>
                 <button id="btn-phase-confirm-ok" class="btn btn-gold">确认切换</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 处理技能回复弹窗（v3.0.46）========== -->
+    <div id="process-reply-modal" class="modal" style="display:none;">
+        <div class="modal-content modal-process-reply">
+            <span class="modal-close" id="btn-close-process-reply">&times;</span>
+            <h3>💬 处理技能并回复</h3>
+            <div id="process-reply-summary" class="process-reply-summary"></div>
+            <div class="process-reply-input-row">
+                <input id="process-reply-input" class="process-reply-input"
+                       placeholder="输入回复内容（如：技能已处理、目标已标记…）"
+                       autocomplete="off" />
+            </div>
+            <div class="process-reply-quick">
+                <span class="quick-reply-label">快捷：</span>
+                <button class="btn btn-process-quick" data-reply="✅ 技能已处理">✅ 已处理</button>
+                <button class="btn btn-process-quick" data-reply="技能生效，目标已标记">🔒 已标记</button>
+                <button class="btn btn-process-quick" data-reply="请详细说明你的技能目标">❓ 请说明</button>
+                <button class="btn btn-process-quick" data-reply="收到，主持人已知晓">📝 已知晓</button>
+            </div>
+            <div class="confirm-actions">
+                <button id="btn-process-reply-cancel" class="btn btn-copper">取消</button>
+                <button id="btn-process-reply-confirm" class="btn btn-gold">确认并回复</button>
             </div>
         </div>
     </div>
