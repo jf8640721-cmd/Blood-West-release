@@ -22,6 +22,8 @@ function init() {
     // 无论 Supabase 是否成功，都绑定事件（确保按钮可点击）
     bindEvents();
     setupRtDragAndDrop();
+    // v3.0.47: 结算事件
+    if (typeof bindSettleEvents === 'function') bindSettleEvents();
     setupSeatSwap();
     setupSeatClickHandler();
 

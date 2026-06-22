@@ -1198,3 +1198,150 @@ body::before {
 
 .history-action-time { font-size: 11px; color: var(--cream-muted); font-family: var(--font-mono); flex-shrink: 0; }
 .history-action-resolution { font-size: 11px; color: var(--cream-dim); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+
+/* ============================================================
+   游戏结算弹窗（v3.0.47）
+   ============================================================ */
+.btn-settle {
+    background: linear-gradient(180deg, #8b5a2e, #5a3010);
+    border: 1px solid #b8781e;
+    color: #f0d080;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.btn-settle:hover {
+    background: linear-gradient(180deg, #a06a38, #6a4020);
+    border-color: #daa520;
+}
+
+.modal-settle {
+    max-width: 480px;
+    width: 90%;
+    background: var(--bg-deep);
+    border: 2px solid var(--border-gold);
+    padding: 24px;
+}
+
+.modal-settle h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--gold-primary);
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.settle-warn {
+    text-align: center;
+    color: var(--cinnabar);
+    font-size: 13px;
+    margin-bottom: 16px;
+    padding: 6px;
+    background: rgba(240, 80, 60, 0.08);
+    border-radius: var(--radius-sm);
+}
+
+.settle-summary {
+    margin-bottom: 16px;
+}
+
+.settle-players {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 4px;
+}
+
+.settle-count {
+    color: var(--cream-muted);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.settle-factions {
+    color: var(--cream-dim);
+    font-size: 12px;
+}
+
+.settle-player-list {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-md);
+    padding: 6px;
+    background: rgba(10, 5, 2, 0.4);
+}
+
+.settle-player-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(180, 130, 60, 0.08);
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+
+.settle-player-row:last-child {
+    border-bottom: none;
+}
+
+.settle-player-row.faction-good { border-left: 3px solid rgba(248, 232, 176, 0.35); }
+.settle-player-row.faction-evil { border-left: 3px solid rgba(240, 80, 60, 0.35); }
+
+.sp-number { color: var(--cream-dim); font-weight: bold; min-width: 32px; }
+.sp-name { color: var(--cream-light); flex: 1; min-width: 60px; }
+.sp-role { color: var(--gold-primary); font-size: 12px; }
+.sp-faction { font-size: 12px; opacity: 0.7; }
+.sp-status { font-size: 12px; opacity: 0.6; }
+
+.settle-prompt {
+    text-align: center;
+    color: var(--cream-muted);
+    font-size: 14px;
+    margin: 12px 0 8px;
+}
+
+.settle-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-settle-good,
+.btn-settle-evil {
+    flex: 1;
+    max-width: 180px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.2s;
+}
+
+.btn-settle-good {
+    background: linear-gradient(180deg, rgba(248, 232, 176, 0.15), rgba(180, 140, 40, 0.08));
+    border-color: rgba(248, 232, 176, 0.3);
+    color: #f8e8b0;
+}
+
+.btn-settle-good:hover {
+    background: linear-gradient(180deg, rgba(248, 232, 176, 0.25), rgba(180, 140, 40, 0.15));
+    border-color: #f8e8b0;
+    box-shadow: 0 0 18px rgba(248, 232, 176, 0.2);
+}
+
+.btn-settle-evil {
+    background: linear-gradient(180deg, rgba(240, 80, 60, 0.15), rgba(180, 40, 30, 0.08));
+    border-color: rgba(240, 80, 60, 0.3);
+    color: #f05848;
+}
+
+.btn-settle-evil:hover {
+    background: linear-gradient(180deg, rgba(240, 80, 60, 0.25), rgba(180, 40, 30, 0.15));
+    border-color: #f05848;
+    box-shadow: 0 0 18px rgba(240, 80, 60, 0.2);
+}

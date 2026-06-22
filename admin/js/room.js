@@ -114,6 +114,8 @@ function showRoomUI() {
     $('#btn-board-config').style.display = 'inline-block';
     $('#btn-debug-players').style.display = 'inline-block';
     $('#btn-exit-room').style.display = 'inline-block';
+    // v3.0.47: 显示结算按钮
+    if (typeof showSettleButton === 'function') showSettleButton();
 
     // 确保 Canvas 圆桌在布局完成后绘制
     requestAnimationFrame(function() {
@@ -131,6 +133,8 @@ function hideRoomUI() {
     $('#btn-board-config').style.display = 'none';
     $('#btn-debug-players').style.display = 'none';
     $('#btn-exit-room').style.display = 'none';
+    // v3.0.47: 隐藏结算按钮
+    if (typeof hideSettleButton === 'function') hideSettleButton();
     // 重置右侧消息面板
     $('#rt-reply-area').style.display = 'none';
     $('#rt-role-selector').style.display = 'none';

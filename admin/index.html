@@ -25,7 +25,7 @@
         <h1 class="logo">
             <span class="logo-main">西游纪</span>
             <span class="logo-sub">Blood-West</span>
-            <span class="logo-version">v3.0.46</span>
+            <span class="logo-version">v3.0.47</span>
         </h1>
 
         <div class="toolbar-actions">
@@ -58,6 +58,9 @@
 
             <!-- 退出房间 -->
             <button id="btn-exit-room" class="btn btn-exit" style="display:none;">退出房间</button>
+
+            <!-- 游戏结算（v3.0.47）-->
+            <button id="btn-settle" class="btn btn-settle" style="display:none;" title="结算游戏">🏆 结算</button>
         </div>
     </header>
 
@@ -260,6 +263,24 @@
         </div>
     </div>
 
+    <!-- 游戏结算弹窗（v3.0.47）-->
+    <div id="settle-modal" class="modal" style="display:none;">
+        <div class="modal-content modal-settle">
+            <span class="modal-close" id="btn-close-settle">&times;</span>
+            <h3>🏆 游戏结算</h3>
+            <p class="settle-warn">结算后将生成玩家排行榜数据，此操作不可撤销。</p>
+            <div class="settle-summary" id="settle-summary"></div>
+            <p class="settle-prompt">请选择获胜阵营：</p>
+            <div class="settle-btns">
+                <button class="btn btn-settle-good" data-winner="good">☀ 善良阵营获胜</button>
+                <button class="btn btn-settle-evil" data-winner="evil">🌙 邪恶阵营获胜</button>
+            </div>
+            <div class="confirm-actions" style="margin-top:14px;">
+                <button id="btn-settle-cancel" class="btn btn-copper">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== CDN 依赖 ========== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1"
             integrity="sha384-UQ9Ztz63gzT2JZCuDRkNXV8RP/gXxdPUuM9LKlz2BzqGx9xFYNAK8yAEgbfZHs7P"
@@ -291,6 +312,7 @@
     <script src="js/roles-ui.js?v=3.0.2"></script>
     <script src="js/queue.js?v=3.0.2"></script>
     <script src="js/history.js?v=3.0.2"></script>
+    <script src="js/settle.js?v=3.0.47"></script>
 
     <!-- ========== 主入口 ========== -->
     <script src="app.js?v=3.0.2"></script>

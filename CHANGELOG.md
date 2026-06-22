@@ -1,5 +1,52 @@
 # 版本日志
 
+## v3.0.47 (2026-06-22)
+
+### 🏆 玩家排行榜 + 头像系统 + 游戏结算
+
+**小程序端 — 玩家名牌升级**：
+- 昵称弹窗新增头像选择（`<button open-type="chooseAvatar">`）：玩家可在首夜设置微信头像
+- 头像上传到 Supabase Storage `player-avatars` bucket，URL 存入 `players.avatar_url`
+- 聊天页顶部 `player-badge`、邪恶群聊页同步显示头像缩略图
+- 头像与昵称同步到本地 Storage + Supabase，跨页面持久化
+
+**小程序端 — 玩家排行榜**：
+- 图鉴页新增 Tab 切换：「角色图册」|「玩家榜」
+- 排行榜展示：排名（前三奖牌）、头像、昵称、生涯场次、胜率
+- 按胜率降序排列，空状态引导文案
+- API 新增 `getLeaderboard()`、`uploadAvatar()`、`updateAvatarUrl()`
+
+**Web 端 — 游戏结算**：
+- 工具栏新增「🏆 结算」按钮，进入房间后可见
+- 结算弹窗：展示本局玩家摘要（阵营、角色、存活状态）
+- 主持人选择获胜方（善良/邪恶），确认后不可撤销
+- 自动写入 `game_participants` 表 + 调用 RPC 更新 `player_game_stats`
+- 测试玩家（`openid` 以 `test_` 开头）自动排除统计
+
+**数据库变更**：
+- `players` 表新增 `avatar_url TEXT` 字段
+- 新增 `player_game_stats` 表（openid PK, games_played, games_won）
+- 新增 `game_participants` 表（每局结算审计追踪）
+- 新增 `upsert_game_stats` RPC 函数（原子更新生涯统计）
+
+### 变更文件
+
+- `supabase/schema.sql` — 新增 2 表 + avatar_url 字段 + RLS + RPC 函数（+70行）
+- `admin/index.html` — 结算按钮 + 结算弹窗 + settle.js 引用（+25行）
+- `admin/style.css` — 结算弹窗完整样式（+120行）
+- `admin/app.js` — `bindSettleEvents()` 初始化调用（+2行）
+- `admin/js/room.js` — 结算按钮显隐控制（+4行）
+- `admin/js/settle.js` — 新增结算模块（~140行）
+- `miniprogram/pages/chat/chat.wxml` — 昵称弹窗 +头像选择 + 顶部栏头像（+10行）
+- `miniprogram/pages/chat/chat.js` — 头像上传/保存 + 轮询同步（+40行）
+- `miniprogram/pages/chat/chat.wxss` — 头像组件样式（+40行）
+- `miniprogram/pages/evil-chat/evil-chat.wxml` — 同步头像弹窗（+8行）
+- `miniprogram/pages/evil-chat/evil-chat.js` — 同步头像逻辑（+30行）
+- `miniprogram/pages/gallery/gallery.wxml` — Tab 切换 + 排行榜 UI（+50行）
+- `miniprogram/pages/gallery/gallery.js` — Tab 切换 + 排行榜加载（+30行）
+- `miniprogram/pages/gallery/gallery.wxss` — Tab 样式 + 排行榜样式（+140行）
+- `miniprogram/utils/api.js` — 新增 5 个 API 方法 + getPlayerStatus 扩展（+50行）
+
 ## v3.0.46 (2026-06-19)
 
 ### ✨ 主持人处理回复 + 玩家技能记忆本
