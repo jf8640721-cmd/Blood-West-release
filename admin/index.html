@@ -25,7 +25,7 @@
         <h1 class="logo">
             <span class="logo-main">西游纪</span>
             <span class="logo-sub">Blood-West</span>
-            <span class="logo-version">v3.0.50</span>
+            <span class="logo-version">v3.0.51</span>
         </h1>
 
         <div class="toolbar-actions">
@@ -211,6 +211,14 @@
 
             <!-- 平衡校验状态 -->
             <div id="board-balance-status"></div>
+
+            <!-- v3.0.51: 角色搜索 -->
+            <div class="board-search-row">
+                <input id="board-search-input" class="board-search-input"
+                       placeholder="🔍 搜索角色…（输入名称快速定位）"
+                       autocomplete="off" />
+                <button id="btn-board-search-clear" class="board-search-clear" style="display:none;">✕</button>
+            </div>
 
             <!-- 角色列表（按类别分组） -->
             <div id="board-role-list" class="board-role-list"></div>

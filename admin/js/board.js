@@ -154,6 +154,16 @@ function renderBoardPanel() {
     });
     $('#board-role-list').innerHTML = listHtml;
 
+    // v3.0.51: 清除搜索提示
+    var existingHint = document.getElementById('board-search-hint');
+    if (existingHint) existingHint.remove();
+
+    // 重新应用搜索过滤
+    var searchInput = $('#board-search-input');
+    if (searchInput && searchInput.value.trim()) {
+        filterBoardRoles(searchInput.value.trim().toLowerCase());
+    }
+
     // 更新复原按钮状态
     var restoreBtn = $('#btn-board-restore');
     if (restoreBtn) {
@@ -162,9 +172,140 @@ function renderBoardPanel() {
 
     // 渲染衣服推荐
     renderClothesSection();
+
+    // v3.0.51: 绑定搜索事件
+    bindBoardSearch();
 }
 
-// 折叠/展开版型分类
+// v3.0.51: 版型角色搜索
+function bindBoardSearch() {
+    var searchInput = $('#board-search-input');
+    var clearBtn = $('#btn-board-search-clear');
+    if (!searchInput || !clearBtn) return;
+
+    // 移除旧事件（避免重复绑定）
+    var newInput = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newInput, searchInput);
+    searchInput = newInput;
+
+    searchInput.addEventListener('input', function () {
+        var keyword = this.value.trim().toLowerCase();
+        clearBtn.style.display = keyword ? '' : 'none';
+        filterBoardRoles(keyword);
+    });
+
+    clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        this.style.display = 'none';
+        filterBoardRoles('');
+        searchInput.focus();
+    });
+}
+
+function filterBoardRoles(keyword) {
+    var catGroups = document.querySelectorAll('.board-cat-group');
+    catGroups.forEach(function (group) {
+        if (!keyword) {
+            // 无搜索词：全部显示
+            group.style.display = '';
+            var tags = group.querySelectorAll('.board-role-tag, .board-role-tag--clickable');
+            tags.forEach(function (t) { t.style.display = ''; });
+            var addBtns = group.querySelectorAll('.board-cat-add-btn');
+            addBtns.forEach(function (b) { b.style.display = ''; });
+            return;
+        }
+
+        // 过滤角色标签
+        var hasVisible = false;
+        var tags = group.querySelectorAll('.board-role-tag, .board-role-tag--clickable');
+        tags.forEach(function (t) {
+            var name = (t.textContent || '').replace(/[⇄×]/g, '').trim().toLowerCase();
+            if (name.indexOf(keyword) !== -1) {
+                t.style.display = '';
+                hasVisible = true;
+            } else {
+                t.style.display = 'none';
+            }
+        });
+
+        // 搜索时隐藏 "+" 按钮
+        var addBtns = group.querySelectorAll('.board-cat-add-btn');
+        addBtns.forEach(function (b) { b.style.display = 'none'; });
+
+        // 如果该分类没有可见角色，隐藏整个分组
+        group.style.display = hasVisible ? '' : 'none';
+    });
+
+    // 更新搜索结果提示
+    updateBoardSearchHint(keyword);
+}
+
+function updateBoardSearchHint(keyword) {
+    var existingHint = document.getElementById('board-search-hint');
+    if (existingHint) existingHint.remove();
+
+    if (!keyword) return;
+
+    // 查找可添加的匹配角色
+    var usedIds = boardPanelState.roles.map(function (r) { return r.id; });
+    var available = ROLES.filter(function (r) {
+        return usedIds.indexOf(r.id) === -1 &&
+               r.name.toLowerCase().indexOf(keyword) !== -1;
+    });
+
+    if (available.length === 0) return;
+
+    var hintHtml = '<div id="board-search-hint" class="board-search-hint">';
+    hintHtml += '<span class="board-search-hint-label">可添加角色：</span>';
+    available.forEach(function (r) {
+        hintHtml += '<span class="board-role-tag board-role-tag--addable" ' +
+                    'data-role-id="' + r.id + '" ' +
+                    'onclick="quickAddRoleFromSearch(event, this)" ' +
+                    'title="点击添加 ' + r.name + '">' +
+                    r.name + ' <span class="board-role-add-icon">+</span></span>';
+    });
+    hintHtml += '</div>';
+
+    var roleList = $('#board-role-list');
+    if (roleList) {
+        roleList.insertAdjacentHTML('beforebegin', hintHtml);
+    }
+}
+
+// v3.0.51: 搜索后快速添加角色
+function quickAddRoleFromSearch(event, el) {
+    event.stopPropagation();
+    var roleId = el.getAttribute('data-role-id');
+    var role = ROLES_BY_ID[roleId];
+    if (!role) return;
+
+    // 检查是否重复
+    var exists = boardPanelState.roles.some(function (r) { return r.id === roleId; });
+    if (exists) return;
+
+    // 添加到版型并重新渲染
+    boardPanelState.roles.push(role);
+
+    // 清除搜索并重新渲染
+    var searchInput = $('#board-search-input');
+    if (searchInput) searchInput.value = '';
+    var clearBtn = $('#btn-board-search-clear');
+    if (clearBtn) clearBtn.style.display = 'none';
+
+    renderBoardPanel();
+    flashBoardRoleTag(roleId);
+}
+
+// 高亮新增的角色标签
+function flashBoardRoleTag(roleId) {
+    setTimeout(function () {
+        var tags = document.querySelectorAll('.board-role-tag--clickable[data-role-id="' + roleId + '"]');
+        tags.forEach(function (t) {
+            t.classList.add('board-role-tag--flash');
+            setTimeout(function () { t.classList.remove('board-role-tag--flash'); }, 1500);
+        });
+    }, 100);
+}
 function toggleBoardCat(header) {
     var body = header.nextElementSibling;
     var toggle = header.querySelector('.board-cat-toggle');
@@ -196,42 +337,53 @@ function startRoleSwap(event, tagEl) {
     // 获取同类别未使用的角色
     var availableRoles = getAvailableRolesForCategory(category, usedIds);
 
-    // 构建下拉框
-    var selectHtml = '<select class="board-role-swap-select" ' +
-                     'data-role-index="' + roleIndex + '" ' +
-                     'onchange="commitRoleSwap(this)" ' +
-                     'onblur="cancelRoleSwap(this)">';
-    selectHtml += '<option value="">-- 选择角色 --</option>';
+    // v3.0.51: 使用可搜索的 input + datalist 替代原生 select
+    var datalistId = 'board-swap-datalist-' + roleIndex;
+    var inputHtml = '<span class="board-role-swap-wrap">' +
+                    '<input class="board-role-swap-input" ' +
+                    'data-role-index="' + roleIndex + '" ' +
+                    'data-current-id="' + currentRoleId + '" ' +
+                    'list="' + datalistId + '" ' +
+                    'placeholder="输入角色名搜索…" ' +
+                    'onchange="commitRoleSwapInput(this)" ' +
+                    'onblur="cancelRoleSwapInput(this)" />' +
+                    '<datalist id="' + datalistId + '">';
     availableRoles.forEach(function(r) {
-        var selected = (r.id === currentRoleId) ? ' selected' : '';
-        selectHtml += '<option value="' + r.id + '"' + selected + '>' + r.name + '</option>';
+        inputHtml += '<option value="' + r.id + '">' + r.name + '</option>';
     });
-    selectHtml += '</select>';
+    inputHtml += '</datalist></span>';
 
     // 替换 DOM
-    tagEl.outerHTML = selectHtml;
+    tagEl.outerHTML = inputHtml;
 
-    // 自动聚焦下拉框
-    var selectEl = document.querySelector('.board-role-swap-select[data-role-index="' + roleIndex + '"]');
-    if (selectEl) {
-        selectEl.focus();
+    // 自动聚焦输入框
+    var inputEl = document.querySelector('.board-role-swap-input[data-role-index="' + roleIndex + '"]');
+    if (inputEl) {
+        inputEl.focus();
+        // 预填当前角色名方便搜索
+        var currentRole = ROLES_BY_ID[currentRoleId];
+        if (currentRole) {
+            inputEl.value = currentRole.name;
+            inputEl.select();
+        }
     }
 }
 
-// 确认交换：更新 boardPanelState 并重新渲染
-function commitRoleSwap(selectEl) {
-    var roleIndex = parseInt(selectEl.getAttribute('data-role-index'));
-    var newRoleId = selectEl.value;
+// v3.0.51: 确认交换（input + datalist 版本）
+function commitRoleSwapInput(inputEl) {
+    var roleIndex = parseInt(inputEl.getAttribute('data-role-index'));
+    var typedName = (inputEl.value || '').trim();
 
-    if (isNaN(roleIndex) || !newRoleId) return;
+    if (isNaN(roleIndex) || !typedName) return;
 
-    var newRole = ROLES_BY_ID[newRoleId];
+    // 通过名称查找角色（支持模糊匹配）
+    var newRole = findRoleByName(typedName);
     if (!newRole) return;
 
     // 防重复检查
     var duplicate = false;
     boardPanelState.roles.forEach(function(r, i) {
-        if (i !== roleIndex && r.id === newRoleId) duplicate = true;
+        if (i !== roleIndex && r.id === newRole.id) duplicate = true;
     });
     if (duplicate) return;
 
@@ -242,28 +394,41 @@ function commitRoleSwap(selectEl) {
     renderBoardPanel();
 }
 
-// 取消交换：下拉框失焦未选择时恢复为标签
-function cancelRoleSwap(selectEl) {
-    // setTimeout 给 onchange 时间触发，避免竞态
+// v3.0.51: 按名称查找角色
+function findRoleByName(name) {
+    var lower = name.toLowerCase();
+    // 精确匹配
+    for (var i = 0; i < ROLES.length; i++) {
+        if (ROLES[i].name.toLowerCase() === lower) return ROLES[i];
+    }
+    // 包含匹配
+    for (var i = 0; i < ROLES.length; i++) {
+        if (ROLES[i].name.toLowerCase().indexOf(lower) !== -1) return ROLES[i];
+    }
+    return null;
+}
+
+// v3.0.51: 取消交换（input 版本）
+function cancelRoleSwapInput(inputEl) {
     setTimeout(function() {
-        if (selectEl && selectEl.parentNode) {
-            // select 还在 DOM 中 → 没有 commit，恢复标签
-            var roleIndex = parseInt(selectEl.getAttribute('data-role-index'));
+        if (inputEl && inputEl.parentNode) {
+            var roleIndex = parseInt(inputEl.getAttribute('data-role-index'));
             var role = boardPanelState.roles[roleIndex];
             if (role) {
-                selectEl.outerHTML = '<span class="board-role-tag board-role-tag--clickable" ' +
-                                     'data-role-index="' + roleIndex + '" ' +
-                                     'data-role-category="' + role.category + '" ' +
-                                     'data-role-id="' + role.id + '" ' +
-                                     'onclick="startRoleSwap(event, this)">' +
-                                     role.name +
-                                     ' <span class="board-role-swap-icon">⇄</span>' +
-                                     ' <span class="board-role-remove-btn" data-role-index="' + roleIndex + '" ' +
-                                     'onclick="removeRoleFromBoard(event, this)" title="移除此角色">×</span>' +
-                                     '</span>';
+                var wrap = inputEl.parentNode;
+                wrap.outerHTML = '<span class="board-role-tag board-role-tag--clickable" ' +
+                                 'data-role-index="' + roleIndex + '" ' +
+                                 'data-role-category="' + role.category + '" ' +
+                                 'data-role-id="' + role.id + '" ' +
+                                 'onclick="startRoleSwap(event, this)">' +
+                                 role.name +
+                                 ' <span class="board-role-swap-icon">⇄</span>' +
+                                 ' <span class="board-role-remove-btn" data-role-index="' + roleIndex + '" ' +
+                                 'onclick="removeRoleFromBoard(event, this)" title="移除此角色">×</span>' +
+                                 '</span>';
             }
         }
-    }, 150);
+    }, 200);
 }
 
 // 从版型中移除指定索引的角色
