@@ -903,15 +903,15 @@ body::before {
 }
 .board-role-swap-cancel:hover { background: rgba(200,60,40,0.4); }
 
-/* 下拉选项列表 */
+/* 下拉选项列表 — position:fixed 避开面板 overflow 裁剪，JS 动态设置 top/left */
 .board-role-swap-dropdown {
-    position: absolute; top: 100%; left: 0; margin-top: 2px;
-    min-width: 140px; max-height: 200px; overflow-y: auto;
-    background: rgba(18,8,2,0.95);
+    position: fixed;
+    max-height: 220px; overflow-y: auto;
+    background: rgba(18,8,2,0.96);
     border: 1px solid var(--border-gold);
     border-radius: var(--radius-sm);
     box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-    z-index: 100;
+    z-index: 1000;
 }
 .board-role-swap-option {
     padding: 6px 10px; font-size: 13px; color: #c4b59a;

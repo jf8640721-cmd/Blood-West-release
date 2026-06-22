@@ -372,6 +372,8 @@ function startRoleSwap(event, tagEl) {
             if (currentRole) {
                 inputEl.value = currentRole.name;
             }
+            // 定位下拉框（position:fixed 避开面板 overflow 裁剪）
+            positionSwapDropdown(wrap);
             inputEl.focus();
             inputEl.select();
         }
@@ -388,6 +390,19 @@ function filterSwapDropdown(inputEl) {
         var name = (opt.textContent || '').toLowerCase();
         opt.style.display = (!keyword || name.indexOf(keyword) !== -1) ? '' : 'none';
     });
+    // 过滤后重新定位（可见选项数量变化可能影响高度）
+    positionSwapDropdown(wrap);
+}
+
+// 根据输入框屏幕位置动态定位下拉框（position:fixed 避开 overflow 裁剪）
+function positionSwapDropdown(wrap) {
+    var input = wrap.querySelector('.board-role-swap-input');
+    var dropdown = wrap.querySelector('.board-role-swap-dropdown');
+    if (!input || !dropdown) return;
+    var rect = input.getBoundingClientRect();
+    dropdown.style.top = (rect.bottom + 3) + 'px';
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.minWidth = rect.width + 'px';
 }
 
 // 键盘操作：Enter 确认，Escape 取消
@@ -507,24 +522,45 @@ function findRoleByName(name) {
 
 // 点击版型面板外部关闭交换
 var _swapOutsideHandler = null;
+var _swapScrollHandler = null;
+var _swapScrollEl = null;
+
 function ensureSwapOutsideListener() {
-    if (_swapOutsideHandler) return;
-    _swapOutsideHandler = function(e) {
-        var wraps = document.querySelectorAll('.board-role-swap-wrap');
-        var clickedInside = false;
-        wraps.forEach(function(w) {
-            if (w.contains(e.target)) clickedInside = true;
-        });
-        if (clickedInside) return;
-        // 点击外部 → 全部取消
-        wraps.forEach(function(w) { cancelSwapExplicit(w); });
-    };
-    document.addEventListener('mousedown', _swapOutsideHandler);
+    if (!_swapOutsideHandler) {
+        _swapOutsideHandler = function(e) {
+            var wraps = document.querySelectorAll('.board-role-swap-wrap');
+            var clickedInside = false;
+            wraps.forEach(function(w) {
+                if (w.contains(e.target)) clickedInside = true;
+            });
+            if (clickedInside) return;
+            // 点击外部 → 全部取消
+            wraps.forEach(function(w) { cancelSwapExplicit(w); });
+        };
+        document.addEventListener('mousedown', _swapOutsideHandler);
+    }
+    // v3.0.52: 面板滚动时重新定位下拉框（position:fixed 不会跟随滚动）
+    if (!_swapScrollHandler) {
+        _swapScrollEl = document.querySelector('#board-modal .board-panel');
+        if (_swapScrollEl) {
+            _swapScrollHandler = function() {
+                var wraps = document.querySelectorAll('.board-role-swap-wrap');
+                wraps.forEach(function(w) { positionSwapDropdown(w); });
+            };
+            _swapScrollEl.addEventListener('scroll', _swapScrollHandler, { passive: true });
+        }
+    }
 }
+
 function removeSwapOutsideListener() {
     if (_swapOutsideHandler) {
         document.removeEventListener('mousedown', _swapOutsideHandler);
         _swapOutsideHandler = null;
+    }
+    if (_swapScrollHandler && _swapScrollEl) {
+        _swapScrollEl.removeEventListener('scroll', _swapScrollHandler);
+        _swapScrollHandler = null;
+        _swapScrollEl = null;
     }
 }
 
