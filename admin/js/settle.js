@@ -185,15 +185,72 @@ async function executeSettle(winner) {
         closeSettleModal();
 
         var winnerLabel = winner === 'good' ? '善良阵营' : '邪恶阵营';
-        alert('✅ 第 ' + currentRound + ' 轮结算完成！\n\n获胜方：' + winnerLabel + '\n已更新 ' + updateCount + ' 名玩家的生涯统计。');
+        var settleMsg = '✅ 第 ' + currentRound + ' 轮结算完成！\n\n获胜方：' + winnerLabel + '\n已更新 ' + updateCount + ' 名玩家的生涯统计。';
 
-        // 隐藏结算按钮（本回合已结算，确认新版型后重新出现）
+        // 隐藏结算按钮
         var btnSettle = document.getElementById('btn-settle');
         if (btnSettle) btnSettle.style.display = 'none';
+
+        // v3.0.50: 询问是否清理房间准备下一局
+        if (confirm(settleMsg + '\n\n是否清除聊天/技能记录，准备下一局游戏？\n（玩家名牌将保留）')) {
+            await clearRoomForNextGame(roomId);
+        } else {
+            alert(settleMsg);
+        }
 
     } catch (err) {
         console.error('结算异常:', err);
         alert('结算过程发生异常，请查看控制台。');
+    }
+}
+
+// ============================================================
+// v3.0.50: 清理房间准备下一局（保留玩家名牌）
+// ============================================================
+
+async function clearRoomForNextGame(roomId) {
+    try {
+        var { error } = await state.supabase.rpc('reset_room_for_next_game', {
+            p_room_id: roomId
+        });
+
+        if (error) {
+            console.error('清理房间失败:', error);
+            alert('清理房间失败，请查看控制台。\n\n结算已保存，可手动刷新页面后重新开始。');
+            return;
+        }
+
+        // 更新本地状态
+        state.players.forEach(function (p) {
+            p.role = null;
+            p.status = 'alive';
+            p.is_dizzy = false;
+            p.kicked = false;
+        });
+        state.room.phase = '首夜';
+        state.messages = [];
+        state.evilMessages = [];
+        state.newMsgPlayers.clear();
+        state.evilUnread = false;
+        state.activeBoard = null;
+        localStorage.removeItem('botc_active_board');
+
+        // 刷新 UI
+        renderRoundTable();
+        updatePhaseButton('首夜');
+        if (typeof renderMessages === 'function') renderMessages();
+        if (typeof renderEvilMessages === 'function') renderEvilMessages();
+        if (typeof updateEvilToolbarButton === 'function') updateEvilToolbarButton();
+
+        // 重置技能队列
+        if (typeof initNightQueue === 'function') initNightQueue('首夜');
+        if (typeof initDayQueue === 'function') initDayQueue('首夜');
+
+        alert('🧹 房间已清理完毕！\n\n聊天记录、技能记录已清除\n玩家角色已重置\n房间阶段回到首夜\n\n请确认新版型开始下一局。');
+
+    } catch (err) {
+        console.error('清理房间异常:', err);
+        alert('清理房间异常，请查看控制台。');
     }
 }
 

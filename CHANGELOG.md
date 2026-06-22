@@ -1,5 +1,17 @@
 # 版本日志
 
+## v3.0.50 (2026-06-22)
+
+### 🧹 结算后一键清理房间
+
+- 结算完成后弹出确认框，可选择清除聊天/技能记录准备下一局
+- 新增 `reset_room_for_next_game` RPC（SECURITY DEFINER）：
+  - 清除 `messages`、`evil_chat_messages`、`skill_actions`、`skill_states`
+  - 重置玩家 `role`/`status`/`is_dizzy`/`kicked`
+  - 重置房间 `phase` 为「首夜」
+  - **保留玩家名牌**：nickname、avatar_url、player_number、openid 不动
+- 清理后自动刷新圆桌、阶段按钮、消息面板
+
 ## v3.0.49 (2026-06-22)
 
 ### 🔄 同房间多轮结算
