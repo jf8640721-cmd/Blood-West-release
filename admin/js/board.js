@@ -48,6 +48,7 @@ function openBoardPanel() {
 
 function closeBoardPanel() {
     $('#board-modal').style.display = 'none';
+    removeSwapOutsideListener();  // v3.0.51: 清理交换监听器
 }
 
 function adjustBoardCount(delta) {
@@ -318,7 +319,7 @@ function toggleBoardCat(header) {
     }
 }
 
-// 点击角色标签 → 原地替换为同类别下拉选择器
+// 点击角色标签 → 原地替换为搜索输入框 + 可点击下拉列表
 function startRoleSwap(event, tagEl) {
     event.stopPropagation();
 
@@ -334,101 +335,197 @@ function startRoleSwap(event, tagEl) {
         if (i !== roleIndex) usedIds.push(r.id);
     });
 
-    // 获取同类别未使用的角色
+    // 获取同类别所有可用角色
     var availableRoles = getAvailableRolesForCategory(category, usedIds);
+    // 把当前角色也加入列表（避免找不到）
+    var currentRole = ROLES_BY_ID[currentRoleId];
+    var allCategoryRoles = getAvailableRolesForCategory(category, []);
 
-    // v3.0.51: 使用可搜索的 input + datalist 替代原生 select
-    var datalistId = 'board-swap-datalist-' + roleIndex;
-    var inputHtml = '<span class="board-role-swap-wrap">' +
-                    '<input class="board-role-swap-input" ' +
-                    'data-role-index="' + roleIndex + '" ' +
-                    'data-current-id="' + currentRoleId + '" ' +
-                    'list="' + datalistId + '" ' +
-                    'placeholder="输入角色名搜索…" ' +
-                    'onchange="commitRoleSwapInput(this)" ' +
-                    'onblur="cancelRoleSwapInput(this)" />' +
-                    '<datalist id="' + datalistId + '">';
-    availableRoles.forEach(function(r) {
-        inputHtml += '<option value="' + r.id + '">' + r.name + '</option>';
+    // 构建搜索输入 + 下拉列表
+    var html = '<span class="board-role-swap-wrap" data-role-index="' + roleIndex + '">' +
+               '<input class="board-role-swap-input" ' +
+               'placeholder="输入搜索…" ' +
+               'oninput="filterSwapDropdown(this)" ' +
+               'onkeydown="onSwapKeydown(event, this)" />' +
+               '<button class="board-role-swap-cancel" onclick="cancelSwapExplicit(this)" title="取消">✕</button>' +
+               '<div class="board-role-swap-dropdown">';
+    allCategoryRoles.forEach(function(r) {
+        html += '<div class="board-role-swap-option' + (r.id === currentRoleId ? ' current' : '') + '" ' +
+                'data-role-id="' + r.id + '" ' +
+                'onmousedown="commitSwapByClick(event, this)" ' +
+                'ontouchstart="commitSwapByClick(event, this)">' +
+                r.name + '</div>';
     });
-    inputHtml += '</datalist></span>';
+    html += '</div></span>';
 
     // 替换 DOM
-    tagEl.outerHTML = inputHtml;
+    tagEl.outerHTML = html;
 
-    // 自动聚焦输入框
-    var inputEl = document.querySelector('.board-role-swap-input[data-role-index="' + roleIndex + '"]');
-    if (inputEl) {
-        inputEl.focus();
-        // 预填当前角色名方便搜索
-        var currentRole = ROLES_BY_ID[currentRoleId];
-        if (currentRole) {
-            inputEl.value = currentRole.name;
+    // 注册点击外部关闭
+    ensureSwapOutsideListener();
+
+    // 聚焦输入框，预填当前角色名
+    var wrap = document.querySelector('.board-role-swap-wrap[data-role-index="' + roleIndex + '"]');
+    if (wrap) {
+        var inputEl = wrap.querySelector('.board-role-swap-input');
+        if (inputEl) {
+            if (currentRole) {
+                inputEl.value = currentRole.name;
+            }
+            inputEl.focus();
             inputEl.select();
         }
     }
 }
 
-// v3.0.51: 确认交换（input + datalist 版本）
-function commitRoleSwapInput(inputEl) {
-    var roleIndex = parseInt(inputEl.getAttribute('data-role-index'));
-    var typedName = (inputEl.value || '').trim();
-
-    if (isNaN(roleIndex) || !typedName) return;
-
-    // 通过名称查找角色（支持模糊匹配）
-    var newRole = findRoleByName(typedName);
-    if (!newRole) return;
-
-    // 防重复检查
-    var duplicate = false;
-    boardPanelState.roles.forEach(function(r, i) {
-        if (i !== roleIndex && r.id === newRole.id) duplicate = true;
+// 搜索过滤下拉选项
+function filterSwapDropdown(inputEl) {
+    var keyword = (inputEl.value || '').trim().toLowerCase();
+    var wrap = inputEl.closest('.board-role-swap-wrap');
+    if (!wrap) return;
+    var options = wrap.querySelectorAll('.board-role-swap-option');
+    options.forEach(function(opt) {
+        var name = (opt.textContent || '').toLowerCase();
+        opt.style.display = (!keyword || name.indexOf(keyword) !== -1) ? '' : 'none';
     });
-    if (duplicate) return;
-
-    // 更新版型状态
-    boardPanelState.roles[roleIndex] = newRole;
-
-    // 重新渲染面板
-    renderBoardPanel();
 }
 
-// v3.0.51: 按名称查找角色
+// 键盘操作：Enter 确认，Escape 取消
+function onSwapKeydown(event, inputEl) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        commitSwapFromInput(inputEl);
+    } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelSwapExplicit(inputEl);
+    }
+}
+
+// 点击下拉选项（mousedown 防止 blur 竞态）
+function commitSwapByClick(event, optionEl) {
+    event.preventDefault();
+    event.stopPropagation();
+    var roleId = optionEl.getAttribute('data-role-id');
+    var wrap = optionEl.closest('.board-role-swap-wrap');
+    if (!wrap || !roleId) return;
+    var roleIndex = parseInt(wrap.getAttribute('data-role-index'));
+    if (isNaN(roleIndex)) return;
+
+    var newRole = ROLES_BY_ID[roleId];
+    if (!newRole) return;
+
+    // 防重复
+    var dup = false;
+    boardPanelState.roles.forEach(function(r, i) {
+        if (i !== roleIndex && r.id === roleId) dup = true;
+    });
+    if (dup) return;
+
+    boardPanelState.roles[roleIndex] = newRole;
+    renderBoardPanel();
+    removeSwapOutsideListener();
+}
+
+// 从输入框确认（Enter 键触发）
+function commitSwapFromInput(inputEl) {
+    var wrap = inputEl.closest('.board-role-swap-wrap');
+    if (!wrap) return;
+    var roleIndex = parseInt(wrap.getAttribute('data-role-index'));
+    if (isNaN(roleIndex)) return;
+
+    var typed = (inputEl.value || '').trim();
+    if (!typed) return;
+
+    // 先找可见选项中的第一个匹配
+    var visibleOptions = wrap.querySelectorAll('.board-role-swap-option:not([style*="display: none"])');
+    if (visibleOptions.length === 1) {
+        var onlyId = visibleOptions[0].getAttribute('data-role-id');
+        var onlyRole = ROLES_BY_ID[onlyId];
+        if (onlyRole) {
+            boardPanelState.roles[roleIndex] = onlyRole;
+            renderBoardPanel();
+            removeSwapOutsideListener();
+            return;
+        }
+    }
+
+    // 模糊匹配
+    var newRole = findRoleByName(typed);
+    if (!newRole) return;
+
+    var dup = false;
+    boardPanelState.roles.forEach(function(r, i) {
+        if (i !== roleIndex && r.id === newRole.id) dup = true;
+    });
+    if (dup) return;
+
+    boardPanelState.roles[roleIndex] = newRole;
+    renderBoardPanel();
+    removeSwapOutsideListener();
+}
+
+// 显式取消
+function cancelSwapExplicit(el) {
+    var wrap = (el.classList && el.classList.contains('board-role-swap-wrap'))
+        ? el : el.closest('.board-role-swap-wrap');
+    if (!wrap) return;
+    var roleIndex = parseInt(wrap.getAttribute('data-role-index'));
+    if (isNaN(roleIndex)) { wrap.remove(); return; }
+
+    var role = boardPanelState.roles[roleIndex];
+    if (!role) { wrap.remove(); return; }
+
+    wrap.outerHTML = buildRoleTagHtml(roleIndex, role);
+    removeSwapOutsideListener();
+}
+
+// 构建角色标签 HTML
+function buildRoleTagHtml(roleIndex, role) {
+    return '<span class="board-role-tag board-role-tag--clickable" ' +
+           'data-role-index="' + roleIndex + '" ' +
+           'data-role-category="' + role.category + '" ' +
+           'data-role-id="' + role.id + '" ' +
+           'onclick="startRoleSwap(event, this)">' +
+           role.name +
+           ' <span class="board-role-swap-icon">⇄</span>' +
+           ' <span class="board-role-remove-btn" data-role-index="' + roleIndex + '" ' +
+           'onclick="removeRoleFromBoard(event, this)" title="移除此角色">×</span>' +
+           '</span>';
+}
+
+// 按名称查找角色
 function findRoleByName(name) {
     var lower = name.toLowerCase();
-    // 精确匹配
     for (var i = 0; i < ROLES.length; i++) {
         if (ROLES[i].name.toLowerCase() === lower) return ROLES[i];
     }
-    // 包含匹配
     for (var i = 0; i < ROLES.length; i++) {
         if (ROLES[i].name.toLowerCase().indexOf(lower) !== -1) return ROLES[i];
     }
     return null;
 }
 
-// v3.0.51: 取消交换（input 版本）
-function cancelRoleSwapInput(inputEl) {
-    setTimeout(function() {
-        if (inputEl && inputEl.parentNode) {
-            var roleIndex = parseInt(inputEl.getAttribute('data-role-index'));
-            var role = boardPanelState.roles[roleIndex];
-            if (role) {
-                var wrap = inputEl.parentNode;
-                wrap.outerHTML = '<span class="board-role-tag board-role-tag--clickable" ' +
-                                 'data-role-index="' + roleIndex + '" ' +
-                                 'data-role-category="' + role.category + '" ' +
-                                 'data-role-id="' + role.id + '" ' +
-                                 'onclick="startRoleSwap(event, this)">' +
-                                 role.name +
-                                 ' <span class="board-role-swap-icon">⇄</span>' +
-                                 ' <span class="board-role-remove-btn" data-role-index="' + roleIndex + '" ' +
-                                 'onclick="removeRoleFromBoard(event, this)" title="移除此角色">×</span>' +
-                                 '</span>';
-            }
-        }
-    }, 200);
+// 点击版型面板外部关闭交换
+var _swapOutsideHandler = null;
+function ensureSwapOutsideListener() {
+    if (_swapOutsideHandler) return;
+    _swapOutsideHandler = function(e) {
+        var wraps = document.querySelectorAll('.board-role-swap-wrap');
+        var clickedInside = false;
+        wraps.forEach(function(w) {
+            if (w.contains(e.target)) clickedInside = true;
+        });
+        if (clickedInside) return;
+        // 点击外部 → 全部取消
+        wraps.forEach(function(w) { cancelSwapExplicit(w); });
+    };
+    document.addEventListener('mousedown', _swapOutsideHandler);
+}
+function removeSwapOutsideListener() {
+    if (_swapOutsideHandler) {
+        document.removeEventListener('mousedown', _swapOutsideHandler);
+        _swapOutsideHandler = null;
+    }
 }
 
 // 从版型中移除指定索引的角色

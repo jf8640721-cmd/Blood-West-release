@@ -884,13 +884,43 @@ body::before {
     50% { box-shadow: 0 0 12px rgba(184,120,30,0.6); }
 }
 
-/* 交换输入框 */
-.board-role-swap-wrap { display: inline-flex; }
+/* v3.0.51: 交换下拉组件 */
+.board-role-swap-wrap {
+    position: relative; display: inline-flex; align-items: center; gap: 4px;
+}
 .board-role-swap-input {
-    width: 150px; padding: 4px 8px;
-    background: rgba(20,10,4,0.8); border: 1px solid var(--border-gold);
-    border-radius: var(--radius-sm); color: #f0e0c0; font-size: 12px;
-    outline: none;
+    width: 140px; padding: 5px 8px;
+    background: rgba(20,10,4,0.9); border: 1px solid var(--border-gold);
+    border-radius: var(--radius-sm); color: #f0e0c0; font-size: 13px;
+    outline: none; z-index: 1;
+}
+.board-role-swap-cancel {
+    flex-shrink: 0; width: 22px; height: 22px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(200,60,40,0.2); border: 1px solid rgba(200,60,40,0.3);
+    border-radius: 50%; color: #f08070; font-size: 11px;
+    cursor: pointer; z-index: 1;
+}
+.board-role-swap-cancel:hover { background: rgba(200,60,40,0.4); }
+
+/* 下拉选项列表 */
+.board-role-swap-dropdown {
+    position: absolute; top: 100%; left: 0; margin-top: 2px;
+    min-width: 140px; max-height: 200px; overflow-y: auto;
+    background: rgba(18,8,2,0.95);
+    border: 1px solid var(--border-gold);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    z-index: 100;
+}
+.board-role-swap-option {
+    padding: 6px 10px; font-size: 13px; color: #c4b59a;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.1s;
+}
+.board-role-swap-option:hover,
+.board-role-swap-option.current {
+    background: rgba(184,120,30,0.25); color: #f0e0c0;
 }
 
 /* 衣服推荐区域 */
