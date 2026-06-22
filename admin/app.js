@@ -86,13 +86,6 @@ function bindEvents() {
         if (e.key === 'Enter') replyToPlayer();
     });
 
-    // 快捷回复模板按钮
-    document.querySelectorAll('.btn-quick-reply').forEach(btn => {
-        btn.addEventListener('click', function() {
-            sendQuickReply(this.getAttribute('data-reply'));
-        });
-    });
-
     // 版型配置
     $('#btn-board-config').addEventListener('click', openBoardPanel);
     $('#btn-close-board').addEventListener('click', closeBoardPanel);

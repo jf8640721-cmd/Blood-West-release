@@ -198,33 +198,6 @@ function sendSubscribeNotify(content) {
     });
 }
 
-// 快捷回复（模板消息，不透露技能结果）
-async function sendQuickReply(content) {
-    if (!state.selectedPlayer) {
-        alert('请先选择一位玩家');
-        return;
-    }
-
-    const { error } = await state.supabase
-        .from('messages')
-        .insert([{
-            room_id: state.room.id,
-            player_id: state.selectedPlayer.id,
-            direction: 'host_to_player',
-            content: content,
-            phase: null
-        }]);
-
-    if (error) {
-        showError('快捷回复', error);
-        return;
-    }
-
-    // 异步发送微信订阅通知
-    sendSubscribeNotify(content);
-    // Realtime 会自动推送消息
-}
-
 // ============================================================
 // 踢出玩家
 // ============================================================
