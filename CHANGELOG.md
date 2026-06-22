@@ -4,10 +4,11 @@
 
 ### 🐛 修复角色交换下拉框被截断
 
-- 交换下拉框从 `position: absolute` 改为 `position: fixed`，逃脱面板 `overflow` 裁剪
-- JS 根据输入框 `getBoundingClientRect` 动态计算下拉框屏幕坐标
-- 面板滚动时自动重新定位下拉框（scroll 事件监听）
-- z-index 提升至 1000，确保覆盖所有弹窗层级
+- 下拉框改为 Portal 模式：渲染到 `document.body`，彻底摆脱面板 `overflow-y: auto` 裁剪
+- `position: fixed` + `getBoundingClientRect()` 动态定位，`requestAnimationFrame` 确保布局完成
+- 下方空间不足时自动翻转到输入框上方显示
+- 面板滚动/输入过滤时实时重新定位
+- 关闭面板/取消交换时自动清理 body 上的下拉框残留
 
 ## v3.0.51 (2026-06-22)
 

@@ -319,7 +319,7 @@ function toggleBoardCat(header) {
     }
 }
 
-// 点击角色标签 → 原地替换为搜索输入框 + 可点击下拉列表
+// 点击角色标签 → 原地替换为搜索输入框（下拉框 Portal 到 body 避开 overflow 裁剪）
 function startRoleSwap(event, tagEl) {
     event.stopPropagation();
 
@@ -329,80 +329,90 @@ function startRoleSwap(event, tagEl) {
 
     if (isNaN(roleIndex)) return;
 
-    // 收集当前版型中已使用的角色 ID（排除自己）
-    var usedIds = [];
-    boardPanelState.roles.forEach(function(r, i) {
-        if (i !== roleIndex) usedIds.push(r.id);
-    });
-
-    // 获取同类别所有可用角色
-    var availableRoles = getAvailableRolesForCategory(category, usedIds);
-    // 把当前角色也加入列表（避免找不到）
     var currentRole = ROLES_BY_ID[currentRoleId];
     var allCategoryRoles = getAvailableRolesForCategory(category, []);
 
-    // 构建搜索输入 + 下拉列表
+    // 构建搜索输入（不含下拉框 — 下拉框 Portal 到 body）
     var html = '<span class="board-role-swap-wrap" data-role-index="' + roleIndex + '">' +
                '<input class="board-role-swap-input" ' +
                'placeholder="输入搜索…" ' +
                'oninput="filterSwapDropdown(this)" ' +
                'onkeydown="onSwapKeydown(event, this)" />' +
                '<button class="board-role-swap-cancel" onclick="cancelSwapExplicit(this)" title="取消">✕</button>' +
-               '<div class="board-role-swap-dropdown">';
-    allCategoryRoles.forEach(function(r) {
-        html += '<div class="board-role-swap-option' + (r.id === currentRoleId ? ' current' : '') + '" ' +
-                'data-role-id="' + r.id + '" ' +
-                'onmousedown="commitSwapByClick(event, this)" ' +
-                'ontouchstart="commitSwapByClick(event, this)">' +
-                r.name + '</div>';
-    });
-    html += '</div></span>';
+               '</span>';
 
     // 替换 DOM
     tagEl.outerHTML = html;
 
-    // 注册点击外部关闭
+    // 创建下拉框 Portal 到 body（不在任何 overflow 容器内）
+    var dropdown = document.createElement('div');
+    dropdown.className = 'board-role-swap-dropdown';
+    dropdown.setAttribute('data-swap-role-index', roleIndex);
+    allCategoryRoles.forEach(function(r) {
+        var opt = document.createElement('div');
+        opt.className = 'board-role-swap-option' + (r.id === currentRoleId ? ' current' : '');
+        opt.setAttribute('data-role-id', r.id);
+        opt.textContent = r.name;
+        opt.addEventListener('mousedown', function(e) { commitSwapByClick(e, opt); });
+        opt.addEventListener('touchstart', function(e) { commitSwapByClick(e, opt); });
+        dropdown.appendChild(opt);
+    });
+    document.body.appendChild(dropdown);
+
+    // 注册监听器
     ensureSwapOutsideListener();
 
-    // 聚焦输入框，预填当前角色名
+    // 聚焦输入框，预填当前角色名，定位下拉框
     var wrap = document.querySelector('.board-role-swap-wrap[data-role-index="' + roleIndex + '"]');
     if (wrap) {
         var inputEl = wrap.querySelector('.board-role-swap-input');
         if (inputEl) {
-            if (currentRole) {
-                inputEl.value = currentRole.name;
-            }
-            // 定位下拉框（position:fixed 避开面板 overflow 裁剪）
-            positionSwapDropdown(wrap);
-            inputEl.focus();
-            inputEl.select();
+            if (currentRole) inputEl.value = currentRole.name;
+            // requestAnimationFrame 确保 DOM 布局完成后再获取坐标
+            requestAnimationFrame(function() {
+                repositionPortalDropdowns();
+                inputEl.focus();
+                inputEl.select();
+            });
         }
     }
 }
 
-// 搜索过滤下拉选项
+// 搜索过滤下拉选项（下拉框在 body 上，通过 data-swap-role-index 定位）
 function filterSwapDropdown(inputEl) {
     var keyword = (inputEl.value || '').trim().toLowerCase();
     var wrap = inputEl.closest('.board-role-swap-wrap');
     if (!wrap) return;
-    var options = wrap.querySelectorAll('.board-role-swap-option');
+    var roleIndex = wrap.getAttribute('data-role-index');
+    var dropdown = document.querySelector('.board-role-swap-dropdown[data-swap-role-index="' + roleIndex + '"]');
+    if (!dropdown) return;
+    var options = dropdown.querySelectorAll('.board-role-swap-option');
     options.forEach(function(opt) {
         var name = (opt.textContent || '').toLowerCase();
         opt.style.display = (!keyword || name.indexOf(keyword) !== -1) ? '' : 'none';
     });
-    // 过滤后重新定位（可见选项数量变化可能影响高度）
-    positionSwapDropdown(wrap);
+    repositionPortalDropdowns();
 }
 
-// 根据输入框屏幕位置动态定位下拉框（position:fixed 避开 overflow 裁剪）
-function positionSwapDropdown(wrap) {
-    var input = wrap.querySelector('.board-role-swap-input');
-    var dropdown = wrap.querySelector('.board-role-swap-dropdown');
-    if (!input || !dropdown) return;
-    var rect = input.getBoundingClientRect();
-    dropdown.style.top = (rect.bottom + 3) + 'px';
-    dropdown.style.left = rect.left + 'px';
-    dropdown.style.minWidth = rect.width + 'px';
+// 重新定位所有 Portal 下拉框（position:fixed，基于对应输入框的屏幕坐标）
+function repositionPortalDropdowns() {
+    var dropdowns = document.querySelectorAll('.board-role-swap-dropdown');
+    dropdowns.forEach(function(dropdown) {
+        var roleIndex = dropdown.getAttribute('data-swap-role-index');
+        var wrap = document.querySelector('.board-role-swap-wrap[data-role-index="' + roleIndex + '"]');
+        if (!wrap) { dropdown.remove(); return; }
+        var input = wrap.querySelector('.board-role-swap-input');
+        if (!input) { dropdown.remove(); return; }
+        var rect = input.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 3) + 'px';
+        dropdown.style.left = rect.left + 'px';
+        dropdown.style.minWidth = rect.width + 'px';
+        // 避免超出视口底部：如果下方空间不足，翻转到输入框上方
+        var dropdownHeight = dropdown.offsetHeight || 200;
+        if (rect.bottom + dropdownHeight + 10 > window.innerHeight) {
+            dropdown.style.top = (rect.top - dropdownHeight - 3) + 'px';
+        }
+    });
 }
 
 // 键盘操作：Enter 确认，Escape 取消
@@ -421,9 +431,9 @@ function commitSwapByClick(event, optionEl) {
     event.preventDefault();
     event.stopPropagation();
     var roleId = optionEl.getAttribute('data-role-id');
-    var wrap = optionEl.closest('.board-role-swap-wrap');
-    if (!wrap || !roleId) return;
-    var roleIndex = parseInt(wrap.getAttribute('data-role-index'));
+    var dropdown = optionEl.closest('.board-role-swap-dropdown');
+    if (!dropdown || !roleId) return;
+    var roleIndex = parseInt(dropdown.getAttribute('data-swap-role-index'));
     if (isNaN(roleIndex)) return;
 
     var newRole = ROLES_BY_ID[roleId];
@@ -451,8 +461,11 @@ function commitSwapFromInput(inputEl) {
     var typed = (inputEl.value || '').trim();
     if (!typed) return;
 
-    // 先找可见选项中的第一个匹配
-    var visibleOptions = wrap.querySelectorAll('.board-role-swap-option:not([style*="display: none"])');
+    // 查找 Portal 下拉框中的可见选项
+    var dropdown = document.querySelector('.board-role-swap-dropdown[data-swap-role-index="' + roleIndex + '"]');
+    var visibleOptions = dropdown
+        ? dropdown.querySelectorAll('.board-role-swap-option:not([style*="display: none"])')
+        : [];
     if (visibleOptions.length === 1) {
         var onlyId = visibleOptions[0].getAttribute('data-role-id');
         var onlyRole = ROLES_BY_ID[onlyId];
@@ -479,7 +492,7 @@ function commitSwapFromInput(inputEl) {
     removeSwapOutsideListener();
 }
 
-// 显式取消
+// 显式取消（恢复角色标签 + 移除 Portal 下拉框）
 function cancelSwapExplicit(el) {
     var wrap = (el.classList && el.classList.contains('board-role-swap-wrap'))
         ? el : el.closest('.board-role-swap-wrap');
@@ -529,9 +542,13 @@ function ensureSwapOutsideListener() {
     if (!_swapOutsideHandler) {
         _swapOutsideHandler = function(e) {
             var wraps = document.querySelectorAll('.board-role-swap-wrap');
+            var dropdowns = document.querySelectorAll('.board-role-swap-dropdown');
             var clickedInside = false;
             wraps.forEach(function(w) {
                 if (w.contains(e.target)) clickedInside = true;
+            });
+            dropdowns.forEach(function(d) {
+                if (d.contains(e.target)) clickedInside = true;
             });
             if (clickedInside) return;
             // 点击外部 → 全部取消
@@ -539,13 +556,12 @@ function ensureSwapOutsideListener() {
         };
         document.addEventListener('mousedown', _swapOutsideHandler);
     }
-    // v3.0.52: 面板滚动时重新定位下拉框（position:fixed 不会跟随滚动）
+    // 面板滚动时重新定位 Portal 下拉框
     if (!_swapScrollHandler) {
         _swapScrollEl = document.querySelector('#board-modal .board-panel');
         if (_swapScrollEl) {
             _swapScrollHandler = function() {
-                var wraps = document.querySelectorAll('.board-role-swap-wrap');
-                wraps.forEach(function(w) { positionSwapDropdown(w); });
+                repositionPortalDropdowns();
             };
             _swapScrollEl.addEventListener('scroll', _swapScrollHandler, { passive: true });
         }
@@ -562,6 +578,9 @@ function removeSwapOutsideListener() {
         _swapScrollHandler = null;
         _swapScrollEl = null;
     }
+    // 清理所有 Portal 下拉框
+    var dropdowns = document.querySelectorAll('.board-role-swap-dropdown');
+    dropdowns.forEach(function(d) { d.remove(); });
 }
 
 // 从版型中移除指定索引的角色

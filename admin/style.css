@@ -903,10 +903,10 @@ body::before {
 }
 .board-role-swap-cancel:hover { background: rgba(200,60,40,0.4); }
 
-/* 下拉选项列表 — position:fixed 避开面板 overflow 裁剪，JS 动态设置 top/left */
+/* 下拉选项列表 — Portal 到 body，position:fixed + JS 动态定位，避开 overflow 裁剪 */
 .board-role-swap-dropdown {
     position: fixed;
-    max-height: 220px; overflow-y: auto;
+    max-height: 220px; min-width: 140px; overflow-y: auto;
     background: rgba(18,8,2,0.96);
     border: 1px solid var(--border-gold);
     border-radius: var(--radius-sm);
