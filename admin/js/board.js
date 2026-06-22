@@ -478,6 +478,11 @@ function confirmBoard() {
     // 持久化到 localStorage
     localStorage.setItem('botc_active_board', JSON.stringify(board));
 
+    // v3.0.49: 新版型 = 新回合，重置结算状态
+    state.currentRound++;
+    localStorage.setItem('botc_current_round', state.currentRound);
+    if (typeof showSettleButton === 'function') showSettleButton();
+
     closeBoardPanel();
 
     // 如果当前有选中的玩家，刷新角色选择器

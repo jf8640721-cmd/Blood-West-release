@@ -1259,6 +1259,16 @@ body::before {
     font-weight: bold;
 }
 
+.settle-round {
+    color: var(--gold-primary);
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(184, 120, 30, 0.15);
+    border: 1px solid rgba(184, 120, 30, 0.3);
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
 .settle-factions {
     color: var(--cream-dim);
     font-size: 12px;

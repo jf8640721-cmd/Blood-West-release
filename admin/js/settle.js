@@ -1,7 +1,8 @@
 /**
- * admin/js/settle.js - 游戏结算逻辑（v3.0.48 积分制）
+ * admin/js/settle.js - 游戏结算逻辑（v3.0.49 回合隔离）
  * 依赖：state.js（全局状态）、roles.js（ROLES_BY_ID 角色数据）
  * 积分规则：善良阵营获胜 → 善良玩家 +1分；邪恶阵营获胜 → 邪恶玩家 +2分
+ * 回合隔离：每次确认新版型回合+1，结算按 room_id + round_number 隔离
  */
 
 // ============================================================
@@ -15,16 +16,18 @@ function showSettleModal() {
         return;
     }
 
-    // 检查是否已结算过
+    // v3.0.49: 检查当前回合是否已结算
     var roomId = state.room.id;
+    var currentRound = state.currentRound || 1;
     state.supabase
         .from('game_participants')
         .select('id')
         .eq('room_id', roomId)
+        .eq('round_number', currentRound)
         .limit(1)
         .then(function (res) {
             if (res.data && res.data.length > 0) {
-                alert('该房间已经结算过了，无法重复结算。');
+                alert('第 ' + currentRound + ' 轮已经结算过了。请确认新版型后重新结算。');
                 return;
             }
             if (res.error) {
@@ -51,7 +54,9 @@ function renderSettleSummary() {
     var summary = document.getElementById('settle-summary');
     if (!summary) return;
 
+    var currentRound = state.currentRound || 1;
     var html = '<div class="settle-players">';
+    html += '<span class="settle-round">第 ' + currentRound + ' 轮</span>';
     html += '<span class="settle-count">共 ' + activePlayers.length + ' 名玩家</span>';
 
     // 统计阵营
@@ -116,6 +121,7 @@ async function executeSettle(winner) {
     }
 
     // 1. 构建 game_participants 数据
+    var currentRound = state.currentRound || 1;
     var participants = [];
     players.forEach(function (p) {
         var roleObj = getPlayerRoleObj(p);
@@ -132,7 +138,8 @@ async function executeSettle(winner) {
             role_id: p.role || '',
             faction: faction,
             survived: survived,
-            won: won
+            won: won,
+            round_number: currentRound
         });
     });
 
@@ -178,9 +185,9 @@ async function executeSettle(winner) {
         closeSettleModal();
 
         var winnerLabel = winner === 'good' ? '善良阵营' : '邪恶阵营';
-        alert('✅ 结算完成！\n\n获胜方：' + winnerLabel + '\n已更新 ' + updateCount + ' 名玩家的生涯统计。');
+        alert('✅ 第 ' + currentRound + ' 轮结算完成！\n\n获胜方：' + winnerLabel + '\n已更新 ' + updateCount + ' 名玩家的生涯统计。');
 
-        // 隐藏结算按钮（防止重复结算）
+        // 隐藏结算按钮（本回合已结算，确认新版型后重新出现）
         var btnSettle = document.getElementById('btn-settle');
         if (btnSettle) btnSettle.style.display = 'none';
 
@@ -229,6 +236,43 @@ function bindSettleEvents() {
             if (e.target === modal) closeSettleModal();
         });
     }
+}
+
+// v3.0.49: 恢复回合状态 + 检查当前回合是否已结算
+function restoreSettleState() {
+    // 恢复当前回合
+    var savedRound = localStorage.getItem('botc_current_round');
+    if (savedRound) {
+        state.currentRound = parseInt(savedRound) || 1;
+    } else {
+        state.currentRound = 1;
+    }
+
+    // 检查当前回合是否已结算
+    if (!state.room || !state.room.id) return;
+
+    var roomId = state.room.id;
+    var currentRound = state.currentRound;
+
+    state.supabase
+        .from('game_participants')
+        .select('id')
+        .eq('room_id', roomId)
+        .eq('round_number', currentRound)
+        .limit(1)
+        .then(function (res) {
+            if (res.data && res.data.length > 0) {
+                // 当前回合已结算，隐藏按钮
+                hideSettleButton();
+            } else {
+                // 当前回合未结算，显示按钮
+                showSettleButton();
+            }
+        })
+        .catch(function () {
+            // 查询失败时默认显示（允许结算）
+            showSettleButton();
+        });
 }
 
 // 显示结算按钮（进入房间后调用）

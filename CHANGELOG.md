@@ -1,5 +1,18 @@
 # 版本日志
 
+## v3.0.49 (2026-06-22)
+
+### 🔄 同房间多轮结算
+
+- 每次主持人确认新版型（`confirmBoard`）自动进入新回合，结算按钮重新可用
+- `game_participants` 表新增 `round_number` 字段，结算按房间+回合隔离
+- `state.currentRound` 追踪当前回合，localStorage 持久化
+- 进入房间时自动检查当前回合是否已结算，决定结算按钮显示/隐藏
+- 结算弹窗显示当前回合数
+
+**数据库变更**：
+- `game_participants` 新增 `round_number INTEGER NOT NULL DEFAULT 1`
+
 ## v3.0.48 (2026-06-22)
 
 ### 📊 排行榜积分制

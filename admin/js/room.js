@@ -114,8 +114,8 @@ function showRoomUI() {
     $('#btn-board-config').style.display = 'inline-block';
     $('#btn-debug-players').style.display = 'inline-block';
     $('#btn-exit-room').style.display = 'inline-block';
-    // v3.0.47: 显示结算按钮
-    if (typeof showSettleButton === 'function') showSettleButton();
+    // v3.0.49: 恢复当前回合，检查是否已结算，决定是否显示结算按钮
+    restoreSettleState();
 
     // 确保 Canvas 圆桌在布局完成后绘制
     requestAnimationFrame(function() {

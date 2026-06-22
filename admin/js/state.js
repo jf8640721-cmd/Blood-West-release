@@ -43,6 +43,7 @@ const state = {
     realtimeChannel: null,  // Supabase Realtime 频道
     newMsgPlayers: new Set(), // 有新消息未查看的玩家 ID 集合
     activeBoard: null,      // 当前版型 { playerCount, distribution, roles[] }
+    currentRound: 1,        // v3.0.49: 当前游戏回合（用于结算隔离）
     evilMessages: [],       // 邪恶群聊消息
     msgTab: 'private',      // 当前消息面板 Tab：'private' | 'evil'
     evilUnread: false       // 邪恶群聊是否有未读消息
