@@ -1,5 +1,18 @@
 # 版本日志
 
+## v3.0.48 (2026-06-22)
+
+### 📊 排行榜积分制
+
+- **积分规则**：善良阵营获胜 → 善良玩家 +1分；邪恶阵营获胜 → 邪恶玩家 +2分
+- 排行榜新增「积分」列，按积分降序排列（副排序：胜率 → 场次）
+- `player_game_stats` 表新增 `points` 列，`upsert_game_stats` RPC 加 `p_points` 参数
+- Web 结算时自动计算每位玩家的本局积分并写入数据库
+
+**数据库变更**：
+- `player_game_stats` 新增 `points INTEGER NOT NULL DEFAULT 0`
+- `upsert_game_stats` RPC 签名变更（新增 `p_points INTEGER` 参数）
+
 ## v3.0.47 (2026-06-22)
 
 ### 🏆 玩家排行榜 + 头像系统 + 游戏结算

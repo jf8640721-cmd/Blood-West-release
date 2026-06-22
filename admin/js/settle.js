@@ -1,6 +1,7 @@
 /**
- * admin/js/settle.js - 游戏结算逻辑（v3.0.47）
+ * admin/js/settle.js - 游戏结算逻辑（v3.0.48 积分制）
  * 依赖：state.js（全局状态）、roles.js（ROLES_BY_ID 角色数据）
+ * 积分规则：善良阵营获胜 → 善良玩家 +1分；邪恶阵营获胜 → 邪恶玩家 +2分
  */
 
 // ============================================================
@@ -154,12 +155,16 @@ async function executeSettle(winner) {
             if (part.openid.indexOf('test_') === 0) continue;
 
             var p = players[i];
+            // v3.0.48: 计算积分 — 善良获胜+1，邪恶获胜+2，输了0分
+            var points = part.won ? (part.faction === 'evil' ? 2 : 1) : 0;
+
             // 使用 RPC 函数原子更新统计
             var { error: rpcErr } = await state.supabase.rpc('upsert_game_stats', {
                 p_openid: part.openid,
                 p_nickname: p.nickname || '',
                 p_avatar_url: p.avatar_url || '',
-                p_won: part.won
+                p_won: part.won,
+                p_points: points
             });
 
             if (rpcErr) {
