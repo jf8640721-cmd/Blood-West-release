@@ -84,8 +84,8 @@ var ROLES = [
     id: "gao_cuilan", name: "高翠兰", category: "townsfolk",
     ability: "猪猪宝贝：高翠兰与猪八戒同时在场时，二人互知身份。猪八戒不死，高翠兰不会死亡（晕眩不可打断羁绊）",
     balanceTags: ["info","protection"],
-    abilityType: "passive", nightOrder: null, firstNightOrder: null,
-    needsChoice: false, isDizzyable: true, deathImmune: true,
+    abilityType: "passive", nightOrder: null, firstNightOrder: 8,
+    needsChoice: false, firstNightNeedsChoice: false, isDizzyable: true, deathImmune: true,
     inheritsDemon: false, teamSynergy: "猪猪宝贝",
     description: "高翠兰与猪八戒的羁绊使她获得死亡免疫——只要猪八戒活着，她就安全。二人开场互知身份。",
     tips: "告知双方彼此身份；猪八戒死亡后高翠兰的保护立即失效"
