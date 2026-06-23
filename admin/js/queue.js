@@ -439,8 +439,16 @@ async function executeProcessWithReply() {
     var replyContent = $('#process-reply-input').value.trim();
     closeProcessReplyModal();
 
+    // v3.0.54: 检测是否为白天队列项
+    var isDayItem = !!item.dayAction;
+    var itemPhase = isDayItem ? state.dayQueuePhase : state.queuePhase;
+
     item.status = 'processing';
-    renderQueuePanel();
+    if (isDayItem) {
+        renderDayQueuePanel();
+    } else {
+        renderQueuePanel();
+    }
 
     try {
         var resolutionText = replyContent || '主持人已处理';
@@ -459,7 +467,7 @@ async function executeProcessWithReply() {
             if (updateRes.error) {
                 console.error('更新技能行动失败:', updateRes.error);
                 item.status = 'submitted';
-                renderQueuePanel();
+                if (isDayItem) renderDayQueuePanel(); else renderQueuePanel();
                 return;
             }
         } else {
@@ -469,7 +477,7 @@ async function executeProcessWithReply() {
             if (item.resolution) resolutionParts.push('[' + item.resolution + ']');
             var insertData = {
                 room_id: state.room.id,
-                phase: state.queuePhase,
+                phase: itemPhase,
                 player_id: item.player.id,
                 role_id: item.roleObj.id,
                 direction: 'player_initiated',
@@ -488,12 +496,16 @@ async function executeProcessWithReply() {
             if (res.error) {
                 console.error('插入技能行动失败:', res.error);
                 item.status = 'submitted';
-                renderQueuePanel();
+                if (isDayItem) renderDayQueuePanel(); else renderQueuePanel();
                 return;
             }
             if (res.data && res.data.length > 0) {
                 item.actionId = res.data[0].id;
-                state.queueActions[item.actionId] = res.data[0];
+                if (isDayItem) {
+                    state.dayQueueActions[item.actionId] = res.data[0];
+                } else {
+                    state.queueActions[item.actionId] = res.data[0];
+                }
             }
         }
 
@@ -506,19 +518,28 @@ async function executeProcessWithReply() {
                     player_id: item.player.id,
                     direction: 'host_to_player',
                     content: replyContent,
-                    phase: state.queuePhase
+                    phase: itemPhase
                 });
         }
 
         item.status = 'completed';
-        state.queueProcessed++;
-
-        // 触发检测
-        await detectAndInsertTriggers(item);
+        if (isDayItem) {
+            // 白天队列：更新已处理计数
+            var dayDone = state.dayQueue.filter(function(q) { return q.status === 'completed' || q.status === 'skipped'; }).length;
+            state.dayQueueProcessed = dayDone;
+            // 也处理触发检测（白天触发型技能如提名/处决等）
+            await detectAndInsertTriggers(item);
+            renderDayQueuePanel();
+        } else {
+            state.queueProcessed++;
+            await detectAndInsertTriggers(item);
+            renderQueuePanel();
+        }
 
     } catch (e) {
         console.error('处理队列项失败:', e);
         item.status = 'submitted';
+        if (isDayItem) renderDayQueuePanel(); else renderQueuePanel();
     }
 }
 
@@ -1205,7 +1226,11 @@ function renderDayQueueButtons(item) {
     var buttons = '';
 
     if (item.interactionType === 'player_initiated') {
-        if (item.status === 'pending') {
+        if (item.status === 'submitted') {
+            // v3.0.54: 玩家已提交 → 主持人处理并回复
+            buttons += '<button class="btn btn-xs btn-queue-process" data-action="process" data-index="' + item.order + '">处理</button>';
+            buttons += '<button class="btn btn-xs btn-queue-skip" data-action="skip" data-index="' + item.order + '">跳过</button>';
+        } else if (item.status === 'pending') {
             buttons += '<button class="btn btn-xs btn-queue-manual" data-action="manual" data-index="' + item.order + '">手动处理</button>';
             buttons += '<button class="btn btn-xs btn-queue-skip" data-action="skip" data-index="' + item.order + '">跳过</button>';
         } else if (item.status === 'completed' || item.status === 'skipped') {
@@ -1244,6 +1269,10 @@ async function handleDayQueueAction(action, orderIndex) {
     if (!item) return;
 
     switch (action) {
+        case 'process':
+            // v3.0.54: 复用夜间"处理并回复"流程（弹窗回复）
+            await processQueueItem(item);
+            break;
         case 'manual':
             await manualProcessDayItem(item);
             break;

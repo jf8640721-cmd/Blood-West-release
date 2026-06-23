@@ -10,6 +10,13 @@
 - `roles.js`：15 个白天技能角色补充 `dayOrder` 字段（释迦/黄风怪/沙僧/唐太宗/普贤菩萨/东海龙王/白蛇/宁采臣/聂小倩/地藏菩萨/法海/灵吉菩萨/太白金星/青狮精/九头虫）
 - `dayOrder >= 20` 为主持人触发型（提名/处决阶段），走 Mode B 主持人反向询问通道
 
+### 🐛 修复白天技能处理无法回复
+
+- **根因**：白天队列 `renderDayQueueButtons` 缺少 `submitted` 状态分支，玩家提交后"处理"按钮不出现
+- `renderDayQueueButtons`：新增 `submitted` → "处理" + "跳过"按钮
+- `handleDayQueueAction`：新增 `process` case，复用夜间 `processQueueItem` 弹窗回复流程
+- `executeProcessWithReply`：支持白天队列（检测 `item.dayAction`，使用正确的 `state.dayQueuePhase`、`state.dayQueueProcessed`、`state.dayQueueActions`）
+
 ### 🐛 修复 Realtime 推送后多目标显示丢失
 
 - **根因**：`handleSkillActionRealtime` / `handleDaySkillActionRealtime` 未解析 `action_data` 中的 `targetNumbers` 数组
