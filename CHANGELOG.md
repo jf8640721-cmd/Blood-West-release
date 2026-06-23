@@ -15,6 +15,8 @@
 - **根因**：`handleSkillActionRealtime` / `handleDaySkillActionRealtime` 未解析 `action_data` 中的 `targetNumbers` 数组
 - 玩家提交多目标（如沙僧选2人）后，初始化加载时正常显示两个号码，但 Realtime 推送刷新后只显示 `targetPlayerId` 对应的单人
 - 修复：两个 Realtime 处理器同步新增 `action_data` 解析逻辑，提取 `targetNumber`/`targetNumbers`/`text` 填充 `targetRaw`
+- 小程序端目标徽章改为显示 `skillBarTargetDisplay`（如 "1号、5号"），修复多选后只显示一个号码的问题
+- 已提交状态保留目标显示文本，玩家可确认自己提交的目标
 
 ## v3.0.53 (2026-06-22)
 
