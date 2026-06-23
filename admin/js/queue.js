@@ -842,6 +842,23 @@ function handleSkillActionRealtime(action) {
         item.actionId = action.id;
         item.targetPlayerId = action.target_player_id;
 
+        // v3.0.54: 解析 action_data 提取多目标显示文本（与 loadQueueActions 保持一致）
+        var actionData = {};
+        try { actionData = JSON.parse(action.action_data || '{}'); } catch(e) {}
+        var displayParts = [];
+        if (actionData.targetNumber) {
+            displayParts.push(actionData.targetNumber + '号');
+        }
+        if (actionData.targetNumbers && actionData.targetNumbers.length > 0) {
+            displayParts.push(actionData.targetNumbers.map(function(n) { return n + '号'; }).join('、'));
+        }
+        if (actionData.text) {
+            displayParts.push(actionData.text);
+        }
+        if (displayParts.length > 0) {
+            item.targetRaw = displayParts.join(' ');
+        }
+
         if (action.status === 'submitted') {
             item.status = 'submitted';
         } else if (action.status === 'responded') {
@@ -1447,6 +1464,23 @@ function handleDaySkillActionRealtime(action) {
     if (item) {
         item.actionId = action.id;
         item.targetPlayerId = action.target_player_id;
+
+        // v3.0.54: 解析 action_data 提取多目标显示文本（与 loadDayQueueActions 保持一致）
+        var dayActionData = {};
+        try { dayActionData = JSON.parse(action.action_data || '{}'); } catch(e) {}
+        var dayDisplayParts = [];
+        if (dayActionData.targetNumber) {
+            dayDisplayParts.push(dayActionData.targetNumber + '号');
+        }
+        if (dayActionData.targetNumbers && dayActionData.targetNumbers.length > 0) {
+            dayDisplayParts.push(dayActionData.targetNumbers.map(function(n) { return n + '号'; }).join('、'));
+        }
+        if (dayActionData.text) {
+            dayDisplayParts.push(dayActionData.text);
+        }
+        if (dayDisplayParts.length > 0) {
+            item.targetRaw = dayDisplayParts.join(' ');
+        }
 
         if (action.status === 'submitted' || action.status === 'responded') {
             item.status = 'submitted';

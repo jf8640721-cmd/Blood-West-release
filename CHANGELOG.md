@@ -10,6 +10,12 @@
 - `roles.js`：15 个白天技能角色补充 `dayOrder` 字段（释迦/黄风怪/沙僧/唐太宗/普贤菩萨/东海龙王/白蛇/宁采臣/聂小倩/地藏菩萨/法海/灵吉菩萨/太白金星/青狮精/九头虫）
 - `dayOrder >= 20` 为主持人触发型（提名/处决阶段），走 Mode B 主持人反向询问通道
 
+### 🐛 修复 Realtime 推送后多目标显示丢失
+
+- **根因**：`handleSkillActionRealtime` / `handleDaySkillActionRealtime` 未解析 `action_data` 中的 `targetNumbers` 数组
+- 玩家提交多目标（如沙僧选2人）后，初始化加载时正常显示两个号码，但 Realtime 推送刷新后只显示 `targetPlayerId` 对应的单人
+- 修复：两个 Realtime 处理器同步新增 `action_data` 解析逻辑，提取 `targetNumber`/`targetNumbers`/`text` 填充 `targetRaw`
+
 ## v3.0.53 (2026-06-22)
 
 ### 🧹 移除私聊快捷回复
