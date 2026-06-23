@@ -1,5 +1,20 @@
 # 版本日志
 
+## v3.0.56 (2026-06-23)
+
+### 🆕 小程序端支持修改玩家号码
+
+- `chat.js`：昵称编辑弹窗新增号码输入框，首夜前可修改自己的 `player_number`
+  - 新增 `numberInput` 数据字段 + `onNumberInput` 方法
+  - `onNicknameTap` 打开弹窗时自动填入当前号码
+  - `onNicknameSave` 增加号码校验：非空时检查范围（1-19）和冲突（与同房间其他玩家比对）
+- `chat.wxml`：昵称弹窗在头像按钮下方增加号码输入行
+- `chat.wxss`：新增 `.number-row` / `.number-label` / `.number-input` 样式
+- `api.js`：新增 `updatePlayerNumber(playerId, newNumber)` 方法
+- 冲突时提示"该号码已被占用"，首夜后禁止修改（与改名牌一致）
+
+---
+
 ## v3.0.55 (2026-06-23)
 
 ### 🔧 模拟玩家昵称改为号码
