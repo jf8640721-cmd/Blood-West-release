@@ -365,6 +365,7 @@ body::before {
 .player-item.dragging { opacity: 0.4; }
 .player-item.drag-over { border-top: 2px solid var(--gold-primary); }
 
+.player-num { font-size: 13px; color: var(--gold-primary); font-weight: 600; flex-shrink: 0; min-width: 22px; text-align: center; }
 .player-name { font-size: 15px; color: var(--cream-dim); cursor: pointer; transition: color 0.2s; }
 .player-name:hover { color: var(--gold-primary); }
 .name-edit-icon { font-size: 12px; opacity: 0.35; transition: opacity 0.2s; }

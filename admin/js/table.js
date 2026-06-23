@@ -516,6 +516,7 @@ function renderPlayerList() {
             return `<li class="player-item ${activeClass} ${newClass}"
                         data-player-id="${p.id}" data-index="${index}" draggable="true">
                       <span class="drag-handle">⠿</span>
+                      <span class="player-num" title="点击修改号码和名牌">${p.player_number}</span>
                       <span class="player-name" onclick="editPlayerNickname('${p.id}');event.stopPropagation();" title="点击修改名牌">${escapeHtml(displayName)} <span class="name-edit-icon">✎</span></span>${roleNameHtml}
                       ${statusBadge}
                       <span class="new-msg-dot"></span>
