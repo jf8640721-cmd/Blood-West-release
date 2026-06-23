@@ -132,12 +132,7 @@ function bindEvents() {
 // 调试工具：模拟玩家加入（浏览器控制台调用）
 // 用法：debugAddTestPlayers(15) — 添加15名测试玩家
 // ============================================================
-const TEST_NICKNAMES = [
-    '孙悟空', '猪八戒', '沙和尚', '唐三藏', '白龙马',
-    '牛魔王', '铁扇公主', '红孩儿', '哪吒', '二郎神',
-    '嫦娥', '观音', '如来', '玉皇大帝', '王母娘娘',
-    '太白金星', '李靖', '金角大王', '银角大王', '蜘蛛精'
-];
+// 模拟玩家昵称直接使用号码（如 1号、2号…）
 
 // UI 按钮调用：弹出输入框，默认15人
 async function debugAddPlayers() {
@@ -194,7 +189,7 @@ async function debugAddTestPlayers(count) {
         players.push({
             room_id: state.room.id,
             openid: 'test_' + ts + '_' + i,
-            nickname: TEST_NICKNAMES[i] || ('测试玩家' + (i + 1))
+            nickname: (i + 1) + '号'
         });
     }
 
