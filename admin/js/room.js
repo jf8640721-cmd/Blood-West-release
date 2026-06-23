@@ -524,33 +524,92 @@ function renderRoomInfo() {
 }
 
 // ============================================================
-// 主持人编辑玩家名牌（始终允许，不受阶段限制）
+// 主持人编辑玩家名牌和号码（始终允许，不受阶段限制）
+// v3.0.57: 支持同时修改号码 — 输入格式 "号码 名牌"
 // ============================================================
 async function editPlayerNickname(playerId) {
     const player = state.players.find(p => p.id === playerId);
     if (!player) return;
 
     const currentName = player.nickname || '未命名玩家';
-    const newName = prompt('修改玩家 ' + player.player_number + ' 号名牌：', currentName);
-    if (newName === null) return; // 用户取消
+    const currentNumber = player.player_number;
+    const input = prompt(
+        '修改玩家信息（格式：号码 名牌）',
+        currentNumber + ' ' + currentName
+    );
+    if (input === null) return; // 用户取消
 
-    const trimmed = newName.trim();
+    const trimmed = input.trim();
     if (!trimmed) {
+        alert('信息不能为空');
+        return;
+    }
+
+    // v3.0.57: 解析"号码 名牌"格式
+    var newNumber = null;
+    var newName = null;
+    var firstSpace = trimmed.indexOf(' ');
+    var firstToken = firstSpace > 0 ? trimmed.substring(0, firstSpace) : trimmed;
+    var parsedNum = parseInt(firstToken);
+
+    if (!isNaN(parsedNum) && parsedNum >= 1 && parsedNum <= 19) {
+        // 第一段是有效号码
+        newNumber = parsedNum;
+        newName = firstSpace > 0 ? trimmed.substring(firstSpace + 1).trim() : '';
+    } else {
+        // 第一段不是号码，全部当名牌
+        newNumber = null;
+        newName = trimmed;
+    }
+
+    // 如果解析出新号码但名牌为空，保留原名牌
+    if (newNumber !== null && !newName) {
+        newName = currentName;
+    }
+
+    // 名牌不能为空
+    if (!newName) {
         alert('名牌不能为空');
         return;
     }
 
-    const { error } = await state.supabase
+    // 号码冲突检查
+    if (newNumber !== null && newNumber !== currentNumber) {
+        var conflict = state.players.some(function(p) {
+            return p.player_number === newNumber && p.id !== playerId;
+        });
+        if (conflict) {
+            alert('该号码已被占用，请选择其他号码');
+            return;
+        }
+    }
+
+    // 组装更新字段
+    var updates = {};
+    var needUpdate = false;
+    if (newNumber !== null && newNumber !== currentNumber) {
+        updates.player_number = newNumber;
+        needUpdate = true;
+    }
+    if (newName !== currentName) {
+        updates.nickname = newName;
+        needUpdate = true;
+    }
+
+    if (!needUpdate) return; // 无变化
+
+    var { error } = await state.supabase
         .from('players')
-        .update({ nickname: trimmed })
+        .update(updates)
         .eq('id', playerId);
 
     if (error) {
-        showError('修改名牌', error);
+        showError('修改玩家信息', error);
         return;
     }
 
     // 本地乐观更新
-    player.nickname = trimmed;
+    if (updates.player_number !== undefined) player.player_number = updates.player_number;
+    if (updates.nickname !== undefined) player.nickname = updates.nickname;
     renderRoundTable();
 }
