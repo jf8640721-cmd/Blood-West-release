@@ -1430,3 +1430,10 @@ body::before {
     border-color: #f05848;
     box-shadow: 0 0 18px rgba(240, 80, 60, 0.2);
 }
+
+/* v3.0.61: 历史记录子技能名 */
+.history-action-skill {
+    color: var(--gold-pale, #d4a843);
+    font-size: 0.9em;
+    font-weight: 500;
+}

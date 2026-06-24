@@ -172,6 +172,11 @@ function renderHistoryActionRow(action, orderNum) {
     html += '<span class="history-action-player">' + escapeHtml(playerInfo.label) + '</span>';
     html += '<span class="history-action-role seat-role-' + roleCategory + '">' + escapeHtml(roleName) + '</span>';
 
+    // v3.0.61: 显示子技能名
+    if (actionData.skillName) {
+        html += '<span class="history-action-skill"> · ' + escapeHtml(actionData.skillName) + '</span>';
+    }
+
     if (targetInfo) {
         html += '<span class="history-action-arrow">→</span>';
         html += '<span class="history-action-target">' + escapeHtml(targetInfo.label) + '</span>';

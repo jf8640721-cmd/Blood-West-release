@@ -261,8 +261,16 @@ function renderQueueRow(item, index) {
         statusClass = 'status-awaiting';
     }
 
+    // v3.0.61: 从 action_data 提取子技能名
+    var specificSkillName = null;
+    if (item.actionId && state.queueActions[item.actionId]) {
+        var ad = {};
+        try { ad = JSON.parse(state.queueActions[item.actionId].action_data || '{}'); } catch(e) {}
+        specificSkillName = ad.skillName || null;
+    }
+
     // 行动描述 + 目标 + 备注（三者紧贴）
-    var actionDesc = getSkillShortName(r);
+    var actionDesc = specificSkillName || getSkillShortName(r);
     var targetHtml = '';
     var noteHtml = '';
 
@@ -412,7 +420,15 @@ function showProcessReplyModal(item) {
 
     // 构建提交摘要
     var r = item.roleObj;
-    var skillName = getSkillShortName(r);
+
+    // v3.0.61: 从 action_data 提取子技能名
+    var specificSkill = null;
+    if (item.actionId && state.queueActions[item.actionId]) {
+        var ad = {};
+        try { ad = JSON.parse(state.queueActions[item.actionId].action_data || '{}'); } catch(e) {}
+        specificSkill = ad.skillName || null;
+    }
+    var skillName = specificSkill || getSkillShortName(r);
     var targetText = item.targetRaw || '';
     if (!targetText && item.targetPlayerId) {
         var tp = state.players.find(function(p) { return p.id === item.targetPlayerId; });
@@ -631,7 +647,13 @@ async function sendHostPrompt(item) {
     if (!state.room) return;
     try {
         var r = item.roleObj;
-        var triggerMsg = '【' + r.name + '·' + getSkillShortName(r) + '】触发：请选择是否发动技能';
+        // v3.0.61: 多技能角色显示技能列表
+        var skillLabel = getSkillShortName(r);
+        if (hasMultipleSkills(r)) {
+            var skillNames = parseSubSkills(r.ability).map(function(s) { return s.name; });
+            skillLabel = skillNames.join('/');
+        }
+        var triggerMsg = '【' + r.name + '·' + skillLabel + '】触发：请选择是否发动技能';
 
         // 创建 host_prompted 记录
         var insertData = {
@@ -1251,7 +1273,15 @@ function renderDayQueueRow(item, index) {
         statusClass = 'status-skipped';
     }
 
-    var actionDesc = da.dayAbility.split('：')[0] || getSkillShortName(r);
+    // v3.0.61: 从 action_data 提取子技能名
+    var specificSkillName = null;
+    if (item.actionId && state.dayQueueActions[item.actionId]) {
+        var ad = {};
+        try { ad = JSON.parse(state.dayQueueActions[item.actionId].action_data || '{}'); } catch(e) {}
+        specificSkillName = ad.skillName || null;
+    }
+
+    var actionDesc = specificSkillName || da.dayAbility.split('：')[0] || getSkillShortName(r);
     var targetHtml = '';
     var noteHtml = '';
 

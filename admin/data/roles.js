@@ -926,4 +926,54 @@ var ROLES = [
 var ROLES_BY_ID = {};
 ROLES.forEach(function(r) { ROLES_BY_ID[r.id] = r; });
 
+// ============================================================
+// v3.0.61: 多技能解析工具
+// ============================================================
+
+/**
+ * 解析角色的 ability 字符串为子技能对象数组
+ * 输入："归元：全局一次，重置一名玩家的技能到初始状态；化墟：全局一次，可使一名死亡玩家使用一次技能"
+ * 输出：[{name:"归元", description:"全局一次，重置一名玩家的技能到初始状态"}, {name:"化墟", description:"..."]]
+ * 单技能角色返回单元素数组，无 ability 返回 [{name:'', description:''}]
+ */
+function parseSubSkills(abilityStr) {
+    if (!abilityStr) return [{ name: '', description: '' }];
+    // 按中文/英文分号分割
+    var parts = abilityStr.split(/[；;]/);
+    return parts.map(function(part) {
+        var trimmed = part.trim();
+        if (!trimmed) return null;
+        // 按第一个中文/英文冒号分割 name: description
+        var colonMatch = trimmed.match(/^([^：:]+)[：:](.*)$/);
+        if (colonMatch) {
+            return {
+                name: colonMatch[1].trim(),
+                description: colonMatch[2].trim()
+            };
+        }
+        // 无冒号回退：整段作为 name
+        return { name: trimmed.substring(0, 10), description: trimmed };
+    }).filter(Boolean);
+}
+
+/**
+ * 检查角色是否有多个子技能
+ */
+function hasMultipleSkills(roleObj) {
+    if (!roleObj || !roleObj.ability) return false;
+    return parseSubSkills(roleObj.ability).length > 1;
+}
+
+/**
+ * 根据索引获取子技能名
+ */
+function getSubSkillName(roleObj, index) {
+    if (!roleObj || !roleObj.ability) return null;
+    var skills = parseSubSkills(roleObj.ability);
+    if (index != null && index >= 0 && index < skills.length) {
+        return skills[index].name;
+    }
+    return null;
+}
+
 // 西游纪角色数据加载完成（共 88 个角色）
