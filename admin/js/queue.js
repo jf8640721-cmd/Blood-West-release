@@ -317,6 +317,7 @@ function renderQueueButtons(item) {
             buttons += '<button class="btn btn-xs btn-queue-process" data-action="process" data-index="' + item.order + '">处理</button>';
             buttons += '<button class="btn btn-xs btn-queue-skip" data-action="skip" data-index="' + item.order + '">跳过</button>';
         } else if (item.status === 'pending') {
+            buttons += '<button class="btn btn-xs btn-queue-send-info" data-action="send-info" data-index="' + item.order + '">💬 发送信息</button>';
             buttons += '<button class="btn btn-xs btn-queue-manual" data-action="manual" data-index="' + item.order + '">手动处理</button>';
             buttons += '<button class="btn btn-xs btn-queue-skip" data-action="skip" data-index="' + item.order + '">跳过</button>';
         } else if (item.status === 'completed' || item.status === 'skipped') {
@@ -377,6 +378,9 @@ async function handleQueueAction(action, orderIndex) {
             break;
         case 'prompt':
             await sendHostPrompt(item);
+            break;
+        case 'send-info':
+            await sendInfoPrompt(item);
             break;
         case 'confirm':
             await confirmPassiveItem(item);
@@ -666,6 +670,65 @@ async function sendHostPrompt(item) {
 
     } catch (e) {
         console.error('发送技能询问失败:', e);
+    }
+    renderQueuePanel();
+}
+
+// ============================================================
+// v3.0.58: 主持人发送自定义信息给玩家（player_initiated 角色用）
+// ============================================================
+async function sendInfoPrompt(item) {
+    if (!state.room) return;
+    var r = item.roleObj;
+    var defaultMsg = '【' + r.name + '】请根据信息做出选择';
+    var infoText = prompt('输入发送给玩家的信息：', defaultMsg);
+    if (!infoText) return; // 用户取消
+
+    try {
+        // 创建 host_prompted 记录
+        var insertData = {
+            room_id: state.room.id,
+            phase: state.queuePhase,
+            player_id: item.player.id,
+            role_id: r.id,
+            direction: 'host_prompted',
+            action_type: 'trigger_prompt',
+            action_data: JSON.stringify({ prompt: infoText }),
+            status: 'awaiting_response'
+        };
+        var res = await state.supabase
+            .from('skill_actions')
+            .insert(insertData)
+            .select();
+
+        if (res.error) {
+            console.error('创建信息记录失败:', res.error);
+            return;
+        }
+
+        if (res.data && res.data.length > 0) {
+            item.actionId = res.data[0].id;
+            state.queueActions[item.actionId] = res.data[0];
+        }
+
+        // 发送系统消息到玩家聊天
+        await state.supabase
+            .from('messages')
+            .insert({
+                room_id: state.room.id,
+                player_id: item.player.id,
+                direction: 'host_to_player',
+                content: '💬 ' + infoText,
+                phase: state.queuePhase
+            });
+
+        // 更新玩家 pending_prompt 状态
+        await updatePlayerPendingPrompt(item.player.id, true);
+
+        item.status = 'awaiting';
+
+    } catch (e) {
+        console.error('发送信息失败:', e);
     }
     renderQueuePanel();
 }
@@ -1231,6 +1294,7 @@ function renderDayQueueButtons(item) {
             buttons += '<button class="btn btn-xs btn-queue-process" data-action="process" data-index="' + item.order + '">处理</button>';
             buttons += '<button class="btn btn-xs btn-queue-skip" data-action="skip" data-index="' + item.order + '">跳过</button>';
         } else if (item.status === 'pending') {
+            buttons += '<button class="btn btn-xs btn-queue-send-info" data-action="send-info" data-index="' + item.order + '">💬 发送信息</button>';
             buttons += '<button class="btn btn-xs btn-queue-manual" data-action="manual" data-index="' + item.order + '">手动处理</button>';
             buttons += '<button class="btn btn-xs btn-queue-skip" data-action="skip" data-index="' + item.order + '">跳过</button>';
         } else if (item.status === 'completed' || item.status === 'skipped') {
@@ -1281,6 +1345,9 @@ async function handleDayQueueAction(action, orderIndex) {
             break;
         case 'trigger':
             await triggerDayItem(item);
+            break;
+        case 'send-info':
+            await sendInfoPrompt(item);
             break;
         case 'undo':
             await undoDayQueueItem(item);

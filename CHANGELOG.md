@@ -1,5 +1,21 @@
 # 版本日志
 
+## v3.0.58 (2026-06-24)
+
+### 🆕 增强 Mode B：主持人发送自定义信息 → 玩家阅读 → 行动
+
+- **新增**"💬 发送信息"按钮：`player_initiated` 角色在 `pending` 状态时，主持人可点击发送自定义信息给玩家
+- `queue.js`：新增 `sendInfoPrompt(item)` 函数 — 弹出输入框让主持人输入信息文本 → INSERT `skill_actions`（`direction: host_prompted`, `status: awaiting_response`）→ 设置 `pending_prompt` → 同时发消息到玩家私聊
+- `queue.js`：`renderQueueButtons` + `renderDayQueueButtons` 均增加"发送信息"按钮
+- `handleQueueAction` + `handleDayQueueAction` 新增 `send-info` case
+- **小程序端无需改动**：Mode B 已支持显示 `skillBarPromptText` + 目标选择 + 回应
+
+**使用场景**：
+- 太上老君 Night 1：主持人发送"你炼出了仙丹" → 玩家阅读 → Night 2 主动使用
+- 巨灵神首夜：主持人发送角色信息 → 玩家了解后提交选择
+
+---
+
 ## v3.0.57 (2026-06-23)
 
 ### 🆕 Web 端支持修改玩家号码
