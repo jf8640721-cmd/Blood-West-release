@@ -147,7 +147,7 @@ var ROLES = [
     ability: "归元：全局一次，重置一名玩家的技能到初始状态；化墟：全局一次，可使一名死亡玩家使用一次技能（外来者+1）",
     outsiderModifier: 1,
     balanceTags: ["support"],
-    abilityType: "active", nightOrder: 14, firstNightOrder: null, firstNightBlocked: true,
+    abilityType: "active", nightOrder: 14, dayOrder: 14, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "菩提祖师拥有两项强大的全局一次能力：归元可重置技能，化墟可让死者再次行动。",

@@ -1042,6 +1042,7 @@ var DAY_ACTIONS = {
     nie_xiaoqian:     { dayOrder: 16, timing: '全局一次', dayAbility: '怨魂日行：只有你和死者可提名投票，处决阶段你死亡' },
     dizang_pusa:      { dayOrder: 17, timing: '全局一次', dayAbility: '彼岸花：在死者上种植，当夜获得其技能' },
     fa_hai:           { dayOrder: 18, timing: '全局一次', dayAbility: '大威天龙/大罗法咒：公开宣布，杀恶魔或爪牙（二选一）' },
+    puti_zushi:       { dayOrder: 14, timing: '全局一次', dayAbility: '归元/化墟：重置一名玩家技能或让死者发动一次技能（外来者+1）' },
     lingji_pusa:      { dayOrder: 19, timing: '全局一次', dayAbility: '轮回：公开宣布，秘密选死者唤醒灵魂' },
 
     // 提名/处决阶段
