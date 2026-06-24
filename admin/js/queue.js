@@ -527,6 +527,10 @@ async function executeProcessWithReply() {
         }
 
         item.status = 'completed';
+
+        // v3.0.59: 清除玩家的 pending_prompt 标记，防止残留导致下夜技能栏不弹出
+        await updatePlayerPendingPrompt(item.player.id, false);
+
         if (isDayItem) {
             // 白天队列：更新已处理计数
             var dayDone = state.dayQueue.filter(function(q) { return q.status === 'completed' || q.status === 'skipped'; }).length;
@@ -553,6 +557,9 @@ async function executeProcessWithReply() {
 async function skipQueueItem(item) {
     item.status = 'skipped';
     state.queueProcessed++;
+
+    // v3.0.59: 清除玩家的 pending_prompt 标记，防止残留导致下夜技能栏不弹出
+    await updatePlayerPendingPrompt(item.player.id, false);
 
     // 可选：在数据库记录跳过
     if (state.room && item.interactionType !== 'passive_auto') {

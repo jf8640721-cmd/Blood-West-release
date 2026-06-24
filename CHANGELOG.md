@@ -1,5 +1,15 @@
 # 版本日志
 
+## v3.0.59 (2026-06-24)
+
+### 🐛 修复：下一夜小程序技能栏不弹出
+
+- **问题**：主持人用"💬 发送信息"触发 Mode B 并处理完毕后，`skill_states.pending_prompt` 残留为 `true`，导致下一夜 Mode A 被阻塞，技能栏不显示
+- `admin/js/queue.js`：`executeProcessWithReply()` 和 `skipQueueItem()` 完成后调用 `updatePlayerPendingPrompt(id, false)` 清除标记
+- `miniprogram/pages/chat/chat.js`：`evaluateSkillBar()` 增加防御逻辑 — 当 `hasPendingPrompt=true` 但无实际 `awaiting_response` 记录时，忽略残留标记继续评估 Mode A
+
+---
+
 ## v3.0.58 (2026-06-24)
 
 ### 🆕 增强 Mode B：主持人发送自定义信息 → 玩家阅读 → 行动
