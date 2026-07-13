@@ -940,7 +940,7 @@ function parseSubSkills(abilityStr) {
     if (!abilityStr) return [{ name: '', description: '', isOncePerGame: false }];
     // 按中文/英文分号分割
     var parts = abilityStr.split(/[；;]/);
-    return parts.map(function(part) {
+    return parts.map(function(part, idx) {
         var trimmed = part.trim();
         if (!trimmed) return null;
         // 按第一个中文/英文冒号分割 name: description
@@ -950,12 +950,13 @@ function parseSubSkills(abilityStr) {
             return {
                 name: colonMatch[1].trim(),
                 description: desc,
-                isOncePerGame: /^全局一次/.test(desc)  // v3.0.64: 标记是否全局一次
+                isOncePerGame: /^全局一次/.test(desc),  // v3.0.64: 标记是否全局一次
+                _originalIndex: idx                      // v3.0.64: 保留原始索引，过滤后仍可定位
             };
         }
         // 无冒号回退：整段作为 name
         var rawName = trimmed.substring(0, 10);
-        return { name: rawName, description: trimmed, isOncePerGame: false };
+        return { name: rawName, description: trimmed, isOncePerGame: false, _originalIndex: idx };
     }).filter(Boolean);
 }
 
