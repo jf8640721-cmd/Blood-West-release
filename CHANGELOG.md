@@ -1,5 +1,14 @@
 # 版本日志
 
+## v3.0.63 (2026-07-13)
+
+### 🐛 修复：多技能角色点击第二个子技能自动跳回第一个
+
+- **问题**：`evaluateSkillBar()` 中 `prevMode` 和 `phaseChanged` 在使用之后才赋值，JS var 提升导致始终为 `undefined`，`selectedSkillIdx` 永远归零
+- 将 `prevMode`/`prevPhase`/`phaseChanged` 赋值移到 `selectedSkillIdx` 计算之前
+
+---
+
 ## v3.0.62 (2026-07-13)
 
 ### 🐛 修复：菩提祖师白天技能栏仍不弹出（补 v3.0.60 遗漏）
