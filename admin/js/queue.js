@@ -547,6 +547,15 @@ async function executeProcessWithReply() {
         // v3.0.59: 清除玩家的 pending_prompt 标记，防止残留导致下夜技能栏不弹出
         await updatePlayerPendingPrompt(item.player.id, false);
 
+        // v3.0.64: 双保险 — Web 端也标记"全局一次"子技能已用
+        if (item.actionId && state.queueActions[item.actionId]) {
+            var adForMark = {};
+            try { adForMark = JSON.parse(state.queueActions[item.actionId].action_data || '{}'); } catch(e) {}
+            if (adForMark.skillIndex != null) {
+                await markSubSkillUsed(item.player.id, adForMark.skillIndex);
+            }
+        }
+
         if (isDayItem) {
             // 白天队列：更新已处理计数
             var dayDone = state.dayQueue.filter(function(q) { return q.status === 'completed' || q.status === 'skipped'; }).length;
@@ -875,6 +884,29 @@ async function updatePlayerPendingPrompt(playerId, value) {
         }
     } catch (e) {
         console.error('更新 pending_prompt 失败:', e);
+    }
+}
+
+// ============================================================
+// v3.0.64: 标记"全局一次"子技能已用（读取→追加→写入，双保险）
+// ============================================================
+async function markSubSkillUsed(playerId, skillIndex) {
+    if (skillIndex == null || skillIndex < 0) return;
+    if (!state.room) return;
+    try {
+        var skillState = await getPlayerSkillState(playerId);
+        if (!skillState) return;
+        var used = [];
+        try { used = JSON.parse(skillState.used_sub_skills || '[]'); } catch(e) {}
+        if (used.indexOf(skillIndex) === -1) {
+            used.push(skillIndex);
+            await state.supabase
+                .from('skill_states')
+                .update({ used_sub_skills: JSON.stringify(used) })
+                .eq('id', skillState.id);
+        }
+    } catch (e) {
+        console.error('markSubSkillUsed 失败:', e);
     }
 }
 

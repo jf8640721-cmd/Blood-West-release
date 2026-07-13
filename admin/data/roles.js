@@ -147,7 +147,7 @@ var ROLES = [
     ability: "归元：全局一次，重置一名玩家的技能到初始状态；化墟：全局一次，可使一名死亡玩家使用一次技能（外来者+1）",
     outsiderModifier: 1,
     balanceTags: ["support"],
-    abilityType: "active", nightOrder: 14, dayOrder: 14, firstNightOrder: null, firstNightBlocked: true,
+    abilityType: "once_per_game", nightOrder: 14, dayOrder: 14, firstNightOrder: null, firstNightBlocked: true,
     needsChoice: true, isDizzyable: true, deathImmune: false,
     inheritsDemon: false, teamSynergy: null,
     description: "菩提祖师拥有两项强大的全局一次能力：归元可重置技能，化墟可让死者再次行动。",
@@ -937,7 +937,7 @@ ROLES.forEach(function(r) { ROLES_BY_ID[r.id] = r; });
  * 单技能角色返回单元素数组，无 ability 返回 [{name:'', description:''}]
  */
 function parseSubSkills(abilityStr) {
-    if (!abilityStr) return [{ name: '', description: '' }];
+    if (!abilityStr) return [{ name: '', description: '', isOncePerGame: false }];
     // 按中文/英文分号分割
     var parts = abilityStr.split(/[；;]/);
     return parts.map(function(part) {
@@ -946,13 +946,16 @@ function parseSubSkills(abilityStr) {
         // 按第一个中文/英文冒号分割 name: description
         var colonMatch = trimmed.match(/^([^：:]+)[：:](.*)$/);
         if (colonMatch) {
+            var desc = colonMatch[2].trim();
             return {
                 name: colonMatch[1].trim(),
-                description: colonMatch[2].trim()
+                description: desc,
+                isOncePerGame: /^全局一次/.test(desc)  // v3.0.64: 标记是否全局一次
             };
         }
         // 无冒号回退：整段作为 name
-        return { name: trimmed.substring(0, 10), description: trimmed };
+        var rawName = trimmed.substring(0, 10);
+        return { name: rawName, description: trimmed, isOncePerGame: false };
     }).filter(Boolean);
 }
 

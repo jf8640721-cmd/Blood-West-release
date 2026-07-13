@@ -1,5 +1,27 @@
 # 版本日志
 
+## v3.0.64 (2026-07-13)
+
+### 🆕 多技能角色独立一次性追踪系统
+
+`once_per_game_used` 列存在但从未被写入的致命缺陷已修复。新增 `used_sub_skills` 机制，按子技能粒度追踪"全局一次"使用状态。
+
+**7 个角色受此机制管理**：
+- **类别A（全部子技能均为全局一次）**：菩提祖师(`active`→`once_per_game`)、姜子牙、法海、宁采臣 — 用完所有子技能后隐藏技能栏
+- **类别B（混合型）**：嫦娥(月神)、蜘蛛精(迷魂阵)、九头虫(夺舍) — 全局一次子技能用过即消失，每夜可用的始终保留
+
+**`parseSubSkills()` 增强**：返回对象新增 `isOncePerGame` 标记（description 以"全局一次"开头自动识别）
+
+**数据流**：
+- `miniprogram/pages/chat/chat.js`：`evaluateSkillBar()` 解析 `used_sub_skills` 过滤已用子技能；`onSkillBarSubmitUse()`/`onSkillBarRespondUse()` 提交后追加索引
+- `miniprogram/utils/api.js`：新增 `upsertSkillState()` 自动判断 INSERT/UPDATE
+- `admin/js/queue.js`：新增 `markSubSkillUsed()`，主持处理时双保险标记
+
+**数据库变更**：
+- `skill_states` 新增 `used_sub_skills TEXT NOT NULL DEFAULT '[]'`（需手动执行 ALTER TABLE）
+
+---
+
 ## v3.0.63 (2026-07-13)
 
 ### 🐛 修复：多技能角色点击第二个子技能自动跳回第一个
