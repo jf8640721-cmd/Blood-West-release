@@ -1,5 +1,14 @@
 # 版本日志
 
+## v3.0.62 (2026-07-13)
+
+### 🐛 修复：菩提祖师白天技能栏仍不弹出（补 v3.0.60 遗漏）
+
+- **问题**：v3.0.60 仅为 `admin/data/roles.js` 添加了 `dayOrder: 14`，遗漏了 `miniprogram/utils/roles.js`，导致小程序端白天仍无法弹出技能栏
+- `miniprogram/utils/roles.js`：菩提祖师补充 `dayOrder: 14`
+
+---
+
 ## v3.0.61 (2026-06-24)
 
 ### 🆕 多技能选择系统
